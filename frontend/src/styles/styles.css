@@ -1,0 +1,2099 @@
+/* Estilo para el elemento "fantasma" que sigue al cursor */
+/* .sortable-ghost {
+  opacity: 0.4;
+  background-color: #c8ebfb;
+  border: 1px dashed #4a90e2;
+} */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+    font-family: "Winky Rough", sans-serif;
+    border-radius: 8px;
+}
+
+:root {
+    --color-verde: #4CAF50;
+    --color-azul: #2196F3;
+    --color-amarillo: #FFC107;
+    --color-naranja: #FF5722;
+    --color-rosa: #E91E63;
+    --color-purpura: #9C27B0;
+    --color-cian: #00BCD4;
+    --color-indigo: #673AB7;
+    --color-amarillo-brillante: #FFEB3B;
+    --color-marron: #795548;
+    --color-rojo: #F44336;
+    --color-azul-oscuro: #3F51B5;
+}
+
+/* Paleta de colores para las notas */
+.color-1 { 
+    color: #4CAF50; /* Verde */
+}
+.color-2 {
+    color: #2196F3; /* Azul */
+}
+.color-3 {
+    color: #FFC107; /* Amarillo */
+}
+.color-4 {
+    color: #FF5722; /* Naranja */
+}
+.color-5 {
+    color: #E91E63; /* Rosa */
+}
+.color-6 {
+    color: #9C27B0; /* Púrpura */
+}
+.color-7 {
+    color: #00BCD4; /* Cian */
+}
+.color-8 {
+    color: #673AB7; /* Índigo */
+}
+.color-9 {
+    color: #FFEB3B; /* Amarillo brillante */
+}
+.color-10 {
+    color: #795548; /* Marrón */
+}
+.color-11 {
+    color: #F44336; /* Rojo */
+}
+.color-12 {
+    color: #3F51B5; /* Azul oscuro */
+}
+
+
+
+body {
+    background-color: rgb(62, 65, 76);
+    background: whitesmoke;
+    background: #9e9e9e;
+    overflow: hidden;
+    /* display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 50px 1fr;
+    grid-template-areas: 
+        "header header"
+        "aside main"
+        ; */
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.pruebasFonts {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: absolute;
+    top: 70px;
+    right: 0;
+    display: none;
+    z-index: 9999;
+}
+
+.pruebasFonts > * {
+    font-size: 22px;
+}
+
+.fonts1 {
+    /* font-family: "Saira", sans-serif; */
+}
+
+.fonts2 {
+    font-family: "Saira", sans-serif;
+}
+
+.fonts3 {
+    font-family: "Exo 2", sans-serif;
+}
+
+.fonts4 {
+    font-family: "Comfortaa", sans-serif;
+}
+
+.fonts5 {
+    font-family: "Winky Rough", sans-serif;
+}
+
+.fonts6 {
+    font-family: "Varela Round", sans-serif;
+}
+
+.fonts7 {
+    font-family: "Maven Pro", sans-serif;
+}
+
+.fonts8 {
+    font-family: "Oswald", sans-serif;
+}
+
+.fonts9 {
+    font-family: "PT Sans Narrow", sans-serif;
+}
+
+.fonts10 {
+    font-family: "Barlow Condensed", sans-serif;
+}
+
+
+
+
+.header-aside-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000; /* Importante para que se muestre encima del main*/
+}
+
+
+/* HEADER BARRA */
+
+.header {
+    /* grid-area: header; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 1000;
+    background: #2196F3;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    /* border-bottom: 2px solid black; */
+}
+
+header * {
+    user-select: none;
+}
+
+.logo-container {
+    height: inherit;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.logo {
+    height: 100%;
+}
+
+.logo-text {
+    font-family: "Winky Rough", sans-serif;
+    /* font-family: "Varela Round", sans-serif; */
+    font-size: 28px;
+}
+
+
+
+
+
+
+.header-toolbar {
+    height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    /* border: 1px solid blue; */
+}
+
+.header-toolbar svg {
+    height: 34px;
+    aspect-ratio: 1;
+    /* stroke-width: 2px; */
+}
+
+.header-toolbar svg path {
+    stroke-width: 2px;
+}
+
+.header-toolbar * {
+    font-size: 14px;
+}
+
+.add-note {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: inherit;
+    padding: 0px 8px;
+}
+
+.add-note:hover {
+    background: #0072d0;
+}
+
+.add-note-text {
+    margin-left: 6px;
+    /* line-height: 1.1; */
+    /* white-space: nowrap; */
+}
+
+.search-container {
+    height: 70%;
+    padding: 0px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    background: whitesmoke;
+}
+
+.search-container > * {
+    height: 30px;
+}
+
+.search-container svg {
+    height: 28px;
+}
+
+.search-inpt {
+    /* height: 100%; */
+    background: inherit;
+    border: none;
+    /* border: 1px solid rgb(112, 112, 112); */
+    /* box-shadow: inset 0 0 1px 1px  gray; */
+    margin-left: 8px ;
+}
+
+.search-inpt:focus {
+    border: none;
+    outline: none;
+}   
+
+.search-inpt::placeholder {
+    color: #555;
+    padding: 0;
+    margin: 0;
+}
+
+#clear-search-button {
+    cursor: pointer;
+    visibility: hidden;
+    font-size: 30px;
+    height: 24px;
+}
+
+
+.delete-notes {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    height: 100%;
+    padding: 0px 8px;
+}
+
+.delete-notes:hover {
+    background: #0072d0;
+}
+
+.delete-note-text {
+    margin-left: 2px;
+}
+
+
+
+
+
+
+.perfil-container {
+    position: relative;
+    height: inherit;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: end;
+    align-items: center;
+    column-gap: 10px;
+    margin-right: 26px;
+    
+}
+
+.perfil-nombre {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.perfil-img {
+    height: 90%;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.perfil-options-dropdown {
+    position: absolute;
+    top: 60px;
+    /* left: 56px; */
+    /* left: 0; */
+    right: 0;
+    /* width: fit-content; */
+    background: whitesmoke;
+    border: 1px solid black;
+    padding: 3px;
+    z-index: 1000;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition: 120ms;
+}
+
+.perfil-options-dropdown.active {
+    pointer-events: unset;
+    user-select: unset;
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+}
+
+.perfil-option {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    padding: 3px 14px;
+    flex-grow: 1;
+    text-wrap: nowrap;
+    /* background :#8c8cff; */
+}
+
+.perfil-option:hover {
+    background: #ff7474;
+}
+
+
+
+
+
+
+/* ESTILO IMPORTANTE PARA EVITAR EL FLASH AL RECARGAR LA PAGINA. evitar Flash of Unstyled Content (FOUC) o, quiza, Flash of Unintended Transition (FOIT) */
+
+.transition-activate {
+    /* Estas son las dos propiedades que hacen transicion en el aside y el main */
+    transition: transform 200ms ease, margin-left 200ms ease;
+}
+
+
+/* ASIDE BARRA LATERAL IZQUIERDA */
+
+.aside {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    padding: 4px 0;
+    background: #91cdff;
+    border: 2px solid black;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    /* height: 80%; */
+    
+}
+
+.aside-hidden {
+    transform: translateX(-198px);
+}
+
+
+.aside-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+#aside__menuham {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 0px;
+    margin-right: 2px;
+}
+
+#aside__menuham svg {
+    cursor: pointer;
+    height: 30px;
+    margin: 4px 8px;
+    transition: 280ms;
+}
+
+#aside__menuham svg:hover {
+    /* transform: scale(1.1); */
+    scale: 1.2;
+}
+
+
+.aside__all-notes {
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: end;
+    padding: 10px 4px;
+    transition: 100ms;
+    background: #5bb5ff;
+}
+
+.aside__all-notes:hover {
+    background: #0083ed;
+}
+
+.aside__all-notes svg {
+    height: 26px;
+    /* transform: scale(-1.4, 1); */
+    margin-right: 4px;
+}
+
+.all-notes-text {
+    /* font-size: 18px; */
+    margin-right: 16px;
+    letter-spacing: 1px;
+}
+
+
+
+/* Scroll aqui */
+
+.notes-group__container {
+    flex-grow: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #007bff #f0f0f0;
+    margin: 0;
+}
+
+
+
+
+.notes-group__container::-webkit-scrollbar {
+    width: 10px; /* Grosor de la barra */
+}
+
+.notes-group__container::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Color del fondo de la barra */
+}
+
+.notes-group__container::-webkit-scrollbar-thumb {
+    background: #007bff; /* Color del "pulgar" (parte que se mueve) */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+
+
+
+.notes-group {
+    position: relative;
+    user-select: none;
+    /* cursor: pointer; */
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: start;
+    padding: 5px 0 5px 6px;
+    gap: 4px;
+    border-radius: 5px;
+    transition: 80ms;
+}
+
+.notes-group:hover {
+    background: #4ba4ed;
+}
+
+
+
+
+
+.notes-group.active,
+.aside__all-notes.active {
+    background-color: #0083ed; /* Un color de fondo más intenso para el activo */
+    color: white;
+}
+
+.notes-group.active .group-name,
+.aside__all-notes.active .all-notes-text {
+    color: white;
+}
+
+.notes-group.active .group-svg path {
+    stroke: white;
+}
+
+.aside__all-notes.active svg path {
+    stroke: white;
+}
+
+
+
+
+.notes-group svg, .notes-group svg path {
+    cursor: pointer;
+    aspect-ratio: 1;
+    height: 22px;
+    width: 22px;
+    stroke: #000000;
+    margin-right: 0;
+    padding: 0;
+    margin-left: 2px;
+    transition: 180ms;
+}
+
+.notes-group > svg:hover {
+    transform: scale(1.3);
+}
+
+.group-name {
+    font-size: 18px;
+    margin-left: 4px;
+    margin-right: 0;
+    font-weight: bold;
+    flex-grow: 1;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    padding: 3px 6px;
+    color: #000;
+
+    /* En caso de que los de arriba no funcione puedo usar este word-wrap: break-word; */
+    /* word-wrap: break-word; */
+}
+
+#no-notes-message {
+
+}
+
+
+.group-color-selector {
+    cursor: pointer;
+    height: 30px;
+    aspect-ratio: 1/1;
+    /* object-fit: cover; */
+    /* width: 30px; */
+    border-radius: 50%;
+    border: 1px dashed #000;
+    /* border: 2px solid whitesmoke; */
+    background-color: rgb(246, 242, 234);
+    padding: 0;
+    transition: 120ms;    
+}
+
+.group-color-selector:hover {
+    transform: scale(1.2);
+}
+
+
+.group-color-indicator {
+    border-radius: 0px;
+    height: 70%;
+    height: 30px;
+    aspect-ratio: 1 / 1;
+    width: 30px;
+    padding: 0;
+    margin-left: auto;
+    clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 25% 100%, 0% 50%);
+    /* Estado inicial, será cambiado por JS */
+    background-color: transparent; 
+    background-color: #f6f2ea;
+    /* border: 2px solid #ffffff; */
+    margin-left: 6px;
+}
+
+/* añadir etiqueta */
+
+.aside__add-group {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: end;
+    margin-top: 10px;
+    margin-right: 8px;
+    color: #d600a1;
+    width: fit-content;
+    margin-left: auto;
+}
+
+.aside__add-group__box {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: 100ms;
+
+}
+
+.aside__add-group__box:hover {
+    transform: scale(1.05);
+}
+
+.aside__add-group svg {
+    height: 34px;
+}
+
+.add-group__text {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+
+
+/* Estilos para el menú desplegable de selección de color */
+
+.color-palette-dropdown {
+    display: none;
+    /* position: absolute; */
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    z-index: 1000 ;
+    grid-template-columns: repeat(4, 1fr);
+    cursor: pointer;
+    transform: scale(0.8);
+    /* transition: 180ms; */
+    user-select: none;
+    pointer-events: none;
+}
+
+.color-palette-dropdown.active {
+    display: grid;
+    user-select: unset;
+    pointer-events: unset;
+}
+
+.color-option {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #ffffff;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: transform 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+
+
+/* Asigna colores de fondo usando los atributos data-color */
+/* 
+.color-option[data-color="#FFC0CB"] { background-color: #FFC0CB; }
+.color-option[data-color="#FF69B4"] { background-color: #FF69B4; }
+.color-option[data-color="#FF0000"] { background-color: #FF0000; }
+.color-option[data-color="#FFA500"]  { background-color: #FFA500; }
+.color-option[data-color="#FFFF00"] { background-color: #FFFF00; }
+.color-option[data-color="#ADFF2F"] { background-color: #ADFF2F; }
+.color-option[data-color="#008000"] { background-color: #008000; }
+.color-option[data-color="#00FFFF"] { background-color: #00FFFF; }
+.color-option[data-color="#0000FF"] { background-color: #0000FF; }
+.color-option[data-color="#8A2BE2"] { background-color: #8A2BE2; }
+.color-option[data-color="#EE82EE"] { background-color: #EE82EE; }
+.color-option[data-color="#800080"] { background-color: #800080; }
+.color-option[data-color="#A52A2A"] { background-color: #A52A2A; }
+.color-option[data-color="#808080"] { background-color: #808080; }
+.color-option[data-color="#000000"] { background-color: #000000; }
+.color-option[data-color="#FFFFFF"] { background-color: #FFFFFF; } */
+
+
+
+
+
+/* OPCIONES DE GRUPO DROPDOWN */
+
+.group-options-dropdown {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    /* top: calc(100% + 5px); */
+    /* left: 0; */
+    background-color: #fff;
+    border: 4px solid #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transform: scale(0.9);
+
+    user-select: none;
+    pointer-events: none;
+}
+
+.group-options-dropdown.active {
+    display: flex;
+    user-select: unset;
+    pointer-events: unset;
+}
+
+.group-options-dropdown svg, .group-option-dropdown svg path {
+    cursor: pointer;
+    aspect-ratio: 1;
+    height: 22px;
+    width: 22px;
+    stroke: #000000;
+    margin-right: 0;
+    padding: 0;
+    margin-left: 2px;
+    transition: 180ms;
+}
+
+.group-option {
+    cursor: pointer;
+    user-select: none;
+    border-radius: 3px;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 6px 8px;
+    column-gap: 8px;
+}
+
+.group-option:hover {
+    background: #3eb2ff;
+}
+
+
+
+
+
+
+
+/* CAMBIAR GRUPO DROPDOWN */
+
+.available-groups-dropdown {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 2px solid #1a3864; 
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2px 2px; 
+    min-width: 150px; 
+    max-height: 180px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    z-index: 1101;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 120ms ease-out; 
+
+    scrollbar-width: thin;
+    scrollbar-color: #2196f3 rgb(192, 192, 192);
+}
+
+.available-groups-dropdown.active {
+    pointer-events: unset;
+    user-select: unset;
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+}
+
+.available-groups {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 4px 16px 4px 6px;
+}
+
+.available-groups:hover {
+    background-color: #49adff;
+}
+
+.available-group-color {
+    width: 22px;
+    aspect-ratio: 1/1;
+    border: 1px solid rgb(0, 0, 0);
+}
+.available-group-name {
+    /* border: 1px solid red; */
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+
+
+/* MODAL DE CONFIRMACION AL ELIMINAR GRUPOS */
+
+.modal-delete-group {
+    display: none;
+    position: fixed; 
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-delete-group-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
+    text-align: center;
+}
+
+.delete-group-close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.delete-group-close-button:hover,
+.delete-group-close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-delete-group-content > h2 {
+    margin-bottom: 10px;
+}
+
+.modal-delete-group-content button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmDeleteGroupBtn {
+    background-color: #dc3545;
+    color: white;
+    transition: 180ms;
+}
+
+#confirmDeleteGroupBtn:hover {
+    transform: scale(1.1);
+    background-color: rgb(255, 108, 108);
+}
+
+#cancelDeleteGroupBtn {
+    background-color: #6c757d; /* Gris para cancelar */
+    color: white;
+    transition: 180ms;
+}
+
+#cancelDeleteGroupBtn:hover {
+    transform: scale(1.1);
+    background-color: rgb(196, 196, 196);
+}
+
+
+
+
+
+
+
+/* MAIN NOTAS */
+
+main {
+    background: #ffffff;
+    margin: 60px auto auto 250px;
+    height: calc(100vh - 60px);
+    /* width: calc(100vw - 250px); */
+    /* height: 100%; */
+    /* width: 100%; */
+
+    position: relative;
+    /* overflow-x: scroll; */
+    /* overflow-y: scroll; */
+
+    background: #008080;
+}
+
+.main-grow {
+    /* flex-grow: 1; */
+    margin-left: 52px;
+}
+
+.all-notes-container {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+
+    /* height: 1000px; */
+    display: none;
+}
+
+
+
+#no-notes-message {
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+    align-content: center;
+    /* margin: auto; */
+    /* border: 2px solid red; */
+}
+
+
+/* envoltorio de muuri */
+.grid-wrapper {
+    /* width: inherit; */
+    /* height: inherit; */
+    overflow-y: scroll;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 20px;
+    
+    /* width: 100%; */
+    height: 100%;
+
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    /* align-items: center; */
+
+    /* position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+
+
+    background: #0072d0;
+    /* background: #f3f3f3; */
+}
+
+
+/* Contenedor de muuri para notas fijadas*/
+.grid-pinned {
+    position: relative;
+    /* background: #87CEEB; */
+    width: 100%;
+    min-height: 0px;
+    margin-bottom: 60px;
+}
+
+/* Contenedor de muuri para notas no fijadas*/
+.grid {
+    position: relative;
+    /* background: #87CEEB; */
+    /* min-width: 900px; */
+    width: 100%;
+}
+
+
+
+
+
+
+/* Para que muuri posicione el elemento arrastrado por encima siempre */
+.muuri-item-dragging {
+    z-index: 3;
+}
+.muuri-item-hidden {
+    z-index: 0;
+}
+.muuri-item-releasing {
+    z-index: 2;
+}
+.muuri-item-placeholder {
+    z-index: 1;
+}
+
+
+
+
+/* Items de muuri */
+.note-card-container {
+    /* cursor: pointer; */
+    position: absolute;
+    width: 270px;
+    height: 190px;
+    /* padding: 4px 4px 10px 4px; */
+    margin: 10px;
+    /* padding: 6px 8px 8px 8px; */
+    /* padding: 4px; */
+    background: #edbcff;
+    border-radius: 6px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgb(117, 117, 117);
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    box-sizing: border-box;
+    /* transition: 200ms; */
+    /* unicode-bidi: isolate; */
+    transition: background 200ms;
+}
+
+.note-card {
+    width: inherit;
+    height: inherit;
+    padding: 4px 4px 10px 4px;
+    /* background: #edbcff; */
+    /* background: #d9d9d9; */
+    /* border-radius: 6px; */
+    /* box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2); */
+    /* border: 2px solid rgb(117, 117, 117); */
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    box-sizing: border-box;
+    transition: transform 200ms ease-in-out, background 200ms, opacity 200ms ease-in-out;
+}
+
+/* .note-card-container {
+    position: absolute;
+    width: 280px;
+    height: 190px;
+    padding: 6px 1px 8px 1px;
+    background: #edbcff;
+    border-radius: 6px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgb(117, 117, 117);
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin: 10px;
+} */
+
+.note-tools-container {
+    position: relative;
+    height: fit-content;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+    padding: 0 6px;
+    /* display: none; */
+}
+
+
+.note-multiple-selector {
+    background: white;
+    border: 2px solid rgb(99, 99, 99);
+    border: 3px solid rgba(29, 37, 255, 0.71);
+    border-radius: 50%;
+    height: 26px;
+    width: 26px;
+    aspect-ratio: 1/1;
+    position: absolute;
+    left: -15px;
+    top: -18px;
+    /* transition: transform 2000ms, color 2000ms; */
+}
+
+.note-multiple-selector:hover {
+    border: 3px solid rgb(30, 38, 255);
+    transform: scale(1.05);
+}
+
+
+/* ESTAS 2 CLASES SON PARA LAS OPCIONES QUE APARECEN AL HACER HOVER EN UNA NOTA CARD */
+.note-hidden-options {
+    opacity: 0;
+    transition: opacity 180ms, transform 200ms, border 200ms;
+}
+
+.note-card-container:hover .note-hidden-options,
+.note-card-container.is-selected .note-hidden-options {
+    opacity: 1;
+}
+
+
+
+
+.note-tools-right-side {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.note-tools-right-side * {
+    cursor: pointer;
+    height: 22px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 200ms;
+}
+
+.note-tools-right-side > *:hover {
+    transform: scale(1.26);
+}
+
+.note-group {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    /* width: fit-content; */
+    gap: 5px;
+    margin-left: 16px;
+}
+
+.note-group-color {
+    cursor: pointer;
+    height: 20px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: #f6f2ea; 
+    padding: 0;
+    transition: 120ms;
+}
+
+.note-group-color:hover {
+    transform: scale(1.2);
+}
+
+.note-group-name {
+    cursor: default;
+    font-size: 12px;
+    color: rgb(74, 74, 74);
+    width: fit-content;
+}
+
+.note-pin {
+}
+
+.note-pin > * {
+    height: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note-pinned {
+}
+
+.note-unpinned {
+    /* opacity: 0; */
+    /* transition: opacity 200ms ease-in-out; */
+}
+
+.note-options-btn {
+    /* opacity: 0; */
+    cursor: pointer;
+    fill: #000000;
+    color: #000000;
+}
+
+
+/* OPCIONES DE NOTA CARD DROPDOWN */
+
+.note-options-dropdown {
+    position: absolute;
+    right: 4%;
+    top: 14%;
+
+    display: flex;
+    width: 160px;
+    padding: 3px;
+    flex-direction: column;
+    background-color: #e7f7ff;
+    outline: 2px solid #000000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transform: scale(0.9);
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    /* transition: */
+        /* opacity 300ms ease-out, */
+        /* clip-path 400ms ease-in-out; */
+    font-size: 12px;
+}
+
+.note-options-dropdown.active-options-dropdown {
+    user-select: unset;
+    pointer-events: unset;
+    opacity: 1;
+    visibility: visible;
+    /* animation: noteOptions 100ms ease-in-out; */
+}
+
+/* 
+@keyframes noteOptions {
+    0% {
+        clip-path: inset(0 0 100% 0);
+    }
+    100% {
+        clip-path: inset(0 0 0 0);
+    }
+} */
+
+
+
+.note-options-dropdown svg, .note-options-dropdown svg path {
+    cursor: pointer;
+    aspect-ratio: 1;
+    height: 26px;
+    width: 26px;
+    stroke: #000000;
+    /* stroke: #e41010; */
+    margin-right: 0;
+    padding: 0;
+    margin-left: 2px;
+    transition: 180ms;
+}
+
+.note-options-dropdown span {
+    /* line-height: 1; */
+    display: flex;
+    flex-wrap: nowrap;
+    /* border: 1px solid red; */
+    padding: 0;
+    /* color: #e41010; */
+}
+
+
+.note-option {
+    cursor: pointer;
+    user-select: none;
+    /* border-radius: 3px; */
+    transition: transform 200ms;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 2px 3px;
+    column-gap: 8px;
+}
+
+.note-option:hover {
+    background: #3eb2ff;
+}
+
+
+
+.note-text {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 8px 16px;
+    /* gap: 4px; */
+}
+
+.note-title {
+    border-radius: 0;
+    /* margin-bottom: 4px; */
+    /* padding: 0 6px; */
+    color: #1c1c1c;
+    outline: none;
+    overflow: hidden;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 0.9;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    letter-spacing: 0.2px;
+    word-spacing: 3px;
+    /* word-break: break-all; */
+    text-overflow: ellipsis;
+    min-height: 0px;
+    max-height: 32px;
+    display: flex;
+    flex: 0 0 auto;
+    /* border: 1px solid red; */
+    margin-bottom: 10px;
+
+    /* --max-lines: 2;
+    --line-height: 0.9;
+      height: calc(var(--max-lines) * 1em * var(--line-height));
+      line-height: var(--line-height); */
+}
+
+.note-title:empty {
+    display: none;
+  }
+
+/* .note-title:focus {
+    border: 1px solid #007bff;
+    background-color: #eca9ff;
+    max-height: 150px;
+    white-space: normal;
+} */
+
+.note-body {
+    border-radius: 0;
+    /* padding: 2px 6px; */
+    /* margin: 4px 0; */
+    color: #080808;
+    outline: none;
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* height: 120px; */
+    /* max-height: 208px; */
+    /* flex: 1 0; */
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 400;
+    overflow-wrap: break-word;
+    /* word-break: break-all; */
+    text-overflow: ellipsis;
+    /* border: 1px solid red; */
+
+    /* display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5; */
+
+
+  --max-lines: 4;
+  --line-height: 1.3;
+    height: calc(var(--max-lines) * 1em * var(--line-height));
+    line-height: var(--line-height);
+}
+
+/* .note-body:focus {
+    border: 1px solid #007bff;
+    background-color: #eca9ff;
+    scrollbar-width:thin;
+} */
+
+.note-body::-webkit-scrollbar {
+    /* display: none;. */
+}
+
+.note-footer {
+    /* position: absolute; */
+    /* flex: 1; */
+    /* bottom: 6px; */
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
+    /* background: #4b1a5220; */
+    color: #000000;
+    /* flex: 0 0 28px; */
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: start;
+    /* padding: 1px 10px; */
+    padding: 1px 10px;
+    column-gap: 6px;
+    user-select: none;
+    overflow: hidden;
+    /* display: none; */
+}
+
+.note-footer * {
+    font-size: 10px;
+    font-family: "Oswald", sans-serif;
+    font-family: "PT Sans Narrow", sans-serif;
+    /* font-family: "Barlow Condensed", sans-serif; */
+    font-weight: 600;
+    letter-spacing: .6px;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    /* overflow: hidden; */
+}
+
+.note-last-modified {
+    padding: 2px 8px;
+    /* background: #4b1a5220; */
+    color: #4d4d4d;
+}
+
+.note-length {
+}
+
+.note-date-creation {
+}
+
+
+
+
+
+/* PARA QUE AL APARECER LA NUEVA NOTA TENGA UNA ANIMACION. */
+/* @keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    1% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+} */
+
+/* .note-fade {
+    animation: fadeInOut 200ms ease-in-out;
+} */
+
+
+
+
+
+
+/* Clase para la animación de eliminacion */
+/* IMPORTANTE: Si usas transition entonces debes cambiar en javascrip en la funcion eliminar el listener por transitionend, y si es animacion animatioend */
+.nota-eliminando {
+    /* opacity: 0; */
+    /* transform: scale(0.8); */
+    /* transition: opacity 0.5s ease-out, transform 0.5s ease-out; */
+    animation: deleteNote 400ms ease-in-out forwards;
+}
+
+@keyframes deleteNote {
+    0% {
+        /* opacity: 1; */
+        clip-path: inset(0 0 0 0);
+        /* width: 240px; */
+        /* transform: scale(1); */
+    }
+    50% {
+        clip-path: inset(0 100% 0 0);
+        width: 240px;
+    }
+    100% {
+        /* opacity: 1; */
+        clip-path: inset(0 100% 0 0);
+        width: 0;
+        /* transform: scale(1); */
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+/* AQUI COMIENZAN LOS ESTILOS DEL EDITOR DE NOTAS */
+/* AQUI COMIENZAN LOS ESTILOS DEL EDITOR DE NOTAS */
+/* AQUI COMIENZAN LOS ESTILOS DEL EDITOR DE NOTAS */
+/* AQUI COMIENZAN LOS ESTILOS DEL EDITOR DE NOTAS */
+.modal-editor {
+    position: absolute;
+    /* top: 60px;
+    left: 250px;
+    right: 0;
+    bottom: 0; */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: #00000034;
+    box-shadow: inset 0 0 20px 00px rgba(0, 0, 0, 0.386);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 900;
+
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 160ms;
+
+}
+
+.modal-editor.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+#editor {
+    height: 94%;
+    width: 70%;
+    background-color: #f6f2ea;
+    outline: 3px solid rgb(77, 77, 77);
+    padding: 12px 32px 4px 32px;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    overflow: hidden;
+    visibility: inherit;
+    transform: translateY(-20px);
+    transition: 200ms;
+}
+
+#editor.active {
+    visibility: visible;
+    transform: translateY(0px);
+}
+
+.editor-toolbar {
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.editor-tools-right {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: end;
+    align-items: center;
+    column-gap: 28px;
+}
+
+.editor-tools {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    column-gap: 6px;    
+}
+
+.editor-tools .group-color-selector {
+    height: 30px;
+    aspect-ratio: 1/1;
+}
+
+.editor-tools svg {
+    height: 30px;
+    aspect-ratio: 1/1;
+    /* object-fit: cover; */
+    transition: 180ms;
+    /* transition: 180ms; */
+    cursor: pointer;
+}
+
+.editor-tools svg:hover {
+    transform: scale(1.3);
+}
+
+#editor-group-color {
+    cursor: pointer;
+    position: relative;
+    height: 30px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: #f6f2ea; 
+
+    padding: 0;
+    transition: 120ms;
+}
+
+#editor-group-color:hover {
+    transform: scale(1.2);
+}
+
+#editor-group-name {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: #575757;
+    pointer-events: none;
+}
+
+#editor-pinned {
+    display: none;
+}
+
+#editor-unpinned {
+    display: none;
+}
+
+#editor-pinned.active {
+    display: block;
+}
+
+#editor-unpinned.active {
+    display: block;
+}
+
+#editor-save-btn {
+    padding: 4px 14px;
+    font-size: 0.8em;
+    /* font-weight: 600; */
+    cursor: pointer;
+}
+
+
+
+#editor-note {
+    /* position: relative; */
+    display: flex;
+    flex-direction: column;
+    /* width: 96%; */
+    flex: 1 0 auto;
+    /* border: 1px solid red; */
+}
+
+.editor-title {
+    position: relative;
+    cursor: text;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.416);
+    display: inline-block;
+    min-height: 30px;
+    /* max-height: 100px; */
+    margin: 0px 38px;
+    margin: 0px;
+    /* padding: 4px 12px; */
+    padding: 3px 5px;
+    /* padding-bottom: 6px; */
+    font-size: 1.4em;
+    font-weight: 600;
+    word-break: break-all;
+    line-height: 1em;
+    letter-spacing: 0.2px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    z-index: 1000;
+    /* border: 1px solid red; */
+
+    white-space: pre-wrap; /* Preserva espacios, tabulaciones y saltos de línea */
+    /* font-family: monospace; */
+    /* Opcional: para que las tabulaciones se vean uniformes */
+}
+
+.editor-title:focus {
+    outline: none;
+    /* background: #f3d8a5; */
+}
+
+.editor-title::before {
+    content: "Escribe el título de la nota...";
+    color: #999;
+    position: absolute;
+    top: 4px;
+    left: 9px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 100ms;
+    /* background: #000; */
+}
+
+.editor-title.active::before {
+    opacity: 1;
+}
+
+.editor-body {
+    position: relative;
+    cursor: text;
+    /* padding: 4px 18px; */
+    padding: 5px;
+    margin: 8px 0 4px 0;
+    display: inline-block;
+    flex: 1 0 0;
+    min-height: 40px;
+    /* border: 1px solid red; */
+    font-size: 1.1em;
+    /* letter-spacing: 0px; */
+    /* text-wrap: wrap; */
+    word-wrap: break-all;
+    overflow-wrap: break-word;
+    /* hyphens: auto; */
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 1000;
+    scrollbar-width: thin;
+    scrollbar-color: #5151ff #f3f3f3 ;
+
+    white-space: pre-wrap; /* Preserva espacios, tabulaciones y saltos de línea */
+    /* Opcional: para que las tabulaciones se vean uniformes */
+    /* font-family: monospace;  */
+
+    /* scroll-behavior: smooth; */
+}
+
+.editor-body:focus {
+    outline: none;
+    /* background: #f3d8a5; */
+}
+
+.editor-body::before {
+    content: "Escribe algo...";
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 100ms;
+    /* background: #000; */
+}
+
+.editor-body.active::before {
+    opacity: 1;
+}
+
+.editor-footer {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: start;
+    align-items: center;
+    /* border: 1px solid red; */
+    padding: 2px 10px;
+    margin-top: 6px;
+    column-gap: 6px;
+    /* font-family: "Oswald", sans-serif; */
+    /* font-family: "PT Sans Narrow", sans-serif; */
+    /* font-family: "Barlow Condensed", sans-serif; */
+}
+
+.editor-footer > * {
+    font-weight: 600;
+    /* font-family: "Oswald", sans-serif; */
+    /* font-family: "PT Sans Narrow", sans-serif; */
+    /* font-family: "Barlow Condensed", sans-serif; */
+    /* font-family: "Exo 2", sans-serif; */
+    /* font-family: "Saira", sans-serif; */
+    /* font-family: "Comfortaa", sans-serif; */
+    /* font-family: "Winky Rough", sans-serif; */
+    font-family: "Varela Round", sans-serif;
+    /* font-family: "Maven Pro", sans-serif; */
+    /* font-family: "Oswald", sans-serif; */
+    /* font-family: "PT Sans Narrow", sans-serif; */
+    /* font-family: "Barlow Condensed", sans-serif; */
+}
+
+.editor-info {
+    font-size: 12px;
+    font-weight: 200;
+    padding: 2px 20px;
+    background: #bba5002d;
+    display: flex;
+    justify-content: start;
+    user-select: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+    /* Paleta de colores */
+    /* --color-pink-light: #FFC0CB; */
+    --color-pink-hot: #FF69B4;
+    --color-red: #FF0000;
+    --color-orange: #FFA500;
+    --color-yellow: #FFFF00;
+    --color-green-yellow: #ADFF2F;
+    --color-green: #008000;
+    --color-cyan: #00FFFF;
+    --color-blue: #0000FF;
+    --color-blue-violet: #8A2BE2;
+    --color-violet: #EE82EE;
+    /* --color-purple: #800080; */
+    /* --color-brown: #A52A2A; */
+    /* --color-gray: #808080; */
+    --color-black: #000000;
+    /* --color-white: #FFFFFF; */
+  }
+
+
+
+
+  :root {
+    /* Tonos Rojos y Rosas */
+    /* --color-ruby-red: #E74C3C; */
+    /* --color-crimson: #C0392B; */
+    --color-magenta-bright: #FF00FF;
+    --color-deep-pink: #FF1493;
+    
+    /* Tonos Naranjas y Amarillos */
+    /* --color-sun-orange: #F39C12; */
+    --color-gold: #FFD700;
+    --color-lime-green: #32CD32;
+    /* --color-electric-yellow: #FFFF00; */
+  
+    /* Tonos Verdes y Azules */
+    --color-emerald-green: #2ECC71;
+    --color-teal: #008080;
+    --color-sky-blue: #3498DB;
+    --color-royal-blue: #00008B;
+  
+    /* Tonos Púrpuras y Marrones */
+    --color-purple-vivid: #8A2BE2;
+    /* --color-indigo: #4B0082; */
+    --color-chocolate: #D2691E;
+    --color-burgundy: #800020;
+  }
+
+
+  :root {
+    /* Tonos Rojos y Rosas */
+    --color-coral: #FF7F50;
+    --color-hot-pink: #FF69B4;
+    --color-crimson: #DC143C;
+    --color-rose-pastel: #F8BBD0;
+  
+    /* Tonos Naranjas y Amarillos */
+    --color-tangerine: #FFA07A;
+    --color-gold: #FFD700;
+    --color-lime: #00FF00;
+    --color-lemon-pastel: #FFFACD;
+  
+    /* Tonos Verdes y Azules */
+    --color-emerald: #50C878;
+    --color-teal: #008080;
+    --color-sky-blue: #87CEEB;
+    --color-navy: #000080;
+  
+    /* Tonos Púrpuras, Marrones y Neutro */
+    --color-lavender-pastel: #E6E6FA;
+    --color-indigo: #4B0082;
+    --color-sienna: #A0522D;
+    --color-black: #000000;
+  }
+
+
+
+
+
+
+   :root {
+    /* Tonos Rojos y Naranjas */
+    --color-pure-red: #FF0000;
+    --color-coral: #FF7F50;
+    --color-tangerine: #FFA07A;
+  
+    /* Tonos Amarillos y Verdes */
+    --color-gold: #FFD700;
+    --color-green-yellow: #ADFF2F;
+    --color-pure-green: #008000;
+   }
+
+
+
+
+
+
+
+
+
+
+
+/* ESTILOS PARA LA SELECCIÓN MÚLTIPLE DE NOTAS */
+
+/* Estilo para el círculo selector cuando la nota está seleccionada */
+.note-multiple-selector.is-selected-selector {
+    background-color: #007bff;
+    border-color: #0056b3;
+}
+
+/* Ocultar herramientas de la nota y mostrar selector en modo selección */
+body.selection-mode-active .note-card-container .note-tools-container {
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.selection-mode-active .note-card-container .note-multiple-selector {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Estilos para las notas NO seleccionadas en modo selección */
+body.selection-mode-active .note-card-container:not(.is-selected) {
+    transform: scale(0.95);
+    opacity: 0.6;
+    border-color: transparent;
+}
+
+/* Estilos para las notas SELECCIONADAS en modo selección */
+body.selection-mode-active .note-card-container.is-selected {
+    transform: scale(1);
+    opacity: 1;
+    border: 3px solid #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.5);
+}
+
+
+/* Icono de checkmark para el selector (usando un pseudo-elemento) */
+.note-multiple-selector.is-selected-selector::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 7px;
+    width: 4px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+
+
+
+/* Barra de herramientas para acciones de selección múltiple */
+#selection-toolbar {
+    position: fixed;
+    /* bottom: -100px; */
+    top: -140px; /* Oculto por defecto */
+    left: 50%;
+    transform: translateX(-50%);
+    /* width: fit-content; */
+    width: 100%;
+    height: 60px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    /* border-radius: 8px 8px 0 0; */
+    border-radius: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 1100;
+    transition: top 0.3s ease-in-out;
+}
+
+#selection-toolbar.visible {
+    top: 0; /* Visible */
+}
+
+#selection-count {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#selection-toolbar-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 14px;
+}
+
+#selection-toolbar button {
+    padding: 8px 46px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+
+#selection-toolbar svg {
+    height: 20px;
+}
+
+#delete-selected-btn {
+    background-color: #dc3545;
+    color: white;
+    stroke: white;
+    fill: white;
+
+}
+
+#delete-selected-btn path {
+    /* background-color: #dc3545; */
+    color: white;
+    stroke: white;
+    fill: white;
+}
+
+#duplicate-selected-btn {
+    background-color: #17a2b8; /* Un color cian para duplicar */
+    color: white;
+}
+
+#duplicate-selected-btn path {
+    color: white;
+    stroke: white;
+    fill: white;
+}
+
+#duplicate-selected-btn:hover {
+    background-color: #138496;
+}
+
+#delete-selected-btn:hover {
+    background-color: #c82333;
+}
+
+#cancel-selection-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+#cancel-selection-btn:hover {
+    background-color: #5a6268;
+}
+
+.selection-toolbar-span {
+    font-size: 12px;
+}
