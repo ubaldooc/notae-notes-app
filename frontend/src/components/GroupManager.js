@@ -9,24 +9,21 @@ import { guardarGrupoEnDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB, ac
 import { colorearActualizarGrupoEditor } from './NoteEditor.js';
 
 // import { actualizarInfoGrupoEnNoteCards, actualizarInfoGrupoEnNoteCardspecific, filtrarNotasPorGrupo } from './NoteCard.js';
-import { actualizarInfoGrupoEnNoteCards, actualizarInfoGrupoEnNoteCardspecific } from './NoteCard.js';
+import { actualizarInfoGrupoEnNoteCards, actualizarInfoGrupoEnNoteCard } from './NoteCard.js';
 
-import { validarIDOConvertirElemento } from '../utils.js';
+import { validarIDOConvertirElemento, activarAside } from '../utils.js';
 
-import { handleFilter, actualizarGrupoActivoUI } from './Filters.js';
+import { handleFilter, actualizarGrupoActivoUI } from './FilterManager.js';
 
-import Muuri from 'muuri';
+import { Modal } from './ModalManager.js';
+
+import { store } from '../services/store.js';
 
 import { gridUnpinned } from '../main.js';
 
 // Valores de grupo por defefcto
 const groupNameDefault = "Sin grupo";
 const groupColorDefault = "#f6f2ea";
-
-
-const aside = document.querySelector(".aside");
-const main = document.querySelector(".main");
-const AsideMenuHam = document.getElementById("aside__menuham");
 
 
 // Elementos del editor
@@ -70,28 +67,6 @@ const editorcharCounter = document.getElementById("editor-character-counter");
 
 
 
-
-
-
-// ACTIVAR EL ASIDE
-const activarAside = () => {
-    // main.classList.remove("no-transition");
-    // aside.classList.remove("no-transition");
-    aside.classList.add("transition-activate");
-    main.classList.add("transition-activate");
-
-    aside.classList.toggle("aside-hidden");
-
-    if (aside.classList.contains("aside-hidden")) {
-        localStorage.setItem("aside", "true");
-        // aside.classList.add("aside-hidden");
-        main.classList.add("main-grow");
-    } else {
-        localStorage.setItem("aside", "false");
-        main.classList.remove("main-grow");
-    }
-
-}
 
 
 
@@ -172,11 +147,9 @@ export const inicializarDragAndDropGrupos = () => {
 
 // CREAR JSON GRUPO
 export const crearGrupo = async () => {
-    document.querySelector(".aside").classList.remove("aside-hidden");
-    document.querySelector(".main").classList.remove("main-grow");
 
     // Expandir el aside al añadir un grupo en caso de que este cerrado.
-    if (document.querySelector(".aside").classList.contains("aside-hidden")) {
+    if (document.body.classList.contains("aside-collapsed")) {
         activarAside();
     }
 
@@ -188,16 +161,20 @@ export const crearGrupo = async () => {
     // Crear estructura del grupo
     const groupID = `group-${crypto.randomUUID()}`;
     const numGruposActual = document.querySelector(".notes-group__container").children.length;
+    const now = new Date().toISOString();
 
     const newGroupData = {
         id: groupID,
-        name: "",
+        name: "Nuevo grupo",
         color: "#f6f2ea",
-        order: numGruposActual
+        order: numGruposActual,
+        // Es crucial añadir los timestamps en la creación para que la sincronización funcione.
+        createdAt: now,
+        updatedAt: now
     };
 
-    await guardarGrupoEnDB(newGroupData);
-    renderizarGrupoEnDOM(newGroupData);
+    await guardarGrupoEnDB(newGroupData); // Guarda en DB y sincroniza
+    store.upsertGroup(newGroupData); // Añade al store, lo que causará el re-render
     renombrarGrupo(groupID);
 };
 
@@ -264,8 +241,10 @@ export const renombrarGrupo = (groupID) => {
 
         try {
             await actualizarPropiedadesGrupoEnDB(groupID, { name: finalName });
+            // Actualiza el grupo en el store
+            store.upsertGroup({ ...store.getState().groups.find(g => g.id === groupID), name: finalName });
             // Actualizamos el nombre en todas las tarjetas de nota asociadas
-            actualizarInfoGrupoEnNoteCards(groupID, { name: finalName });
+            actualizarInfoGrupoEnNoteCards(groupID, { name: finalName }); // Esta función ahora usa el store
         } catch (error) {
             console.error("Error al actualizar el nombre del grupo en la DB:", error);
         }
@@ -348,11 +327,13 @@ export const cambiarColorGrupo = (groupID) => {
 
             try {
                 await actualizarPropiedadesGrupoEnDB(groupID, { color: selectedColor });
+                // Actualiza el grupo en el store
+                store.upsertGroup({ ...store.getState().groups.find(g => g.id === groupID), color: selectedColor });
             } catch (error) {
                 console.error("Error al actualizar el color del grupo en la DB:", error);
             }
 
-            colorearActualizarGrupoEditor(groupID, selectedColor);
+            colorearActualizarGrupoEditor(groupID);
             actualizarInfoGrupoEnNoteCards(groupID, { color: selectedColor });
         }
     });
@@ -370,7 +351,7 @@ export const cambiarColorGrupo = (groupID) => {
 // ELIMINAR GRUPO
 export const eliminarGrupo = (identificadorGrupo) => {
     const groupID = validarIDOConvertirElemento(identificadorGrupo);
-
+    
     if (!groupID) {
         console.error("No se pudo obtener un ID de grupo válido. La operación de eliminación ha sido cancelada.");
         return;
@@ -380,75 +361,49 @@ export const eliminarGrupo = (identificadorGrupo) => {
 
     if (grupoTarget) {
         const modal = document.getElementById('confirm-modal-delete-group');
-        const confirmBtn = document.getElementById('confirmDeleteGroupBtn');
-        const cancelBtn = document.getElementById('cancelDeleteGroupBtn');
-        const closeBtn = document.querySelector('.delete-group-close-button');
         const modalMessage = modal.querySelector('p');
 
         const groupName = grupoTarget.querySelector(".group-name").textContent;
         const sanitizedGroupName = DOMPurify.sanitize(groupName);
         modalMessage.innerHTML = `¿Estás seguro de eliminar el grupo \"<span style=\"color: red; font-weight: bold;\">${sanitizedGroupName}</span>\"? Todas las notas del grupo se volverán notas sin grupo.`;
-        modal.style.display = 'flex';
-        confirmBtn.focus();
 
-        // Función para manejar los eventos del teclado en el modal
-        const handleModalKeys = (event) => {
-            // 1. Cerrar el modal con la tecla Escape
-            if (event.key === 'Escape') {
-                closeModalAndCleanup();
-            }
+        const confirmModal = new Modal('confirm-modal-delete-group');
 
-            // 2. Navegar entre botones con las flechas izquierda y derecha
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                event.preventDefault(); // Evita que la página se desplace
-                if (document.activeElement === confirmBtn) {
-                    cancelBtn.focus();
-                } else {
-                    confirmBtn.focus();
+        const confirmBtn = document.getElementById('confirmDeleteGroupBtn');
+        const cancelBtn = document.getElementById('cancelDeleteGroupBtn');
+        const closeButton = modal.querySelector('.delete-group-close-button');
+
+        confirmBtn.onclick = () => confirmModal.confirm();
+        cancelBtn.onclick = () => confirmModal.cancel();
+        closeButton.onclick = () => confirmModal.cancel();
+        modal.onclick = (event) => { if (event.target === modal) confirmModal.cancel(); };
+
+        confirmModal.open({
+            triggerElement: grupoTarget,
+            onConfirm: async () => {
+                try {
+                    const updatedNoteIds = await eliminarGrupoDeDB(groupID);
+                    store.removeGroup(groupID); // Elimina del store, la UI se actualizará
+
+                    if (updatedNoteIds && updatedNoteIds.length > 0) {
+                        updatedNoteIds.forEach(noteId => {
+                            actualizarInfoGrupoEnNoteCard(noteId, null);
+                            store.upsertNote({ ...store.getState().notes.find(n => n.id === noteId), groupId: null });
+                        });
+                    }
+
+                    if (editor.classList.contains("active") && editor.dataset.groupId === groupID) {
+                        colorearActualizarGrupoEditor(null);
+                    }
+
+                    handleFilter('all');
+                    actualizarGrupoActivoUI('all');
+                    gridUnpinned.refreshItems().layout();
+                } catch (error) {
+                    console.error(`Error al eliminar el grupo ${groupID} de la DB:`, error);
                 }
             }
-        };
-
-        // Función centralizada para cerrar el modal y limpiar los listeners
-        const closeModalAndCleanup = () => {
-            modal.style.display = 'none';
-            window.removeEventListener('keydown', handleModalKeys);
-            // Limpiamos los onclick para evitar múltiples asignaciones si el modal se abre de nuevo
-            confirmBtn.onclick = null;
-            cancelBtn.onclick = null;
-            closeBtn.onclick = null;
-            modal.onclick = null;
-        };
-
-        // Añadimos el listener de teclado cuando se abre el modal
-        window.addEventListener('keydown', handleModalKeys);
-
-        confirmBtn.onclick = async () => {
-            try {
-                await eliminarGrupoDeDB(groupID);
-                grupoTarget.remove();
-                colorearActualizarGrupoEditor(null);
-                actualizarInfoGrupoEnNoteCards(null, {});
-                handleFilter('all');
-                actualizarGrupoActivoUI('all');
-
-                // Suponiendo que 'grid' es tu instancia de Muuri
-                gridUnpinned.refreshItems().layout();
-            } catch (error) {
-                console.error(`Error al eliminar el grupo ${groupID} de la DB:`, error);
-            }
-            closeModalAndCleanup();
-        };
-
-        cancelBtn.onclick = closeModalAndCleanup;
-        closeBtn.onclick = closeModalAndCleanup;
-
-        // Cierra el modal si se hace clic fuera de su contenido
-        modal.onclick = (event) => {
-            if (event.target === modal) {
-                closeModalAndCleanup();
-            }
-        };
+        });
 
     } else {
         console.error(`Error: No se encontró el grupo con ID ${groupID}`);
@@ -476,7 +431,9 @@ const createOptionElement = (name, text, svg) => {
 const positionDropdown = (dropdownElement, referenceElement, offsetTop = 0, offsetLeft = 0) => {
     const rect = referenceElement.getBoundingClientRect();
     dropdownElement.style.position = "absolute";
-    dropdownElement.style.top = `${rect.top + window.scrollY + offsetTop}px`;
+    // dropdownElement.style.top = `${rect.top + window.scrollY + offsetTop}px`;
+    // dropdownElement.style.left = `${rect.left + window.scrollX + offsetLeft}px`;
+    dropdownElement.style.top = `${rect.top + window.scrollY + offsetTop + 44}px`;
     dropdownElement.style.left = `${rect.left + window.scrollX + offsetLeft}px`;
 };
 
@@ -508,6 +465,9 @@ export const opcionesGrupo = (groupID) => {
         }
     }
 
+    // Variable para guardar la función de desuscripción
+    let unsubscribeFromStore = null;
+
     // Crear el dropdown
     const groupOptionsDropdown = document.createElement("div");
     groupOptionsDropdown.classList.add("group-options-dropdown");
@@ -528,12 +488,31 @@ export const opcionesGrupo = (groupID) => {
 
     // Cierra y remueve el dropdown, y limpia los listeners.
     const closeAndRemoveDropdown = () => {
+        // 1. Llama a la función de desuscripción si existe.
+        if (unsubscribeFromStore) {
+            unsubscribeFromStore();
+            console.log(`Dropdown para el grupo ${targetGroupId} se ha desuscrito del store.`);
+        }
         groupOptionsDropdown.classList.remove("active");
         groupOptionsDropdown.remove();
         groupOptionsDropdown.removeEventListener("click", handleOptionClick);
         document.removeEventListener("click", handleOutsideClick);
         document.removeEventListener("keydown", handleKeydown);
     };
+
+    // 2. Nos suscribimos al store para mantener el dropdown actualizado.
+    unsubscribeFromStore = store.subscribe(currentState => {
+        const groupFromState = currentState.groups.find(g => g.id === targetGroupId);
+        // Si el grupo ya no existe en el estado (porque fue eliminado), cerramos el dropdown.
+        if (!groupFromState) {
+            console.log(`El grupo ${targetGroupId} fue eliminado. Cerrando su dropdown de opciones.`);
+            closeAndRemoveDropdown();
+        }
+        // Aquí podrías añadir lógica para actualizar el contenido del dropdown si cambiara,
+        // por ejemplo, si una opción dependiera del nombre del grupo.
+    });
+
+    console.log(`Dropdown para el grupo ${targetGroupId} se ha suscrito al store.`);
 
     const handleOptionClick = (event) => {
         const selectedOptionElement = event.target.closest(".group-option");
@@ -678,12 +657,15 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
             // Esto es verdad si el dropdown se abrió desde una tarjeta de nota o desde el editor con una nota cargada.
             if (isForNote && targetID) {
                 const noteId = targetID;                
+                const { notes } = store.getState();
+                const notaParaActualizar = notes.find(n => n.id === noteId);
 
                 // Actualizar en la base de datos
-                const notaParaActualizar = await obtenerNotaPorIdDesdeDB(noteId);
                 if (notaParaActualizar) {
-                    notaParaActualizar.groupId = selectedGroupId;
-                    await guardarNotaEnDB(notaParaActualizar);
+                    const notaActualizada = { ...notaParaActualizar, groupId: selectedGroupId };
+                    await guardarNotaEnDB(notaActualizada);
+                    // ¡Paso clave! Actualizamos el store inmediatamente.
+                    store.upsertNote(notaActualizada);
                     console.log(`Nota ${noteId} actualizada con nuevo groupId: ${selectedGroupId}`);
                 } else {
                     console.error(`No se encontró la nota con ID ${noteId} para actualizar.`);
@@ -692,8 +674,18 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
                 // Actualizar la UI de la tarjeta de nota
                 const noteCardElement = document.getElementById(noteId);
                 if (noteCardElement) {
-                    actualizarInfoGrupoEnNoteCardspecific(noteId, selectedGroupId);
+                    actualizarInfoGrupoEnNoteCard(noteId, selectedGroupId);
                     noteCardElement.setAttribute('data-group-id', domGroupId);
+
+                    // --- INICIO: Re-aplicar filtro ---
+                    // Después de cambiar el grupo, verificamos si hay un filtro activo
+                    // y lo volvemos a aplicar para que la nota se mueva o desaparezca si es necesario.
+                    const activeFilterElement = document.querySelector('.notes-group.active, .aside__all-notes.active');
+                    if (activeFilterElement) {
+                        const activeGroupId = activeFilterElement.classList.contains('aside__all-notes') ? 'all' : activeFilterElement.id;
+                        handleFilter(activeGroupId);
+                    }
+                    // --- FIN: Re-aplicar filtro ---
                 }
 
                 // Si el editor está abierto para esta nota, actualizar su UI también
@@ -722,15 +714,13 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
 
     createGroupOption(null, "Sin grupo", "#f6f2ea");
 
-    const availableGroups = document.querySelectorAll(".notes-group");
+    const { groups: availableGroups } = store.getState();
     availableGroups.forEach(group => {
-        const groupID = group.id;
-        const groupName = group.querySelector(".group-name")?.textContent.trim() || "Nombre no encontrado";
-        const groupColor = window.getComputedStyle(group.querySelector(".group-color-selector"))?.backgroundColor || "Color no encontrado";
-        createGroupOption(groupID, groupName, groupColor);
+        // Leemos los datos directamente del objeto de grupo del store
+        createGroupOption(group.id, group.name, group.color);
     });
 
-    console.log(isForNote, targetID);
+    // console.log(isForNote, targetID);
     
     if (isForNote && targetID && !editor.classList.contains("active")) {
         const targetNote = document.getElementById(targetID);
@@ -795,9 +785,10 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
 document.addEventListener("click", (event) => {
     if (event.target.classList.contains("note-group-color")) {
         const noteCardContainer = event.target.closest(".note-card-container");
-        if (noteCardContainer) {
+        // Solo abrir el dropdown si la nota no está en la papelera
+        if (noteCardContainer && !noteCardContainer.classList.contains('is-trashed')) {
             dropdownCambiarGroup(noteCardContainer.id);
-        } else {
+        } else if (!noteCardContainer) {
             console.log("No se pudo encontrar el contenedor de la nota.");
         }
     }
@@ -829,7 +820,7 @@ document.addEventListener("click", (event) => {
 export const initGroupManager = () => {
     
         // Botón de añadir grupo
-    const addGroupButton = document.querySelector(".aside__add-group");
+    const addGroupButton = document.querySelector(".aside__add-group__box");
     if (addGroupButton) {
         addGroupButton.addEventListener("click", crearGrupo);
     };
@@ -869,4 +860,3 @@ export const initGroupManager = () => {
     console.log("GroupManager incializado");
     
 };
-

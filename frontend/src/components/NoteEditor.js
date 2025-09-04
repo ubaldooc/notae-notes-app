@@ -1,9 +1,8 @@
 
 
-
 import DOMPurify from 'dompurify';
 
-import { formatFecha, validarORestauraNotaJSON, toPastelColorBkgnd } from '../utils.js';
+import { formatFecha, validarORestauraNotaJSON, generateDynamicBackgroundColor } from '../utils.js';
 import { guardarNotaEnDB } from '../services/db.js';
 import { renderizarNotaEnDOM, verificarYReubicarNota } from './NoteCard.js';
 
@@ -32,6 +31,7 @@ const groupColorDefault = "#f6f2ea";
 
 // VARIABLE DONDE SE ALMACENAN LOS DATOS DE LA NOTA QUE USA EL EDITOR
 let notaActualGlobal = null;
+let notaOriginalAlAbrir = null; // Para comparar si hubo cambios reales
 
 
 // LIMPIA TODO EL EDITOR PARA USARLO NUEVO
@@ -43,11 +43,15 @@ const limpiarEditor = () => {
     editorcharCounter.textContent = 0;
     editorGroupColor.style.backgroundColor = groupColorDefault || "#f6f2ea";
     editorGroupName.textContent = groupNameDefault || "Sin grupo";
-    editor.style.backgroundColor = toPastelColorBkgnd(groupColorDefault || "#f6f2ea");
+    editor.style.backgroundColor = generateDynamicBackgroundColor(groupColorDefault || "#f6f2ea");
     editor.dataset.groupId = null;
     editor.dataset.noteId = null;
     notaActualGlobal = null;
-    setTimeout(() => focusAndSetCursorAtEnd(editorBody), 50);
+    editor.classList.remove('read-only');
+    editor.querySelector('.editor-toolbar').style.display = 'flex';
+    editorTitle.contentEditable = true;
+    editorBody.contentEditable = true;
+    notaOriginalAlAbrir = null;
 };
 
 
@@ -98,11 +102,74 @@ const inicializarEditoresListeners = () => {
         }
     })
 
+    /**
+     * Maneja el evento de pegado para el título y el cuerpo del editor,
+     * limpiando el contenido y asegurando una inserción segura y moderna.
+     * @param {ClipboardEvent} event 
+     */
+    const handlePaste = (event) => {
+        event.preventDefault();
+        const target = event.currentTarget;
+        const isTitle = target.id === 'editor-title';
+
+        const clipboardData = event.clipboardData || window.clipboardData;
+        if (!clipboardData) return;
+
+        let contentToPaste = '';
+        let isHtml = false;
+
+        // Para el cuerpo, intenta obtener HTML. Si existe, lo sanitiza.
+        const htmlContent = clipboardData.getData('text/html');
+        if (!isTitle && htmlContent) {
+            contentToPaste = DOMPurify.sanitize(htmlContent);
+            isHtml = true;
+        } else {
+            // Para el título, o como fallback para el cuerpo, usa texto plano.
+            contentToPaste = clipboardData.getData('text/plain');
+        }
+
+        // Si es el título, asegura que sea una sola línea.
+        if (isTitle) {
+            contentToPaste = contentToPaste.replace(/(\r\n|\n|\r)/gm, " ").trim();
+        }
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents(); // Elimina el texto seleccionado, si lo hay.
+
+        let lastNode;
+        if (isHtml) {
+            // Si tenemos HTML sanitizado, lo insertamos como un fragmento.
+            const fragment = range.createContextualFragment(contentToPaste);
+            lastNode = fragment.lastChild;
+            range.insertNode(fragment);
+        } else {
+            // Si tenemos texto plano, lo insertamos como un nodo de texto.
+            const textNode = document.createTextNode(contentToPaste);
+            lastNode = textNode;
+            range.insertNode(textNode);
+        }
+
+        // --- LÓGICA MEJORADA PARA POSICIONAR EL CURSOR ---
+        // Después de insertar el contenido, insertamos un espacio de no ruptura (&nbsp;)
+        // y colocamos el cursor justo después, asegurando que se quede en la misma línea.
+        const spaceNode = document.createTextNode('\u00A0'); // &nbsp;
+        range.setStartAfter(lastNode || target);
+        range.insertNode(spaceNode);
+        range.setStartAfter(spaceNode);
+
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        target.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+    };
+
     editorTitle.addEventListener("input", (event) => {
         if (notaActualGlobal) {
             notaActualGlobal.title = event.target.textContent;
-            notaActualGlobal.updatedAt = new Date().toISOString();
-            editorLastMod.textContent = `Ultima edición: ${formatFecha(notaActualGlobal.updatedAt)}`;
+            // Se elimina la actualización de 'updatedAt' en cada tecleo
             actualizarPlaceholders();
         }
     });
@@ -110,8 +177,7 @@ const inicializarEditoresListeners = () => {
     editorBody.addEventListener("input", (event) => {
         if (notaActualGlobal) {
             notaActualGlobal.body = event.target.textContent;
-            notaActualGlobal.updatedAt = new Date().toISOString();
-            editorLastMod.textContent = `Ultima edición: ${formatFecha(notaActualGlobal.updatedAt)}`;
+            // Se elimina la actualización de 'updatedAt' en cada tecleo
             notaActualGlobal.charCount = notaActualGlobal.body.length;
             editorcharCounter.textContent = notaActualGlobal.charCount;
             actualizarPlaceholders();
@@ -136,55 +202,8 @@ const inicializarEditoresListeners = () => {
         }
     });
 
-    editorTitle.addEventListener("paste", (e) => {
-        e.preventDefault();
-        const textoPlano = (e.clipboardData || window.clipboardData).getData("text");
-        editorTitle.innerHTML = DOMPurify.sanitize(textoPlano);
-        editorTitle.dispatchEvent(new Event("input"));
-    });
-
-    const setupPasteHandler = (editorElement) => {
-        editorElement.addEventListener("paste", (event) => {
-            event.preventDefault();
-            const clipboardData = event.clipboardData;
-            let textPlain = clipboardData.getData("text/plain");
-            const htmlPasted = clipboardData.getData("text/html");
-            let contentToPaste = textPlain;
-            textPlain = textPlain.trim();
-            if (htmlPasted) {
-                contentToPaste = DOMPurify.sanitize(htmlPasted.trim());
-            }
-            contentToPaste = contentToPaste.trimStart();
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            const fragment = range.createContextualFragment(contentToPaste);
-            const marker = document.createElement('span');
-            marker.style.position = 'relative';
-            marker.style.display = 'inline';
-            marker.style.opacity = '0';
-            fragment.appendChild(marker);
-            range.insertNode(fragment);
-            range.setStartBefore(marker);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            marker.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-            setTimeout(() => {
-                if (marker.parentNode) {
-                    marker.parentNode.removeChild(marker);
-                }
-            }, 100);
-            editorElement.focus();
-            editorElement.dispatchEvent(new Event("input", { bubbles: true }));
-        });
-    }
-
-    const myEditor = document.getElementById("editor-body");
-    if (myEditor) {
-        setupPasteHandler(myEditor);
-    }
+    editorTitle.addEventListener("paste", handlePaste);
+    editorBody.addEventListener("paste", handlePaste);
 
     editorBody.addEventListener("focus", function (event) {
         let div = this;
@@ -220,9 +239,10 @@ const focusAndSetCursorAtEnd = (element) => {
 
 
 // ABRIR EL EDITOR 
-export const abrirEditorNota = (notaJSON = null) => {    
+export const abrirEditorNota = (notaJSON = null, { readOnly = false } = {}) => {    
     limpiarEditor();
-    if (!notaJSON) {
+    const isNewNote = !notaJSON;
+    if (isNewNote) {
         notaActualGlobal = {
             id: `note-${crypto.randomUUID()}`,
             title: "",
@@ -232,6 +252,8 @@ export const abrirEditorNota = (notaJSON = null) => {
             charCount: 0,
             pinned: false,
             groupId: null,
+            status: 'active',
+            customOrder: -1 // Valor por defecto para nuevas notas, las pone al principio.
         };
     } else {
         const notaValidada = validarORestauraNotaJSON(notaJSON);
@@ -251,8 +273,29 @@ export const abrirEditorNota = (notaJSON = null) => {
             };
         }
     }
-    colorearActualizarGrupoEditor(notaActualGlobal.groupId)
-    setTimeout(() => focusAndSetCursorAtEnd(editorBody), 50);
+    // Guardamos una copia profunda del estado original de la nota para compararla al guardar.
+    notaOriginalAlAbrir = structuredClone(notaActualGlobal);
+
+    // --- LÓGICA DE SOLO LECTURA ---
+    const editorToolbar = editor.querySelector('.editor-toolbar');
+    if (readOnly) {
+        editor.classList.add('read-only');
+        editorTitle.contentEditable = false;
+        editorBody.contentEditable = false;
+        editorToolbar.style.display = 'none'; // Oculta toda la barra de herramientas
+    } else {
+        // El estado por defecto ya se establece en limpiarEditor()
+    }
+
+    // Lógica de enfoque condicional: no enfocar si es de solo lectura.
+    if (!readOnly) {
+        if (isNewNote) {
+            setTimeout(() => focusAndSetCursorAtEnd(editorTitle), 50);
+        } else {
+            setTimeout(() => focusAndSetCursorAtEnd(editorBody), 50);
+        }
+    }
+
     modalNote.classList.add("active");
     editor.classList.add("active");
     editorTitle.innerHTML = DOMPurify.sanitize(notaActualGlobal.title);
@@ -298,8 +341,11 @@ export const infoJSONNota = (nota) => {
 // ACTUALIZAR ESTILOS DEL EDITOR POR GRUPO
 export const colorearActualizarGrupoEditor = (groupID, groupColor, groupName) => {
 
-    if (editor.dataset.groupId === groupID) {
-        
+    // Convertimos el valor del dataset a null si es la cadena "null" para una comparación correcta.
+    const currentEditorGroupId = editor.dataset.groupId === 'null' ? null : editor.dataset.groupId;
+
+    // Solo actualizamos si el grupo que se está modificando es el mismo que está en el editor.
+    if (currentEditorGroupId === groupID) {
         if (notaActualGlobal) {
             notaActualGlobal.groupId = groupID;
         }
@@ -307,7 +353,7 @@ export const colorearActualizarGrupoEditor = (groupID, groupColor, groupName) =>
         if (groupID === null || groupID === undefined) {
             editorGroupColor.style.backgroundColor = groupColorDefault || "#f6f2ea";
             editorGroupName.textContent = groupNameDefault || "Sin grupo";
-            let editorBckgndColor = toPastelColorBkgnd(groupColorDefault || "#f6f2ea");
+            let editorBckgndColor = generateDynamicBackgroundColor(groupColorDefault || "#f6f2ea");
             editor.style.backgroundColor = editorBckgndColor;
             editor.dataset.groupId = null;
             return;
@@ -324,7 +370,7 @@ export const colorearActualizarGrupoEditor = (groupID, groupColor, groupName) =>
                 console.log("No se pudo encontrar el grupo para obtener su nombre.");
                 editorGroupColor.style.backgroundColor = groupColorDefault || "#f6f2ea";
                 editorGroupName.textContent = groupNameDefault || "Sin grupo";
-                let editorBckgndColor = toPastelColorBkgnd(groupColorDefault || "#f6f2ea");
+                let editorBckgndColor = generateDynamicBackgroundColor(groupColorDefault || "#f6f2ea");
                 editor.style.backgroundColor = editorBckgndColor;
                 if (notaActualGlobal) notaActualGlobal.groupId = null;
                 editor.dataset.groupId = null;
@@ -345,7 +391,7 @@ export const colorearActualizarGrupoEditor = (groupID, groupColor, groupName) =>
         editorGroupName.innerHTML = `Grupo: ${DOMPurify.sanitize(finalGroupName)}`;
         editor.dataset.groupId = groupID;
 
-        let editorBckgndColor = toPastelColorBkgnd(finalGroupColor);
+        let editorBckgndColor = generateDynamicBackgroundColor(finalGroupColor);
         editor.style.backgroundColor = editorBckgndColor;
     } else {
         return
@@ -379,6 +425,19 @@ inicializarEditoresListeners();
 
 // GUARDAR NOTA
 export const guardarNota = async (notaJSON) => {
+    // Comparamos el contenido actual con el original al abrir el editor
+    const contenidoCambiado = notaJSON.title !== notaOriginalAlAbrir.title || notaJSON.body !== notaOriginalAlAbrir.body;
+
+    // Solo si el contenido cambió, actualizamos la fecha.
+    if (contenidoCambiado) {
+        console.log("El contenido de la nota cambió. Actualizando fecha de modificación.");
+        notaJSON.updatedAt = new Date().toISOString();
+    } else {
+        console.log("El contenido no cambió. Se mantiene la fecha de modificación original.");
+        // Nos aseguramos de que la fecha sea la original si no hubo cambios.
+        notaJSON.updatedAt = notaOriginalAlAbrir.updatedAt;
+    }
+
     const notaValida = validarORestauraNotaJSON(notaJSON);
 
     if (notaValida) {
@@ -475,11 +534,37 @@ export const initNoteEditor = () => {
         }
     });
 
+    // --- Listeners para los atajos de teclado ---
+    document.addEventListener('save-note-shortcut', () => {
+        // Solo guardar si el editor está activo
+        if (modalNote.classList.contains('active') && notaActualGlobal) {
+            console.log('Atajo Ctrl+S detectado. Guardando nota...');
+            guardarNota(notaActualGlobal);
+            cerrarEditorUI();
+        }
+    });
+
+    document.addEventListener('escape-pressed-shortcut', () => {
+        // Solo cerrar si el editor está activo
+        if (modalNote.classList.contains('active')) {
+            console.log('Atajo Escape detectado. Cerrando editor...');
+            // La lógica de guardar o descartar ya está en el listener del modal
+            modalNote.click(); 
+        }
+    });
+
+    // --- Listener para el cambio de tema ---
+    document.addEventListener('theme-changed', () => {
+        // Si el editor está abierto, recalcular y aplicar su color de fondo.
+        if (modalNote.classList.contains('active') && notaActualGlobal) {
+            console.log('Tema cambiado. Actualizando color del editor...');
+            // La función colorearActualizarGrupoEditor ya usa generateDynamicBackgroundColor,
+            // que es consciente del tema, por lo que simplemente la volvemos a llamar.
+            colorearActualizarGrupoEditor(notaActualGlobal.groupId);
+        }
+    });
+
 
     console.log("initNoteEditor cargado correctamente");
     
 }
-
-
-
-

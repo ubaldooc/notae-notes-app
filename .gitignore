@@ -1,1 +1,22 @@
+# Dependencias
 node_modules/
+
+# Archivos de compilación y de salida
+dist/
+build/
+out/
+
+# Archivos de configuración y secretos
+.env
+.env.local
+config.js
+secrets.js
+
+# Archivos de registro
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Archivos de sistema y editores
+.DS_Store
+.vscode/

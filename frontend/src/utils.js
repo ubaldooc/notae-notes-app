@@ -1,58 +1,144 @@
 
 
-import { gridUnpinned } from "./main";
-
-
-
-
-const aside = document.querySelector(".aside");
-const main = document.querySelector(".main");
-const AsideMenuHam = document.getElementById("aside__menuham");
-
-if (localStorage.getItem("aside") === "true") {
-    aside.classList.add("aside-hidden");
-    main.classList.add("main-grow");
-} else if (localStorage.getItem("aside") === "false") {
-    aside.classList.remove("aside-hidden");
-    main.classList.remove("main-grow");
-}
 
 export const activarAside = () => {
+    const body = document.body;
+    body.classList.toggle("aside-collapsed");
 
-    // main.classList.remove("no-transition");
-    // aside.classList.remove("no-transition");
-    aside.classList.add("transition-activate");
-    main.classList.add("transition-activate");
-
-    aside.classList.toggle("aside-hidden");
-
-    if (aside.classList.contains("aside-hidden")) {
-        localStorage.setItem("aside", "true");
-        // aside.classList.add("aside-hidden");
-        main.classList.add("main-grow");
+    // Guardar el estado en localStorage para persistencia
+    if (body.classList.contains("aside-collapsed")) {
+        localStorage.setItem("aside-collapsed", "true");
     } else {
-        localStorage.setItem("aside", "false");
-        main.classList.remove("main-grow");
+        localStorage.setItem("aside-collapsed", "false");
     }
 
-    // grid.refreshItems();
-    // grid.layout();
+    // Disparamos un evento 'resize' después de que la animación del aside (200ms) termine.
+    // Muuri, por defecto, escucha este evento y actualiza su layout automáticamente para
+    // reorganizar las notas y ocupar el nuevo espacio disponible.
+    setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+    }, 200); // Este tiempo debe coincidir con la duración de la transición en styles.css
 }
 
-// AsideMenuHam.addEventListener("click", activarAside);
+// FUNCION PARA ORDENAR LAS NOTAS POR FECHA. Esta funcion se usa con grid.sort(ordenarNotas); para que funcione
+export const ordenarNotas = (itemA, itemB) => {
+    const elementA = itemA.getElement();
+    const elementB = itemB.getElement();
+
+    const dateA = new Date(elementA.getAttribute('data-updated-at'));
+    const dateB = new Date(elementB.getAttribute('data-updated-at'));
+
+    // Ordena por fecha descendente (la más reciente primero).
+    // La comparación de fechas funciona restándolas. dateB - dateA da el orden descendente.
+    return dateB - dateA;
+}
+
+// Nueva función para ordenar por más antiguas primero
+export const ordenarNotasAntiguas = (itemA, itemB) => {
+    const elementA = itemA.getElement();
+    const elementB = itemB.getElement();
+
+    const dateA = new Date(elementA.getAttribute('data-updated-at'));
+    const dateB = new Date(elementB.getAttribute('data-updated-at'));
+
+    // Ordena por fecha ascendente (la más antigua primero).
+    return dateA - dateB;
+}
+
+// Nueva función para ordenar por título alfabético (A-Z)
+export const ordenarNotasPorTituloAsc = (itemA, itemB) => {
+    const elementA = itemA.getElement();
+    const elementB = itemB.getElement();
+
+    // Usamos ?. para evitar errores si el elemento .note-title no existe
+    const titleA = elementA.querySelector('.note-title')?.textContent.trim().toLowerCase() || '';
+    const titleB = elementB.querySelector('.note-title')?.textContent.trim().toLowerCase() || '';
+
+    return titleA.localeCompare(titleB);
+};
+
+// Nueva función para ordenar por título alfabético (Z-A)
+export const ordenarNotasPorTituloDesc = (itemA, itemB) => {
+    const elementA = itemA.getElement();
+    const elementB = itemB.getElement();
+
+    const titleA = elementA.querySelector('.note-title')?.textContent.trim().toLowerCase() || '';
+    const titleB = elementB.querySelector('.note-title')?.textContent.trim().toLowerCase() || '';
+
+    // Invertimos la comparación para el orden descendente
+    return titleB.localeCompare(titleA);
+}
+
+// Nueva función para el ordenamiento personalizado
+export const ordenarNotasPersonalizado = (itemA, itemB) => {
+    const elementA = itemA.getElement();
+    const elementB = itemB.getElement();
+
+    const orderAStr = elementA.getAttribute('data-custom-order');
+    const orderBStr = elementB.getAttribute('data-custom-order');
+
+    const orderA = parseInt(orderAStr, 10);
+    const orderB = parseInt(orderBStr, 10);
+
+    // Si el valor no es un número (ej. es null, undefined, o no se puede parsear), lo tratamos como Infinity.
+    // Esto asegura que las notas sin un orden definido se vayan al final, y que el valor 0 sea tratado correctamente.
+    const finalOrderA = isNaN(orderA) ? Infinity : orderA;
+    const finalOrderB = isNaN(orderB) ? Infinity : orderB;
+
+    return finalOrderA - finalOrderB;
+};
+
+/**
+ * Obtiene la función de ordenamiento correcta basándose en la preferencia guardada.
+ * @param {string} [sortType] - El tipo de ordenamiento. Si no se provee, se lee de localStorage.
+ * @returns {Function | null} La función de ordenamiento a utilizar o null si el tipo es inválido.
+ */
+export const getSortFunction = (sortType) => {
+    const type = sortType || localStorage.getItem('noteSortOrder') || 'newest';
+    switch (type) {
+        case 'newest':
+            return ordenarNotas;
+        case 'oldest':
+            return ordenarNotasAntiguas;
+        case 'title-asc':
+            return ordenarNotasPorTituloAsc;
+        case 'title-desc':
+            return ordenarNotasPorTituloDesc;
+        case 'custom':
+            return ordenarNotasPersonalizado;
+        default:
+            return ordenarNotas; // Fallback seguro
+    }
+};
+
+
 
 
 
 
 
 export const initUtils = () => {
-    AsideMenuHam.addEventListener("click", activarAside);
+    // Restaurar el estado del aside al cargar la página
+    if (localStorage.getItem("aside-collapsed") === "true") {
+        document.body.classList.add("aside-collapsed");
+    }
+
+    const AsideMenuHam = document.getElementById("aside__menuham");
+    if (AsideMenuHam) {
+        AsideMenuHam.addEventListener("click", activarAside);
+    }
 }
 
 
 
-// CONVIERTE COLOR A COLORES PASTEL PARA EL BACKGROUND DE LAS NOTAS
-export const toPastelColorBkgnd = (colorString) => {
+/**
+ * Genera un color de fondo dinámico basado en el tema actual (claro u oscuro).
+ * En modo claro, aclara el color (lo hace pastel).
+ * En modo oscuro, oscurece el color.
+ * @param {string} colorString - El color base en formato hex o rgb(a).
+ * @returns {string} El color resultante en formato rgba.
+ */
+export const generateDynamicBackgroundColor = (colorString) => {
     let r, g, b, a;
 
     // Verificar si el color es hexadecimal y lo convertimos a rgb
@@ -87,12 +173,28 @@ export const toPastelColorBkgnd = (colorString) => {
         a = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
     }
 
-    // Modificar el color para hacerlo más pastel (osea acercarlo a blanco)
-    let pastelFactor = 0.7;
-    r = Math.min(255, Math.round(r + (255 - r) * pastelFactor));
-    g = Math.min(255, Math.round(g + (255 - g) * pastelFactor));
-    b = Math.min(255, Math.round(b + (255 - b) * pastelFactor));
+    const isDarkMode = document.body.classList.contains('dark-mode');
 
+    if (isDarkMode) {
+        // En modo oscuro, mezclamos el color con un fondo oscuro para desaturarlo y suavizarlo.
+        // Esto evita colores puros y demasiado brillantes que desentonarían.
+        const mixFactor = 0.3; // Cuánto del color original se conserva (0.3 = 30%)
+        
+        // Color base oscuro para la mezcla (un gris oscuro neutro)
+        const baseDarkR = 45;
+        const baseDarkG = 52;
+        const baseDarkB = 54;
+
+        r = Math.round(r * mixFactor + baseDarkR * (1 - mixFactor));
+        g = Math.round(g * mixFactor + baseDarkG * (1 - mixFactor));
+        b = Math.round(b * mixFactor + baseDarkB * (1 - mixFactor));
+    } else {
+        // En modo claro, lo hacemos pastel (lo acercamos al blanco).
+        const pastelFactor = 0.7;
+        r = Math.min(255, Math.round(r + (255 - r) * pastelFactor));
+        g = Math.min(255, Math.round(g + (255 - g) * pastelFactor));
+        b = Math.min(255, Math.round(b + (255 - b) * pastelFactor));
+    }
     return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
@@ -135,14 +237,16 @@ export const formatFechaNoteCard = (fechaISO)=> {
 export const validarORestauraNotaJSON = (notaJSON) => {
     // 1. Define un esquema de las propiedades esperadas con sus tipos y valores por defecto.
     const esquemaNota = {
-        id: { type: 'string', defaultValue: `note-${crypto.randomUUID()}` },
+        id: { type: 'string', defaultValue: () => `note-${crypto.randomUUID()}` },
         title: { type: 'string', defaultValue: "" },
         body: { type: 'string', defaultValue: "" },
-        createdAt: { type: 'string', defaultValue: new Date().toISOString() },
-        updatedAt: { type: 'string', defaultValue: new Date().toISOString() },
+        createdAt: { type: 'string', defaultValue: () => new Date().toISOString() },
+        updatedAt: { type: 'string', defaultValue: () => new Date().toISOString() },
         charCount: { type: 'number', defaultValue: 0 },
         pinned: { type: 'boolean', defaultValue: false },
-        groupId: { type: ['string', 'object'], defaultValue: null } // groupId puede ser un string o nulo (typeof null es 'object').
+        groupId: { type: ['string', 'object'], defaultValue: null }, // groupId puede ser un string o nulo (typeof null es 'object').
+        status: { type: 'string', defaultValue: 'active' },
+        customOrder: { type: 'number', defaultValue: -1 } // -1 indica que no tiene un orden personalizado asignado.
     };
 
     // 2. Comprobación de formato básico: ¿es un objeto y no es nulo?
@@ -176,11 +280,20 @@ export const validarORestauraNotaJSON = (notaJSON) => {
         } else {
             // Si la propiedad falta o tiene el tipo incorrecto, la resetea a su valor por defecto.
             console.warn(`Reparando JSON: La propiedad '${prop}' se reseteó a su valor por defecto debido a un error.`);
-            notaReparada[prop] = defaultValue;
+            // Si el valor por defecto es una función, la ejecutamos para obtener un valor dinámico.
+            // De lo contrario, usamos el valor estático.
+            notaReparada[prop] = typeof defaultValue === 'function' ? defaultValue() : defaultValue;
         }
     }
 
-    // 6. Retorna el objeto JSON reparado.
+    // 6. Verificación final específica para el campo 'status'.
+    // Si el estado no es uno de los valores válidos, se establece en 'active'.
+    if (notaReparada.status !== 'active' && notaReparada.status !== 'trashed') {
+        console.warn(`Reparando JSON: El estado '${notaReparada.status}' no es válido. Se establecerá en 'active'.`);
+        notaReparada.status = 'active';
+    }
+
+    // 7. Retorna el objeto JSON reparado.
     return notaReparada;
 };
 
@@ -280,8 +393,3 @@ export const validarIDOConvertirElemento = (identificador) => {
 //     selection.removeAllRanges();
 //     selection.addRange(range);
 // };
-
-
-
-
-

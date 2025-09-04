@@ -1,8 +1,13 @@
-import { gridPinned, gridUnpinned, ordenarNotas } from '../main.js';
 import { cargarNotasDesdeDB, vaciarPapeleraEnDB, obtenerNotaPorIdDesdeDB } from '../services/db.js';
 import { renderizarNotaEnDOM } from './NoteCard.js';
 import { abrirEditorNota } from './NoteEditor.js';
+import { getSortFunction } from '../utils.js';
+import { Modal } from './ModalManager.js';
+// import { gridPinned, gridUnpinned } from '../main.js';
 
+// Module-level variables to hold grid instances
+let gridPinned;
+let gridUnpinned;
 
 // ESTILOS GRUPO ACTIVO
 export const actualizarGrupoActivoUI = (groupId) => {
@@ -29,6 +34,8 @@ export const actualizarGrupoActivoUI = (groupId) => {
 
 // FILTROS DE BUSQUEDA DE MUURI para grupos
 export const handleFilter = (groupId) => {
+    if (!gridPinned || !gridUnpinned) return;
+
     const filterSelector = (!groupId || groupId === 'all' || groupId === '.muuri-item' || groupId === 'null' || groupId === null || groupId === undefined)
         ? '.muuri-item'
         : `[data-group-id="${groupId}"]`;
@@ -37,18 +44,18 @@ export const handleFilter = (groupId) => {
     gridUnpinned.filter(filterSelector);
 
     // Después de filtrar, es una buena práctica re-ordenar para asegurar consistencia.
-    gridPinned.sort(ordenarNotas, { layout: 'instant' });
-    gridUnpinned.sort(ordenarNotas, { layout: 'instant' });
-    gridPinned.refreshItems().layout();
-    gridUnpinned.refreshItems().layout();
+    // gridPinned.sort(ordenarNotas, { layout: 'instant' });
+    // gridUnpinned.sort(ordenarNotas, { layout: 'instant' });
+    // gridPinned.refreshItems().layout();
+    // gridUnpinned.refreshItems().layout();
 };
 
 const showTrashView = async () => {
     // 1. Ocultar los grids principales de Muuri y mostrar un contenedor para la papelera
     document.querySelector('.grid-pinned').style.display = 'none';
     document.querySelector('.grid-unpinned').style.display = 'none';
-    gridPinned.hide(gridPinned.getItems(), { instant: true });
-    gridUnpinned.hide(gridUnpinned.getItems(), { instant: true });
+    if (gridPinned) gridPinned.hide(gridPinned.getItems(), { instant: true });
+    if (gridUnpinned) gridUnpinned.hide(gridUnpinned.getItems(), { instant: true });
 
     // 2. Crear o encontrar el contenedor de la papelera y su cabecera
     let trashViewContainer = document.getElementById('trash-view-container');
@@ -108,56 +115,32 @@ const showTrashView = async () => {
 
     // 4. Asignar el evento al botón (se reasigna cada vez, lo que es seguro)
     emptyTrashBtn.onclick = () => {
-        const modal = document.getElementById('confirm-modal-empty-trash');
+        const confirmModal = new Modal('confirm-modal-empty-trash');
+        const modalElement = document.getElementById('confirm-modal-empty-trash');
         const confirmBtn = document.getElementById('confirmEmptyTrashBtn');
         const cancelBtn = document.getElementById('cancelEmptyTrashBtn');
-        const closeBtn = modal.querySelector('.delete-group-close-button');
+        const closeBtn = modalElement.querySelector('.delete-group-close-button');
 
-        modal.style.display = 'flex';
-        confirmBtn.focus();
+        confirmBtn.onclick = () => confirmModal.confirm();
+        cancelBtn.onclick = () => confirmModal.cancel();
+        closeBtn.onclick = () => confirmModal.cancel();
+        modalElement.onclick = (event) => { if (event.target === modalElement) confirmModal.cancel(); };
 
-        const closeModalAndCleanup = () => {
-            modal.style.display = 'none';
-            confirmBtn.onclick = null;
-            cancelBtn.onclick = null;
-            closeBtn.onclick = null;
-            modal.onclick = null;
-            window.removeEventListener('keydown', handleModalKeys);
-        };
-
-        const handleModalKeys = (event) => {
-            if (event.key === 'Escape') {
-                closeModalAndCleanup();
-            }
-            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                event.preventDefault();
-                if (document.activeElement === confirmBtn) {
-                    cancelBtn.focus();
-                } else {
-                    confirmBtn.focus();
+        confirmModal.open({
+            triggerElement: emptyTrashBtn,
+            onConfirm: async () => {
+                try {
+                    await vaciarPapeleraEnDB();
+                    trashNotesContainer.innerHTML = '';
+                    noNotesMessage.style.display = 'block';
+                    noNotesMessage.innerHTML = 'La papelera está vacía.';
+                    emptyTrashBtn.style.display = 'none';
+                } catch (error) {
+                    console.error('Error al intentar vaciar la papelera:', error);
+                    // Aquí podrías usar showNotification si lo importas
                 }
             }
-        };
-
-        window.addEventListener('keydown', handleModalKeys);
-
-        confirmBtn.onclick = async () => {
-            try {
-                await vaciarPapeleraEnDB();
-                trashNotesContainer.innerHTML = '';
-                noNotesMessage.style.display = 'block';
-                noNotesMessage.innerHTML = 'La papelera está vacía.';
-                emptyTrashBtn.style.display = 'none';
-            } catch (error) {
-                console.error('Error al intentar vaciar la papelera:', error);
-            } finally {
-                closeModalAndCleanup();
-            }
-        };
-
-        cancelBtn.onclick = closeModalAndCleanup;
-        closeBtn.onclick = closeModalAndCleanup;
-        modal.onclick = (event) => event.target === modal && closeModalAndCleanup();
+        });
     };
 };
 
@@ -173,20 +156,21 @@ const showMainView = () => {
     document.querySelector('.grid-unpinned').style.display = 'block';
     
     // Mostrar todos los items en los grids de Muuri
-    gridPinned.show(gridPinned.getItems(), { instant: true });
-    gridUnpinned.show(gridUnpinned.getItems(), { instant: true });
+    if (gridPinned) gridPinned.show(gridPinned.getItems(), { instant: true });
+    if (gridUnpinned) gridUnpinned.show(gridUnpinned.getItems(), { instant: true });
     
     // Forzar un relayout para evitar problemas visuales
-    // Usamos refreshItems() para asegurarnos de que Muuri recalcule las dimensiones
-    // de cualquier elemento que haya sido añadido mientras el grid estaba oculto.
-    gridPinned.refreshItems().layout();
-    gridUnpinned.refreshItems().layout();
+    if (gridPinned) gridPinned.refreshItems().layout();
+    if (gridUnpinned) gridUnpinned.refreshItems().layout();
 };
 
 
 
 // LISTENERS DE FILTROS
-export const initFilters = () => {
+export const initFilterManager = (grids) => {
+    gridPinned = grids.gridPinned;
+    gridUnpinned = grids.gridUnpinned;
+
     const visiblePinnedItems = gridPinned.getItems().filter(item => item.isVisible());
     const visibleItemPinnedCount = visiblePinnedItems.length;
 
@@ -231,7 +215,11 @@ export const initFilters = () => {
             return titleText.includes(query) || bodyText.includes(query);
         });
         // Después de filtrar, es crucial re-ordenar y recalcular el layout.
-        grid.sort(ordenarNotas, { layout: 'instant' });
+        // Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario.
+        const currentSortFunction = getSortFunction();
+        if (currentSortFunction) {
+            grid.sort(currentSortFunction, { layout: 'instant' });
+        }
     };
 
     const searchInput = document.getElementById('id__search');
@@ -295,4 +283,5 @@ export const initFilters = () => {
             }
         });
     }
+    console.log("FilterManager inicializado.");
 };

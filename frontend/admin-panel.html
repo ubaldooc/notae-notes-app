@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Comentarios</title>
+    <link rel="stylesheet" href="/src/styles/styles.css">
+    <link rel="stylesheet" href="/src/styles/admin.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <span class="logo-text">Panel de Administrador</span>
+        </div>
+        <a href="/" class="admin-back-link">Volver a la App</a>
+    </header>
+
+    <main class="admin-main">
+        <h1>Comentarios de Usuarios</h1>
+        <div class="admin-controls">
+            <div class="feedback-filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="pending">Pendientes</button>
+                <button class="filter-btn" data-filter="resolved">Resueltos</button>
+            </div>
+            <div class="admin-search-container">
+                <input type="search" id="admin-search-input" placeholder="Buscar por email o contenido...">
+            </div>
+        </div>
+        <div id="admin-loader" class="loader-container" style="display: none;">
+            <div class="loader"></div>
+        </div>
+        <div id="admin-error-message" style="display: none;"></div>
+        <div id="feedback-list-container">
+            <!-- Los comentarios se insertarán aquí dinámicamente -->
+        </div>
+        <div id="pagination-controls" class="pagination-controls">
+            <!-- Los botones de paginación se insertarán aquí -->
+        </div>
+    </main>
+
+    <!-- Modal de confirmación para eliminar un comentario -->
+    <div id="confirm-modal-delete-feedback" class="modal-delete-group" style="display: none;">
+        <div class="modal-delete-group-content">
+            <span class="delete-group-close-button">&times;</span>
+            <h2>Confirmar eliminación</h2>
+            <p>¿Estás seguro de que quieres eliminar este comentario permanentemente? Esta acción no se puede deshacer.</p>
+            <button id="confirmDeleteFeedbackBtn" class="confirm-btn">Sí, eliminar</button>
+            <button id="cancelDeleteFeedbackBtn" class="cancel-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal para responder a un comentario -->
+    <div id="reply-feedback-modal" class="modal-delete-group" style="display: none;">
+        <div class="modal-delete-group-content">
+            <span class="delete-group-close-button">&times;</span>
+            <h3>Responder a Comentario</h3>
+            <div class="reply-context">
+                <p><strong>Para:</strong> <span id="reply-user-email"></span></p>
+                <p><strong>Comentario original:</strong></p>
+                <blockquote id="reply-original-text"></blockquote>
+            </div>
+            <textarea id="reply-textarea" placeholder="Escribe tu respuesta aquí..." rows="6"></textarea>
+            <button id="sendReplyBtn" class="confirm-btn">Enviar Respuesta</button>
+        </div>
+    </div>
+
+    <script type="module" src="/src/admin.js"></script>
+</body>
+</html>

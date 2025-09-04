@@ -10,17 +10,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi App de Notas</title>
 
-    <style>
-        /* ESTILO IMPORTANTE PARA EVITAR EL FLASH AL RECARGAR LA PAGINA. evitar Flash of Unstyled Content (FOUC) o, quiza, Flash of Unintended Transition (FOIT) */
-        .transition-activate {
-            /* transition: 200ms ease; */
-            /*Este es mas especifico, pero si no funciona quita este y deja el de arriba.*/
-            transition: margin-left 200ms, ease transform 200ms ease;
-        }
-    </style>
+    <!-- 1. Script de la librería de Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer
+            data-use_fedcm_for_prompt="true">
+    </script>
+
 </head>
 <body>
-    <div class="pruebasFonts">
+    <!-- <div classscriptbasFonts">
         <p class="fonts1">Prueba de fonts A E I O U</p>
         <p class="fonts2">Prueba de fonts A E I O U</p>
         <p class="fonts3">Prueba de fonts A E I O U</p>
@@ -31,30 +28,65 @@
         <p class="fonts8">Prueba de fonts A E I O U</p>
         <p class="fonts9">Prueba de fonts A E I O U</p>
         <p class="fonts10">Prueba de fonts A E I O U</p>
+    </div> -->
 
-    </div>
-<div class="header-aside-wrap">
     <header class="header">
         <div class="logo-container">
             <img src="public/logo.png" alt="logo" class="logo">
             <span class="logo-text">Mis notas</li>
         </div>
         <div class="header-toolbar">
-            <div class="add-note" id="add-note-btn">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="#1C274C" stroke-width="1.5"></path> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+            <div class="add-note" id="add-note-btn" title="Crear una nota nueva (Ctrl + N)">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke-width="1.5"></path> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
                 <!-- <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="10" stroke="#1C274C" stroke-width="1.5"></circle> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"></path> </g></svg> -->
-                <!-- <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title></title> <g id="Complete"> <g data-name="add" id="add-2"> <g> <line fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="12" x2="12" y1="19" y2="5"></line> <line fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="5" x2="19" y1="12" y2="12"></line> </g> </g> </g> </g></svg> -->
                 <span class="add-note-text">Agregar nota</span>
             </div>
-            <div class="search-container">
-                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="#000000" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg>
+            <div class="search-container" title="Buscar (Ctrl + F)">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                <!-- <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path class="search-icon-path" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg> -->
                 <input type="text" class="search-inpt" id="id__search" placeholder=" Buscar">
-                <svg id="clear-search-button" class="clear-button" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Menu / Close_SM"> <path id="Vector" d="M16 16L12 12M12 12L8 8M12 12L16 8M12 12L8 16" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                <svg id="clear-search-button" class="clear-button" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Menu / Close_SM"> <path id="Vector" d="M16 16L12 12M12 12L8 8M12 12L16 8M12 12L8 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
             </div>
-            <div class="delete-notes">
-                <!-- <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> -->
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 12V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 12V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-                <span class="delete-note-text">Eliminar nota</span>
+            <div class="view-options-container">
+                <span class="view-options-label">Vista</span>
+                <div class="view-options-buttons">
+                    <button id="view-grid-btn" class="view-option-btn active" title="Vista de cuadrícula">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 3H4C3.44772 3 3 3.44772 3 4V10C3 10.5523 3.44772 11 4 11H10C10.5523 11 11 10.5523 11 10V4C11 3.44772 10.5523 3 10 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M20 3H14C13.4477 3 13 3.44772 13 4V10C13 10.5523 13.4477 11 14 11H20C20.5523 11 21 10.5523 21 10V4C21 3.44772 20.5523 3 20 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M10 13H4C3.44772 13 3 13.4477 3 14V20C3 20.5523 3.44772 21 4 21H10C10.5523 21 11 20.5523 11 20V14C11 13.4477 10.5523 13 10 13Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M20 13H14C13.4477 13 13 13.4477 13 14V20C13 20.5523 13.4477 21 14 21H20C20.5523 21 21 20.5523 21 20V14C21 13.4477 20.5523 13 20 13Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    </button>
+                    <button id="view-list-btn" class="view-option-btn" title="Vista de lista">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M4 12H20M4 18H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sort-options-container">
+                <span class="sort-options-label">Ordenar</span>
+                <div class="sort-options-button-wrapper">
+                    <button id="sort-options-btn" class="sort-trigger-btn" title="Opciones de ordenamiento">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 8H13" stroke-width="2" stroke-linecap="round"></path> <path d="M4 16H9" stroke-width="2" stroke-linecap="round"></path> <path d="M17 4L17 20M17 20L20 17M17 20L14 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    </button>
+                    <div id="sort-options-dropdown" class="sort-options-dropdown">
+                        <button class="sort-option" data-sort="newest">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 8H13" stroke-width="2" stroke-linecap="round"></path> <path d="M4 16H9" stroke-width="2" stroke-linecap="round"></path> <path d="M17 4L17 20M17 20L20 17M17 20L14 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                            <span>Más recientes</span>
+                        </button>
+                        <button class="sort-option" data-sort="oldest">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 8H13" stroke-width="2" stroke-linecap="round"></path> <path d="M4 16H9" stroke-width="2" stroke-linecap="round"></path> <path d="M17 20V4M17 4L20 7M17 4L14 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                            <span>Más antiguos</span>
+                        </button>
+                        <button class="sort-option" data-sort="title-asc">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 4V20M17 4L14 7M17 4L20 7M4 16V10C4 8.89543 4.89543 8 6 8H8C9.10457 8 10 8.89543 10 10V16M4 13H10M4 20H10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                            <span>Título (A-Z)</span>
+                        </button>
+                        <button class="sort-option" data-sort="title-desc">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 20V4M17 20L14 17M17 20L20 17M4 16V10C4 8.89543 4.89543 8 6 8H8C9.10457 8 10 8.89543 10 10V16M4 13H10M4 20H10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                            <span>Título (Z-A)</span>
+                        </button>
+                        <button class="sort-option" data-sort="custom">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14 18V15.5C14 14.1193 12.8807 13 11.5 13C10.1193 13 9 14.1193 9 15.5V21H6C5.44772 21 5 20.5523 5 20V11.134C5 10.493 5.30953 9.89823 5.82843 9.48528L9.29289 6.70711C9.68342 6.39464 10.2178 6.39464 10.6083 6.70711L14.0728 9.48528C14.5917 9.89823 14.9 10.493 14.9 11.134V12M14 18H17.5C18.3284 18 19 17.3284 19 16.5V14.5C19 13.6716 18.3284 13 17.5 13C16.6716 13 16 13.6716 16 14.5V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                            <span>Personalizado</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- <div class="filter-controls">
@@ -69,34 +101,58 @@
                 <button class="sort-button" data-sort="category">Categoría</button>
             </div> -->
 
-        
         </div>
-        <div class="perfil-container">
-            <div class="perfil-nombre">Mi nombre</div>
-            <img src="public/images/perfil.png" alt="perfil" class="perfil-img" draggable="false">
-            <div class="perfil-options-dropdown">
-                <span class="perfil-option" id="cerrar-sesion">Cerrar sesion</span>
-                <span class="perfil-option" id="cerrar-sesion">Forma de lista</span>
-                <span class="perfil-option" id="cerrar-sesion">Forma simetrica</span>
-                <span class="perfil-option" id="cerrar-sesion">reordenar en forma masonry</span>
-                <span class="perfil-option" id="cerrar-sesion">Filtrar</span>
-                <span class="perfil-option" id="cerrar-sesion">modo oscuro</span>
-                <span class="perfil-option" id="cerrar-sesion">hacer notas mas grandes o pequeñas para ver mas notas... densidad</span>
-                <span class="perfil-option" id="cerrar-sesion">Ventana a la derecha para ver mas notas mientras edito</span>
-                <span class="perfil-option" id="cerrar-sesion">editar nota en pantalla completa</span>
-                <span class="perfil-option" id="cerrar-sesion">funcion para comprobar si realmente se edito una nota, si no descartar todo y no modificar fecha de edicion</span>
+        <div class="header-right-side">
+            <!-- Contenedor para la animación de carga -->
+            <div class="loader-container" id="sync-loader" style="display: none;" title="Sincronizando datos...">
+                <div class="loader"></div>
+            </div>
+            <div class="perfil-container no-session"> <!-- Inicia sin sesión por defecto -->
+                <div class="perfil-nombre">Invitado</div>
+                <img src="public/guest-perfil.jpg" alt="perfil" class="perfil-img" draggable="false"> <!-- Imagen de invitado -->
+                <div class="perfil-options-dropdown">
+                    <!-- Encabezado del perfil (siempre visible) -->
+                    <div class="dropdown-profile-header">
+                        <img src="public/guest-perfil.jpg" alt="perfil" class="dropdown-perfil-img">
+                        <div class="dropdown-perfil-nombre">Invitado</div>
+                    </div>
+                    <hr class="dropdown-separator">
 
+                    <!-- Botón de Iniciar Sesión (solo para invitados) -->
+                    <button id="custom-google-signin-btn" class="google-signin-btn">
+                        <span>Iniciar sesión con Google</span>
+                    </button>
 
+                    <!-- Opciones comunes (siempre visibles) -->
+                    <button class="perfil-option" id="theme-toggle-btn" title="Cambiar a modo oscuro">
+                        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.32031 11.6835C3.32031 16.6541 7.34975 20.6835 12.3203 20.6835C16.1075 20.6835 19.3483 18.3443 20.6768 15.032C19.643 15.3231 18.5466 15.5 17.4031 15.5C12.9812 15.5 9.32031 11.8391 9.32031 7.41721C9.32031 6.27371 9.49721 5.1773 9.78831 4.1435C6.47662 5.47201 4.13742 8.71285 4.13742 12.5C4.13742 12.2206 4.12603 11.9449 4.10312 11.6735C3.73286 11.6941 3.46334 11.6969 3.32031 11.6835Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 21V22M12 2V3M21.1924 12L22.1924 12M2.19241 12L3.19241 12M18.8076 5.19238L19.5147 4.48528M4.48528 19.5147L5.19238 18.8076M18.8076 18.8076L19.5147 19.5147M4.48528 4.48528L5.19238 5.19238" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span id="theme-toggle-text">Modo Oscuro</span>
+                    </button>
+                    <button class="perfil-option" id="feedback-btn" title="Enviar comentarios">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.09003 9.00002C9.3251 8.33167 9.94144 7.82354 10.6852 7.66934C11.429 7.51515 12.1963 7.73223 12.7501 8.25002C13.3038 8.76781 13.5758 9.55955 13.4352 10.327C13.2946 11.0944 12.7612 11.7458 12.0001 12C11.2389 12.2542 10.7741 12.9318 10.8601 13.5" stroke-width="2" stroke-linecap="round"></path><path d="M12 17.01L12.01 16.999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span>Enviar comentarios</span>
+                    </button>
+                    <!-- Botón para importar datos de invitado -->
+                    <button class="perfil-option" id="import-guest-data-profile-btn" title="Importar datos de la sesión de invitado" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 15L4 18C4 19.1046 4.89543 20 6 20L18 20C19.1046 20 20 19.1046 20 18L20 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 4L12 14M12 4L8 8M12 4L16 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span>Importar datos de invitado</span>
+                    </button>
 
-
-                
+                    <!-- Botón de Cerrar Sesión (solo para usuarios con sesión) -->
+                    <hr class="dropdown-separator logout-separator">
+                    <button class="perfil-option perfil-option--logout" id="logout-btn" title="Cerrar sesión">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 16.5L18.5 13L15 9.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.1429 13H6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 5.5H6.5C5.09524 5.5 4 6.67157 4 8.16667V17.8333C4 19.3284 5.09524 20.5 6.5 20.5H10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
     <aside class="aside">
         <div class="aside-container">
-            <div id="aside__menuham">
+            <div id="aside__menuham" title="Ocultar/Mostrar menú">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 6H20M4 12H20M4 18H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             </div>
             <div class="aside__all-notes">
@@ -191,25 +247,6 @@
                  -->
 
 
-                    <div class="group-options-dropdown">
-                        <div class="group-option" data-groupOption="eliminarGrupo">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-                            <span>Eliminar grupo</span>
-                        </div>
-                        <div class="group-option" data-groupOption="renombrarGrupo">
-                            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.44800000000000006"></g><g id="SVGRepo_iconCarrier"> <path d="M6 8L2 8L2 6L8 5.24536e-07L14 6L14 8L10 8L10 16L6 16L6 8Z" fill="#000000"></path> </g></svg>
-                            <span>Renombrar</span>
-                        </div>
-                        <div class="group-option" data-groupOption="subirGrupo">
-                            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.44800000000000006"></g><g id="SVGRepo_iconCarrier"> <path d="M6 8L2 8L2 6L8 5.24536e-07L14 6L14 8L10 8L10 16L6 16L6 8Z" fill="#000000"></path> </g></svg>
-                            <span>Subir grupo</span>
-                        </div>
-                        <div class="group-option" data-groupOption="bajarGrupo">
-                            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 8L14 8V10L8 16L2 10V8H6V0L10 4.76995e-08V8Z" fill="#000000"></path> </g></svg>
-                            <span>Bajar grupo</span>
-                        </div>
-                    </div>
-                </li>
 
                 <!-- <li class="notes-group" id="id__note-1">
                     <svg width="100px" height="100px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
@@ -260,7 +297,12 @@
                     <div class="group-color-indicator" id="note-color-8"></div>
                 </li> -->
             </ul>
-            <div class="aside__add-group">
+            <div class="aside__bottom">
+                <div class="aside__trash-bin__box">
+                    <!-- <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> -->
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 12V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 12V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    <div class="aside__trash-bin-text">Papelera</div>
+                </div>
                 <div class="aside__add-group__box">
                     <span class="add-group__text">Añadir grupo</span>
                     <svg viewBox="0 0 24 24" fill="none" class="notes-add-svg" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 12L12 12M12 12L9 12M12 12L12 9M12 12L12 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> <path d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C21.5093 4.43821 21.8356 5.80655 21.9449 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
@@ -268,83 +310,22 @@
             </div>
         </div>
     </aside>
-</div>
 
-<main class="main">
+    <main class="main">
     <div id="no-notes-message"></div>
+
+                                                <!-- CONTENEDOR DE NOTAS -->
+                                                <!-- CONTENEDOR DE NOTAS -->
+                                                <!-- CONTENEDOR DE NOTAS -->
+
     <div class="grid-wrapper">
         <!-- <div class="grid" id="all-notes-container"></div> -->
         <!-- <h2>Notas Fijadas</h2> -->
         <div class="grid-pinned" id="pinned-notes-container"></div>
         <!-- <h2>Notas</h2> -->
-        <div class="grid" id="unpinned-notes-container"></div>
+        <div class="grid-unpinned" id="unpinned-notes-container"></div>
     </div>
 
-
-    <!-- <div class="all-notes-container" id="all-notes-container">
-            <article class="note-card-container">
-                <div class="note-title" contenteditable="true" data-placeholder="Título de la nota" spellcheck="false"></div>
-                <div class="note-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." spellcheck="false"></div>
-                <div class="note-footer">
-                    <div class="note-last-modified">20-05-2025 12:00</div>
-                    <div class="note-length">25665 lineas</div>
-                    <div class="notes-date-creation">19-05-2025 11:00</div>
-                </div>
-                <svg viewBox="0 0 24 24" id="id__note-options" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#1C274C"></path> <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="#1C274C"></path> <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" fill="#1C274C"></path> </g></svg>
-                
-                
-                <div class="note-options-container">
-                    <div class="opt__note-delete">Eliminar nota</div>
-                    <div class="opt__note-delete">Hacer una copia</div>
-                    <div class="opt__note-delete">Fijar al incio</div>
-                    <div class="opt__note-delete">Fijar a la derecha</div>
-                </div>
-
-
-                
-            <article class="note-card-container">
-                <div class="note-title" contenteditable="true" data-placeholder="Título de la nota" spellcheck="false"></div>
-                <div class="note-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." spellcheck="false"></div>
-                <div class="note-footer">
-                    <div class="note-last-modified">20-05-2025 12:00</div>
-                    <div class="note-length">25665 lineas</div>
-                    <div class="notes-date-creation">19-05-2025 11:00</div>
-                </div>
-                <svg viewBox="0 0 24 24" id="id__note-options" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#1C274C"></path> <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="#1C274C"></path> <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" fill="#1C274C"></path> </g></svg>
-            </article>
-            <article class="note-card-container">
-                <div class="note-title" contenteditable="true" data-placeholder="Título de la nota" spellcheck="false"></div>
-                <div class="note-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." spellcheck="false"></div>
-                <div class="note-footer">
-                    <div class="note-last-modified">20-05-2025 12:00</div>
-                    <div class="note-length">25665 lineas</div>
-                    <div class="notes-date-creation">19-05-2025 11:00</div>
-                </div>
-                <svg viewBox="0 0 24 24" id="id__note-options" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#1C274C"></path> <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="#1C274C"></path> <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" fill="#1C274C"></path> </g></svg>
-            </article>
-
-            <article class="note-card-container">
-                <div class="note-title" contenteditable="true" data-placeholder="Título de la nota" spellcheck="false"></div>
-                <div class="note-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." spellcheck="false"></div>
-                <div class="note-footer">
-                    <div class="note-last-modified">20-05-2025 12:00</div>
-                    <div class="note-length">25665 lineas</div>
-                    <div class="notes-date-creation">19-05-2025 11:00</div>
-                </div>
-                <svg viewBox="0 0 24 24" id="id__note-options" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#1C274C"></path> <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="#1C274C"></path> <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" fill="#1C274C"></path> </g></svg>
-            </article>
-            <article class="note-card-container">
-                <div class="note-title" contenteditable="true" data-placeholder="Título de la nota" spellcheck="false"></div>
-                <div class="note-body" contenteditable="true" data-placeholder="Escribe tu nota aquí..." spellcheck="false"></div>
-                <div class="note-footer">
-                    <div class="note-last-modified">20-05-2025 12:00</div>
-                    <div class="note-length">25665 lineas</div>
-                    <div class="notes-date-creation">19-05-2025 11:00</div>
-                </div>
-                <svg viewBox="0 0 24 24" id="id__note-options" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" fill="#1C274C"></path> <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="#1C274C"></path> <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" fill="#1C274C"></path> </g></svg>
-            </article>
-        
-        </div> -->
 
 
                                                     <!--    EDITOR     -->
@@ -361,11 +342,11 @@
                         <li class="editor-tools">
                             <div class="svg"></div>
                             <div class="editor-tools-text">fijar a la derecha</div>
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="System / Window_Sidebar"> <path id="Vector" d="M3 6H3.01919M3.01919 6H9M3.01919 6C3 6.31438 3 6.70191 3 7.2002V16.8002C3 17.9203 3 18.4796 3.21799 18.9074C3.40973 19.2837 3.71547 19.5905 4.0918 19.7822C4.51921 20 5.079 20 6.19694 20L9 20M3.01919 6C3.04314 5.60768 3.09697 5.3293 3.21799 5.0918C3.40973 4.71547 3.71547 4.40973 4.0918 4.21799C4.51962 4 5.08009 4 6.2002 4H17.8002C18.9203 4 19.4796 4 19.9074 4.21799C20.2837 4.40973 20.5905 4.71547 20.7822 5.0918C20.9032 5.3293 20.957 5.60768 20.9809 6M9 6H20.9809M9 6V20M20.9809 6H21M20.9809 6C21 6.31368 21 6.70021 21 7.19691L21 16.8031C21 17.921 21 18.48 20.7822 18.9074C20.5905 19.2837 20.2837 19.5905 19.9074 19.7822C19.48 20 18.921 20 17.8031 20H9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="System / Window_Sidebar"> <path id="Vector" d="M3 6H3.01919M3.01919 6H9M3.01919 6C3 6.31438 3 6.70191 3 7.2002V16.8002C3 17.9203 3 18.4796 3.21799 18.9074C3.40973 19.2837 3.71547 19.5905 4.0918 19.7822C4.51921 20 5.079 20 6.19694 20L9 20M3.01919 6C3.04314 5.60768 3.09697 5.3293 3.21799 5.0918C3.40973 4.71547 3.71547 4.40973 4.0918 4.21799C4.51962 4 5.08009 4 6.2002 4H17.8002C18.9203 4 19.4796 4 19.9074 4.21799C20.2837 4.40973 20.5905 4.71547 20.7822 5.0918C20.9032 5.3293 20.957 5.60768 20.9809 6M9 6H20.9809M9 6V20M20.9809 6H21M20.9809 6C21 6.31368 21 6.70021 21 7.19691L21 16.8031C21 17.921 21 18.48 20.7822 18.9074C20.5905 19.2837 20.2837 19.5905 19.9074 19.7822C19.48 20 18.921 20 17.8031 20H9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
                         </li>
                         <li class="editor-tools" id="editor-pin">
-                            <svg id="editor-pinned" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.9894 4.9502L16.52 4.42014V4.42014L15.9894 4.9502ZM19.0716 8.03562L18.541 8.56568L19.0716 8.03562ZM8.73837 19.429L8.20777 19.9591L8.73837 19.429ZM4.62169 15.3081L5.15229 14.7781L4.62169 15.3081ZM17.5669 14.9943L17.3032 14.2922L17.5669 14.9943ZM15.6498 15.7146L15.9136 16.4167H15.9136L15.6498 15.7146ZM8.3322 8.38177L7.62798 8.12375L8.3322 8.38177ZM9.02665 6.48636L9.73087 6.74438V6.74438L9.02665 6.48636ZM5.84504 10.6735L6.04438 11.3965L5.84504 10.6735ZM7.30167 10.1351L6.86346 9.52646L6.86346 9.52646L7.30167 10.1351ZM7.67582 9.79038L8.24665 10.2768H8.24665L7.67582 9.79038ZM14.251 16.3805L14.742 16.9475L14.742 16.9475L14.251 16.3805ZM13.3806 18.2012L12.6574 18.0022V18.0022L13.3806 18.2012ZM13.9169 16.7466L13.3075 16.3094L13.3075 16.3094L13.9169 16.7466ZM2.71846 12.7552L1.96848 12.76L1.96848 12.76L2.71846 12.7552ZM2.93045 11.9521L2.28053 11.5778H2.28053L2.93045 11.9521ZM11.3052 21.3431L11.3064 20.5931H11.3064L11.3052 21.3431ZM12.0933 21.1347L11.7215 20.4833L11.7215 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8588 2.76845L11.6973 2.03606ZM1.4694 21.4699C1.17666 21.763 1.1769 22.2379 1.46994 22.5306C1.76298 22.8233 2.23786 22.8231 2.5306 22.5301L1.4694 21.4699ZM7.18383 17.8721C7.47657 17.5791 7.47633 17.1042 7.18329 16.8114C6.89024 16.5187 6.41537 16.5189 6.12263 16.812L7.18383 17.8721ZM15.4588 5.48026L18.541 8.56568L19.6022 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26897 18.8989L5.15229 14.7781L4.09109 15.8382L8.20777 19.9591L9.26897 18.8989ZM17.3032 14.2922L15.386 15.0125L15.9136 16.4167L17.8307 15.6964L17.3032 14.2922ZM9.03642 8.63979L9.73087 6.74438L8.32243 6.22834L7.62798 8.12375L9.03642 8.63979ZM6.04438 11.3965C6.75583 11.2003 7.29719 11.0625 7.73987 10.7438L6.86346 9.52646C6.69053 9.65097 6.46601 9.72428 5.6457 9.95044L6.04438 11.3965ZM7.62798 8.12375C7.33502 8.92332 7.24338 9.14153 7.10499 9.30391L8.24665 10.2768C8.60041 9.86175 8.7823 9.33337 9.03642 8.63979L7.62798 8.12375ZM7.73987 10.7438C7.92696 10.6091 8.09712 10.4523 8.24665 10.2768L7.10499 9.30391C7.0337 9.38757 6.9526 9.46229 6.86346 9.52646L7.73987 10.7438ZM15.386 15.0125C14.697 15.2714 14.1716 15.4571 13.76 15.8135L14.742 16.9475C14.9028 16.8082 15.1192 16.7152 15.9136 16.4167L15.386 15.0125ZM14.1037 18.4001C14.329 17.5813 14.4021 17.3569 14.5263 17.1838L13.3075 16.3094C12.9902 16.7517 12.8529 17.2919 12.6574 18.0022L14.1037 18.4001ZM13.76 15.8135C13.5903 15.9605 13.4384 16.1269 13.3075 16.3094L14.5263 17.1838C14.5887 17.0968 14.6611 17.0175 14.742 16.9475L13.76 15.8135ZM5.15229 14.7781C4.50615 14.1313 4.06799 13.691 3.78366 13.3338C3.49835 12.9753 3.46889 12.8201 3.46845 12.7505L1.96848 12.76C1.97215 13.3422 2.26127 13.8297 2.61002 14.2679C2.95976 14.7073 3.47115 15.2176 4.09109 15.8382L5.15229 14.7781ZM5.6457 9.95044C4.80048 10.1835 4.10396 10.3743 3.58296 10.5835C3.06341 10.792 2.57116 11.0732 2.28053 11.5778L3.58038 12.3264C3.615 12.2663 3.71693 12.146 4.1418 11.9755C4.56523 11.8055 5.16337 11.6394 6.04438 11.3965L5.6457 9.95044ZM3.46845 12.7505C3.46751 12.6016 3.50616 12.4553 3.58038 12.3264L2.28053 11.5778C2.07354 11.9372 1.96586 12.3452 1.96848 12.76L3.46845 12.7505ZM8.20777 19.9591C8.83164 20.5836 9.34464 21.0987 9.78647 21.4506C10.227 21.8015 10.7179 22.0922 11.3041 22.0931L11.3064 20.5931C11.2369 20.593 11.0814 20.5644 10.721 20.2773C10.3618 19.9912 9.91923 19.5499 9.26897 18.8989L8.20777 19.9591ZM12.6574 18.0022C12.4133 18.8897 12.2462 19.4924 12.0751 19.9188C11.9033 20.3467 11.7821 20.4487 11.7215 20.4833L12.465 21.7861C12.974 21.4956 13.2573 21.0004 13.4671 20.4775C13.6776 19.9532 13.8694 19.2516 14.1037 18.4001L12.6574 18.0022ZM11.3041 22.0931C11.7112 22.0937 12.1114 21.9879 12.465 21.7861L11.7215 20.4833C11.595 20.5555 11.4519 20.5933 11.3064 20.5931L11.3041 22.0931ZM18.541 8.56568C19.6045 9.63022 20.3403 10.3695 20.7917 10.9788C21.2353 11.5774 21.2863 11.8959 21.2321 12.1464L22.6982 12.4634C22.8881 11.5854 22.5382 10.8162 21.9969 10.0857C21.4635 9.36592 20.6305 8.53486 19.6022 7.50556L18.541 8.56568ZM17.8307 15.6964C19.1921 15.1849 20.294 14.773 21.0771 14.3384C21.8718 13.8973 22.5083 13.3416 22.6982 12.4634L21.2321 12.1464C21.178 12.3968 21.0001 12.6655 20.3491 13.0268C19.6865 13.3946 18.7112 13.7632 17.3032 14.2922L17.8307 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1908 1.46165 12.4175 1.10912 11.5357 1.30367L11.8588 2.76845C12.1086 2.71335 12.4277 2.7633 13.0304 3.21075C13.6433 3.66579 14.3876 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73087 6.74438C10.2525 5.32075 10.6161 4.33403 10.9812 3.66315C11.3402 3.00338 11.609 2.82357 11.8588 2.76845L11.5357 1.30367C10.654 1.49819 10.1005 2.14332 9.66362 2.94618C9.23278 3.73793 8.82688 4.85154 8.32243 6.22834L9.73087 6.74438ZM2.5306 22.5301L7.18383 17.8721L6.12263 16.812L1.4694 21.4699L2.5306 22.5301Z" fill="#1C274C"></path> </g></svg>
-                            <svg id="editor-unpinned" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z" fill="#1C274C"></path> </g></svg>
+                            <svg id="editor-pinned" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.9894 4.9502L16.52 4.42014V4.42014L15.9894 4.9502ZM19.0716 8.03562L18.541 8.56568L19.0716 8.03562ZM8.73837 19.429L8.20777 19.9591L8.73837 19.429ZM4.62169 15.3081L5.15229 14.7781L4.62169 15.3081ZM17.5669 14.9943L17.3032 14.2922L17.5669 14.9943ZM15.6498 15.7146L15.9136 16.4167H15.9136L15.6498 15.7146ZM8.3322 8.38177L7.62798 8.12375L8.3322 8.38177ZM9.02665 6.48636L9.73087 6.74438V6.74438L9.02665 6.48636ZM5.84504 10.6735L6.04438 11.3965L5.84504 10.6735ZM7.30167 10.1351L6.86346 9.52646L6.86346 9.52646L7.30167 10.1351ZM7.67582 9.79038L8.24665 10.2768H8.24665L7.67582 9.79038ZM14.251 16.3805L14.742 16.9475L14.742 16.9475L14.251 16.3805ZM13.3806 18.2012L12.6574 18.0022V18.0022L13.3806 18.2012ZM13.9169 16.7466L13.3075 16.3094L13.3075 16.3094L13.9169 16.7466ZM2.71846 12.7552L1.96848 12.76L1.96848 12.76L2.71846 12.7552ZM2.93045 11.9521L2.28053 11.5778H2.28053L2.93045 11.9521ZM11.3052 21.3431L11.3064 20.5931H11.3064L11.3052 21.3431ZM12.0933 21.1347L11.7215 20.4833L11.7215 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8588 2.76845L11.6973 2.03606ZM1.4694 21.4699C1.17666 21.763 1.1769 22.2379 1.46994 22.5306C1.76298 22.8233 2.23786 22.8231 2.5306 22.5301L1.4694 21.4699ZM7.18383 17.8721C7.47657 17.5791 7.47633 17.1042 7.18329 16.8114C6.89024 16.5187 6.41537 16.5189 6.12263 16.812L7.18383 17.8721ZM15.4588 5.48026L18.541 8.56568L19.6022 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26897 18.8989L5.15229 14.7781L4.09109 15.8382L8.20777 19.9591L9.26897 18.8989ZM17.3032 14.2922L15.386 15.0125L15.9136 16.4167L17.8307 15.6964L17.3032 14.2922ZM9.03642 8.63979L9.73087 6.74438L8.32243 6.22834L7.62798 8.12375L9.03642 8.63979ZM6.04438 11.3965C6.75583 11.2003 7.29719 11.0625 7.73987 10.7438L6.86346 9.52646C6.69053 9.65097 6.46601 9.72428 5.6457 9.95044L6.04438 11.3965ZM7.62798 8.12375C7.33502 8.92332 7.24338 9.14153 7.10499 9.30391L8.24665 10.2768C8.60041 9.86175 8.7823 9.33337 9.03642 8.63979L7.62798 8.12375ZM7.73987 10.7438C7.92696 10.6091 8.09712 10.4523 8.24665 10.2768L7.10499 9.30391C7.0337 9.38757 6.9526 9.46229 6.86346 9.52646L7.73987 10.7438ZM15.386 15.0125C14.697 15.2714 14.1716 15.4571 13.76 15.8135L14.742 16.9475C14.9028 16.8082 15.1192 16.7152 15.9136 16.4167L15.386 15.0125ZM14.1037 18.4001C14.329 17.5813 14.4021 17.3569 14.5263 17.1838L13.3075 16.3094C12.9902 16.7517 12.8529 17.2919 12.6574 18.0022L14.1037 18.4001ZM13.76 15.8135C13.5903 15.9605 13.4384 16.1269 13.3075 16.3094L14.5263 17.1838C14.5887 17.0968 14.6611 17.0175 14.742 16.9475L13.76 15.8135ZM5.15229 14.7781C4.50615 14.1313 4.06799 13.691 3.78366 13.3338C3.49835 12.9753 3.46889 12.8201 3.46845 12.7505L1.96848 12.76C1.97215 13.3422 2.26127 13.8297 2.61002 14.2679C2.95976 14.7073 3.47115 15.2176 4.09109 15.8382L5.15229 14.7781ZM5.6457 9.95044C4.80048 10.1835 4.10396 10.3743 3.58296 10.5835C3.06341 10.792 2.57116 11.0732 2.28053 11.5778L3.58038 12.3264C3.615 12.2663 3.71693 12.146 4.1418 11.9755C4.56523 11.8055 5.16337 11.6394 6.04438 11.3965L5.6457 9.95044ZM3.46845 12.7505C3.46751 12.6016 3.50616 12.4553 3.58038 12.3264L2.28053 11.5778C2.07354 11.9372 1.96586 12.3452 1.96848 12.76L3.46845 12.7505ZM8.20777 19.9591C8.83164 20.5836 9.34464 21.0987 9.78647 21.4506C10.227 21.8015 10.7179 22.0922 11.3041 22.0931L11.3064 20.5931C11.2369 20.593 11.0814 20.5644 10.721 20.2773C10.3618 19.9912 9.91923 19.5499 9.26897 18.8989L8.20777 19.9591ZM12.6574 18.0022C12.4133 18.8897 12.2462 19.4924 12.0751 19.9188C11.9033 20.3467 11.7821 20.4487 11.7215 20.4833L12.465 21.7861C12.974 21.4956 13.2573 21.0004 13.4671 20.4775C13.6776 19.9532 13.8694 19.2516 14.1037 18.4001L12.6574 18.0022ZM11.3041 22.0931C11.7112 22.0937 12.1114 21.9879 12.465 21.7861L11.7215 20.4833C11.595 20.5555 11.4519 20.5933 11.3064 20.5931L11.3041 22.0931ZM18.541 8.56568C19.6045 9.63022 20.3403 10.3695 20.7917 10.9788C21.2353 11.5774 21.2863 11.8959 21.2321 12.1464L22.6982 12.4634C22.8881 11.5854 22.5382 10.8162 21.9969 10.0857C21.4635 9.36592 20.6305 8.53486 19.6022 7.50556L18.541 8.56568ZM17.8307 15.6964C19.1921 15.1849 20.294 14.773 21.0771 14.3384C21.8718 13.8973 22.5083 13.3416 22.6982 12.4634L21.2321 12.1464C21.178 12.3968 21.0001 12.6655 20.3491 13.0268C19.6865 13.3946 18.7112 13.7632 17.3032 14.2922L17.8307 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1908 1.46165 12.4175 1.10912 11.5357 1.30367L11.8588 2.76845C12.1086 2.71335 12.4277 2.7633 13.0304 3.21075C13.6433 3.66579 14.3876 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73087 6.74438C10.2525 5.32075 10.6161 4.33403 10.9812 3.66315C11.3402 3.00338 11.609 2.82357 11.8588 2.76845L11.5357 1.30367C10.654 1.49819 10.1005 2.14332 9.66362 2.94618C9.23278 3.73793 8.82688 4.85154 8.32243 6.22834L9.73087 6.74438ZM2.5306 22.5301L7.18383 17.8721L6.12263 16.812L1.4694 21.4699L2.5306 22.5301Z"></path> </g></svg>
+                            <svg id="editor-unpinned" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z"></path> </g></svg>
                         </li>
                             <!-- <li class="editor-tools">
                             <div class="svg"></div>
@@ -398,50 +379,83 @@
                 <span class="delete-group-close-button">&times;</span>
                 <h2>Confirmar eliminación</h2>
                 <p>¿Estás seguro de eliminar este grupo? Todas las notas del grupo se volverán notas sin grupo.</p>
-                <button id="confirmDeleteGroupBtn">Sí, eliminar</button>
-                <button id="cancelDeleteGroupBtn">Cancelar</button>
+                <button id="confirmDeleteGroupBtn" class="confirm-btn">Sí, eliminar</button>
+                <button id="cancelDeleteGroupBtn" class="cancel-btn">Cancelar</button>
+            </div>
+        </div>
+
+                                    <!--    Modal advertencia al vaciar la papelera     -->
+        <div id="confirm-modal-empty-trash" class="modal-delete-group">
+            <div class="modal-delete-group-content">
+                <span class="delete-group-close-button">&times;</span>
+                <h2>Confirmar acción</h2>
+                <p>¿Estás seguro de que quieres vaciar la papelera? Todas las notas se eliminarán permanentemente y esta acción no se puede deshacer.</p>
+                <button id="confirmEmptyTrashBtn" class="confirm-btn">Sí, vaciar papelera</button>
+                <button id="cancelEmptyTrashBtn" class="cancel-btn">Cancelar</button>
+            </div>
+        </div>
+
+                                    <!--    Modal advertencia al eliminar nota permanentemente     -->
+        <div id="confirm-modal-delete-note" class="modal-delete-group">
+            <div class="modal-delete-group-content">
+                <span class="delete-group-close-button">&times;</span>
+                <h2>Confirmar eliminación</h2>
+                <p>¿Estás seguro de que quieres eliminar esta nota permanentemente? Esta acción no se puede deshacer.</p>
+                <button id="confirmDeleteNoteBtn" class="confirm-btn">Sí, eliminar</button>
+                <button id="cancelDeleteNoteBtn" class="cancel-btn">Cancelar</button>
+            </div>
+        </div>
+
+                                    <!--    Modal para confirmar la importación de datos de invitado     -->
+        <div id="confirm-modal-import-guest" class="modal-delete-group">
+            <div class="modal-delete-group-content">
+                <span class="delete-group-close-button">&times;</span>
+                <h2>Confirmar importación</h2>
+                <p>Esto combinará las notas y grupos de la sesión de invitado con tu cuenta actual. Los datos de invitado se eliminarán después de la importación. ¿Deseas continuar?</p>
+                <div class="modal-buttons-container">
+                    <button id="confirmImportGuestBtn" class="confirm-btn">Sí, importar</button>
+                    <button id="cancelImportGuestBtn" class="cancel-btn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+                                                    <!-- Modal para Orden Personalizado -->
+        <div id="custom-order-modal" class="modal-delete-group" style="display: none;">
+            <div class="modal-delete-group-content">
+                <button class="delete-group-close-button">&times;</button>
+                <h3>Cambiar a Orden Personalizado</h3>
+                <p>Has movido una nota. Para guardar un orden personalizado, debes estar en ese modo.</p>
+                <div class="modal-actions" style="display: flex; justify-content: center; gap: 10px;">
+                    <button id="setNewCustomOrderBtn" class="confirm-btn">Establecer nuevo orden</button>
+                    <button id="switchToCustomOrderBtn" class="cancel-btn">Cargar orden guardado</button>
+                    <button id="cancelOrderChangeBtn" class="cancel-btn">Cancelar</button>
+                </div>
+                <p class="modal-explanation">
+                    <strong>Establecer nuevo orden:</strong> La disposición actual de las notas se convertirá en tu nuevo orden "Personalizado".
+                    <br>
+                    <strong>Cargar orden guardado:</strong> Se descartará el cambio que acabas de hacer y se cargará tu orden "Personalizado" anterior.
+                </p>
+            </div>
+        </div>
+
+        <!-- Modal para Enviar Comentarios -->
+        <div id="feedback-modal" class="modal-delete-group" style="display: none;">
+            <div class="modal-delete-group-content">
+                <button class="delete-group-close-button">&times;</button>
+                <h3>Enviar Comentarios</h3>
+                <p>Tus ideas nos ayudan a mejorar. ¡Gracias por tu tiempo!</p>
+                <textarea id="feedback-textarea" placeholder="Escribe aquí tu opinión, sugerencias o reporta un error..." maxlength="5000"></textarea>
+                <button id="send-feedback-btn" class="confirm-btn">Enviar</button>
             </div>
         </div>
 
 
 </main>
 
-    <script type="module" defer>
 
 
-        // const aside = document.querySelector(".aside");
-        // const main = document.querySelector(".main");
-        // const AsideMenuHam = document.getElementById("aside__menuham");
-
-        // if (localStorage.getItem("aside") === "true") {
-        //     aside.classList.add("aside-hidden");
-        //     main.classList.add("main-grow");
-        // } else if (localStorage.getItem("aside") === "false") {
-        //     aside.classList.remove("aside-hidden");
-        //     main.classList.remove("main-grow");
-        // }
-
-        // const activarAside = () => {
-
-        //     // main.classList.remove("no-transition");
-        //     // aside.classList.remove("no-transition");
-        //     aside.classList.add("transition-activate");
-        //     main.classList.add("transition-activate");
-
-        //     aside.classList.toggle("aside-hidden");
-
-        //     if (aside.classList.contains("aside-hidden")) {
-        //         localStorage.setItem("aside", "true");
-        //         // aside.classList.add("aside-hidden");
-        //         main.classList.add("main-grow");
-        //     } else {
-        //         localStorage.setItem("aside", "false");
-        //         main.classList.remove("main-grow");
-        //     }
-        // }
-
-        // AsideMenuHam.addEventListener("click", activarAside);
-    </script>
+    <!-- Contenedor para las notificaciones (toasts) -->
+    <div id="notification-container"></div>
 
     <script type="module" src="/src/main.js"></script>
 
