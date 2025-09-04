@@ -40,14 +40,23 @@ export const handleFilter = (groupId) => {
         ? item => item.getElement().matches('.note-card-container:not(.is-trashed)') // Filtra todo lo que no esté en la papelera
         : `[data-group-id="${groupId}"]`;
 
-    gridPinned.filter(filterSelector);
-    gridUnpinned.filter(filterSelector);
-    
-    // Después de filtrar, es una buena práctica re-ordenar para asegurar consistencia.
-    // gridPinned.sort(ordenarNotas, { layout: 'instant' });
-    // gridUnpinned.sort(ordenarNotas, { layout: 'instant' });
-    // gridPinned.refreshItems().layout();
-    // gridUnpinned.refreshItems().layout();
+    gridPinned.filter(filterSelector, { instant: true });
+    gridUnpinned.filter(filterSelector, { instant: true });
+
+    // Después de filtrar, es crucial re-ordenar y recalcular el layout.
+    // 1. Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario.
+    const currentSortFunction = getSortFunction();
+    if (currentSortFunction) {
+        // 2. Aplicamos el ordenamiento y forzamos un layout inmediato para evitar animaciones bruscas.
+        // Encadenamos las operaciones: sort -> layout.
+        // El { layout: 'instant' } en sort previene la animación de ordenamiento.
+        // El layout(true) final asegura que los elementos se compacten instantáneamente.
+        // No es estrictamente necesario usar .then() aquí, ya que Muuri puede encadenar estas llamadas.
+        gridPinned.sort(currentSortFunction, { layout: 'instant' });
+        gridPinned.layout(true);
+        gridUnpinned.sort(currentSortFunction, { layout: 'instant' });
+        gridUnpinned.layout(true);
+    }
 };
 
 const showTrashView = async () => {
