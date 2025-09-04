@@ -1,9 +1,9 @@
-import { cargarNotasDesdeDB, vaciarPapeleraEnDB, obtenerNotaPorIdDesdeDB } from '../services/db.js';
+import { vaciarPapeleraEnDB, obtenerNotaPorIdDesdeDB } from '../services/db.js';
 import { renderizarNotaEnDOM } from './NoteCard.js';
 import { abrirEditorNota } from './NoteEditor.js';
 import { getSortFunction } from '../utils.js';
 import { Modal } from './ModalManager.js';
-// import { gridPinned, gridUnpinned } from '../main.js';
+import { store } from '../services/store.js';
 
 // Module-level variables to hold grid instances
 let gridPinned;
@@ -37,12 +37,12 @@ export const handleFilter = (groupId) => {
     if (!gridPinned || !gridUnpinned) return;
 
     const filterSelector = (!groupId || groupId === 'all' || groupId === '.muuri-item' || groupId === 'null' || groupId === null || groupId === undefined)
-        ? '.muuri-item'
+        ? item => item.getElement().matches('.note-card-container:not(.is-trashed)') // Filtra todo lo que no esté en la papelera
         : `[data-group-id="${groupId}"]`;
 
     gridPinned.filter(filterSelector);
     gridUnpinned.filter(filterSelector);
-
+    
     // Después de filtrar, es una buena práctica re-ordenar para asegurar consistencia.
     // gridPinned.sort(ordenarNotas, { layout: 'instant' });
     // gridUnpinned.sort(ordenarNotas, { layout: 'instant' });
@@ -54,8 +54,8 @@ const showTrashView = async () => {
     // 1. Ocultar los grids principales de Muuri y mostrar un contenedor para la papelera
     document.querySelector('.grid-pinned').style.display = 'none';
     document.querySelector('.grid-unpinned').style.display = 'none';
-    if (gridPinned) gridPinned.hide(gridPinned.getItems(), { instant: true });
-    if (gridUnpinned) gridUnpinned.hide(gridUnpinned.getItems(), { instant: true });
+    gridPinned?.hide(gridPinned.getItems(), { instant: true });
+    gridUnpinned?.hide(gridUnpinned.getItems(), { instant: true });
 
     // 2. Crear o encontrar el contenedor de la papelera y su cabecera
     let trashViewContainer = document.getElementById('trash-view-container');
@@ -77,7 +77,8 @@ const showTrashView = async () => {
     trashNotesContainer.innerHTML = ''; // Limpiar contenido previo
 
     // 3. Cargar notas y configurar el botón
-    const trashedNotes = await cargarNotasDesdeDB('trashed');
+    // Obtenemos las notas de la papelera desde el store, que es la fuente de verdad.
+    const trashedNotes = store.getState().notes.filter(n => n.status === 'trashed');
     const noNotesMessage = document.getElementById('no-notes-message');
 
     if (trashedNotes.length > 0) {
@@ -114,6 +115,7 @@ const showTrashView = async () => {
     });
 
     // 4. Asignar el evento al botón (se reasigna cada vez, lo que es seguro)
+    // Usando la clase Modal para consistencia
     emptyTrashBtn.onclick = () => {
         const confirmModal = new Modal('confirm-modal-empty-trash');
         const modalElement = document.getElementById('confirm-modal-empty-trash');
@@ -152,12 +154,12 @@ const showMainView = () => {
     }
 
     // Mostrar los grids principales
-    document.querySelector('.grid-pinned').style.display = 'block';
-    document.querySelector('.grid-unpinned').style.display = 'block';
+    document.querySelector('.grid-pinned').style.display = ''; // Usar '' para volver al estilo por defecto de CSS
+    document.querySelector('.grid-unpinned').style.display = '';
     
     // Mostrar todos los items en los grids de Muuri
-    if (gridPinned) gridPinned.show(gridPinned.getItems(), { instant: true });
-    if (gridUnpinned) gridUnpinned.show(gridUnpinned.getItems(), { instant: true });
+    gridPinned?.show(gridPinned.getItems(), { instant: true });
+    gridUnpinned?.show(gridUnpinned.getItems(), { instant: true });
     
     // Forzar un relayout para evitar problemas visuales
     if (gridPinned) gridPinned.refreshItems().layout();
@@ -167,9 +169,11 @@ const showMainView = () => {
 
 
 // LISTENERS DE FILTROS
-export const initFilterManager = (grids) => {
+export const initFilters = (grids) => {
     gridPinned = grids.gridPinned;
     gridUnpinned = grids.gridUnpinned;
+
+    if (!gridPinned || !gridUnpinned) return;
 
     const visiblePinnedItems = gridPinned.getItems().filter(item => item.isVisible());
     const visibleItemPinnedCount = visiblePinnedItems.length;
@@ -182,7 +186,7 @@ export const initFilterManager = (grids) => {
     }
 
     // Manejar el mensaje de "no hay notas" después de cualquier cambio de layout
-    gridUnpinned.on('layoutEnd', () => {
+    const handleLayoutEnd = () => {
         const visiblePinnedItems = gridPinned.getItems().filter(item => item.isVisible());
         const visibleUnpinnedItems = gridUnpinned.getItems().filter(item => item.isVisible());
         const visibleItemPinnedCount = visiblePinnedItems.length;
@@ -202,7 +206,10 @@ export const initFilterManager = (grids) => {
                 noNotesMessage.style.display = 'none';
             }
         }
-    });
+    };
+
+    gridPinned.on('layoutEnd', handleLayoutEnd);
+    gridUnpinned.on('layoutEnd', handleLayoutEnd);
 
     // BUSCADOR HEADER
     const filterGridByQuery = (grid, query) => {
@@ -215,9 +222,9 @@ export const initFilterManager = (grids) => {
             return titleText.includes(query) || bodyText.includes(query);
         });
         // Después de filtrar, es crucial re-ordenar y recalcular el layout.
-        // Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario.
-        const currentSortFunction = getSortFunction();
-        if (currentSortFunction) {
+        // Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario
+        const currentSortFunction = getSortFunction(); 
+        if (currentSortFunction) { // Solo ordenamos si la función es válida
             grid.sort(currentSortFunction, { layout: 'instant' });
         }
     };

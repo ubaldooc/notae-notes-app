@@ -18,7 +18,7 @@ import { initNoteCard, renderizarNotaEnDOM } from './components/NoteCard.js';
 
 import { initHeader } from './components/Header.js';
 
-import { initFilterManager } from './components/FilterManager.js';
+import { initFilters } from './components/FilterManager.js';
 
 import { initUtils, getSortFunction } from './utils.js';
 
@@ -722,7 +722,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGroupManager();
     initNoteEditor();
     initNoteCard();
-    initFilterManager({ gridPinned, gridUnpinned });
+    initFilters({ gridPinned, gridUnpinned });
     initKeyboardShortcuts();
     initSelectionManager({ gridPinned, gridUnpinned });
     initViewSwitcher();
