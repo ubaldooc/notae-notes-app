@@ -319,13 +319,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Aquí puedes añadir opciones de configuración
         // Por ejemplo, para habilitar arrastrar y soltar
-        // layout: {
-        //     fillGaps: true // Esta es la opción clave
-        // }
+        layout: {
+            fillGaps: true // Esta es la opción clave
+        },
        
         // Opciones para deshabilitar las animaciones de entrada y salida
-        showDuration: 0,
-        hideDuration: 0,
+        // showDuration: 0,
+        // hideDuration: 0,
         
         // Otras opciones que controlan la velocidad de las animaciones
         // layoutDuration: 0,
@@ -336,8 +336,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Inicializa la segunda instancia de Muuri para el grid-2
     gridPinned = new Muuri('#pinned-notes-container', {
         dragEnabled: true,
-        // dragContainer: document.querySelector(".grid-unpinned-wrapper"),
-        // dragContainer: document.body
+
+        layout: {
+            fillGaps: true // Esta es la opción clave
+        },
+        // showDuration: 0,
+        // hideDuration: 0,
     });
 
     // --- LÓGICA DEL MODAL DE ORDEN PERSONALIZADO ---

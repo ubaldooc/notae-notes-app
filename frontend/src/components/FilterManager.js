@@ -39,24 +39,31 @@ export const handleFilter = (groupId) => {
     const filterSelector = (!groupId || groupId === 'all' || groupId === '.muuri-item' || groupId === 'null' || groupId === null || groupId === undefined)
         ? item => item.getElement().matches('.note-card-container:not(.is-trashed)') // Filtra todo lo que no esté en la papelera
         : `[data-group-id="${groupId}"]`;
+    
+    // 1. Primero, mostramos todas las notas (excepto las de la papelera) para "resetear" el layout.
+    // Esto ayuda a evitar que las notas aparezcan en lugares extraños al cambiar entre grupos.
+    const allNotesSelector = item => item.getElement().matches('.note-card-container:not(.is-trashed)');
+    gridPinned.filter(allNotesSelector, { instant: true });
+    gridUnpinned.filter(allNotesSelector, { instant: true });
 
-    gridPinned.filter(filterSelector, { instant: true });
-    gridUnpinned.filter(filterSelector, { instant: true });
+    // Tengo que aplicar este filtro primero porque sin el las notas salen desordenadas y en lugares extraños solitarias
+    gridPinned.filter("muuri", { instant: true });
+    gridUnpinned.filter("muuri", { instant: true });
+    
+    requestAnimationFrame(() => {
+        // Aplicamos el filtro del grupo seleccionado.
+        gridPinned.filter(filterSelector);
+        gridUnpinned.filter(filterSelector);
 
-    // Después de filtrar, es crucial re-ordenar y recalcular el layout.
-    // 1. Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario.
-    const currentSortFunction = getSortFunction();
-    if (currentSortFunction) {
-        // 2. Aplicamos el ordenamiento y forzamos un layout inmediato para evitar animaciones bruscas.
-        // Encadenamos las operaciones: sort -> layout.
-        // El { layout: 'instant' } en sort previene la animación de ordenamiento.
-        // El layout(true) final asegura que los elementos se compacten instantáneamente.
-        // No es estrictamente necesario usar .then() aquí, ya que Muuri puede encadenar estas llamadas.
-        gridPinned.sort(currentSortFunction, { layout: 'instant' });
-        gridPinned.layout(true);
-        gridUnpinned.sort(currentSortFunction, { layout: 'instant' });
-        gridUnpinned.layout(true);
-    }
+        // 3. Finalmente, re-ordenamos y compactamos el layout para que todo se vea correcto.
+        const currentSortFunction = getSortFunction();
+        if (currentSortFunction) {
+            gridPinned.sort(currentSortFunction, { layout: 'instant' });
+            gridUnpinned.sort(currentSortFunction, { layout: 'instant' });
+            gridPinned.layout(true);
+            gridUnpinned.layout(true);
+        }
+    });
 };
 
 const showTrashView = async () => {

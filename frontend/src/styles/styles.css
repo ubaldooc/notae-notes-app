@@ -1551,7 +1551,7 @@ body.dark-mode #no-notes-message {
     width: 100%;
     /* min-height: 0px; */
     /* margin-bottom: 60px; */
-    flex: 1 1 auto;
+    /* flex: 1 1 auto; */
 
 }
 
@@ -1561,7 +1561,7 @@ body.dark-mode #no-notes-message {
     /* background: #87CEEB; */
     /* min-width: 900px; */
     width: 100%;
-    flex: 1 1 auto;
+    /* flex: 1 1 auto; */
 }
 
 
