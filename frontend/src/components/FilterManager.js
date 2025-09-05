@@ -148,8 +148,11 @@ const showTrashView = async () => {
             triggerElement: emptyTrashBtn,
             onConfirm: async () => {
                 try {
+                    const trashedNoteIds = store.getState().notes.filter(n => n.status === 'trashed').map(n => n.id);
                     await vaciarPapeleraEnDB();
                     trashNotesContainer.innerHTML = '';
+                    // Usamos la acción específica para eliminar múltiples notas del store.
+                    store.removeNotes(trashedNoteIds);
                     noNotesMessage.style.display = 'block';
                     noNotesMessage.innerHTML = 'La papelera está vacía.';
                     emptyTrashBtn.style.display = 'none';

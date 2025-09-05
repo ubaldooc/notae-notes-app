@@ -1,5 +1,6 @@
-import { moverNotaAPapeleraEnDB } from '../services/db.js';
-import { duplicarNota, updateNoteSelectionStyle } from './NoteCard.js';
+import { moverNotasAPapeleraEnDB } from '../services/db.js';
+import { duplicarNota, updateNoteSelectionStyle, moverNotaAPapelera } from './NoteCard.js';
+import { store } from '../services/store.js';
 
 // Module-level variables to be initialized
 let gridPinned;
@@ -42,18 +43,23 @@ const cancelSelection = () => {
  * Mueve todas las notas seleccionadas a la papelera.
  */
 const deleteSelectedNotes = async () => {
-    const promises = [];
-    for (const noteId of selectedNotes) {
-        promises.push(moverNotaAPapeleraEnDB(noteId));
-        const noteElement = document.getElementById(noteId);
-        if (noteElement) {
-            const itemInPinned = gridPinned.getItems(noteElement)[0];
-            const itemInUnpinned = gridUnpinned.getItems(noteElement)[0];
-            if (itemInPinned) gridPinned.remove([itemInPinned], { removeElements: true });
-            if (itemInUnpinned) gridUnpinned.remove([itemInUnpinned], { removeElements: true });
-        }
+    const noteIdsToDelete = Array.from(selectedNotes);
+    if (noteIdsToDelete.length === 0) return;
+
+    try {
+        await moverNotasAPapeleraEnDB(noteIdsToDelete);
+        // Actualizamos el estado de cada nota a 'trashed' en el store.
+        const { notes } = store.getState();
+        noteIdsToDelete.forEach(id => {
+            const nota = notes.find(n => n.id === id);
+            if (nota) {
+                store.upsertNote({ ...nota, status: 'trashed' });
+            }
+        });
+    } catch (error) {
+        console.error("Error al eliminar las notas seleccionadas:", error);
+        // Aquí podrías mostrar una notificación de error al usuario.
     }
-    await Promise.all(promises);
     cancelSelection();
 };
 

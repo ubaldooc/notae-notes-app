@@ -509,11 +509,10 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
         restoreBtn.onclick = async (e) => {
             e.stopPropagation();
             try {
-                const notaRestaurada = await restaurarNotaEnDB(noteData.id);
-                noteCardContainer.remove();
-                if (notaRestaurada) {
-                    renderizarNotaEnDOM(notaRestaurada);
-                }
+                const notaRestaurada = await restaurarNotaEnDB(noteData.id); // 1. Llama a la DB para cambiar el estado a 'active'.
+                store.upsertNote(notaRestaurada); // 2. Actualiza el store.
+                noteCardContainer.remove(); // 3. Elimina la tarjeta de la vista de papelera.
+                renderizarNotaEnDOM(notaRestaurada); // 4. ¡Paso clave! Vuelve a renderizar la nota en la vista principal.
             } catch (error) {
                 console.error(`Error al restaurar la nota ${noteData.id}:`, error);
                 showNotification('No se pudo restaurar la nota.', 'error');
@@ -543,6 +542,7 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
                 onConfirm: async () => {
                     try {
                         await eliminarNotaPermanentementeDeDB(noteData.id);
+                        store.removeNote(noteData.id); // Elimina del store
                         noteCardContainer.remove();
                     } catch (error) {
                         showNotification('No se pudo eliminar la nota permanentemente.', 'error');
@@ -882,23 +882,34 @@ export const verificarYReubicarNota = (noteId, isPinned) => {
 
 
 // ELIMINAR NOTA, PENDIENTE CREAR UNA CARPETA DE PAPELERIA TEMPORAL PARA ENVIAR LAS NOTAS ELIMINADAS.
-const moverNotaAPapelera = async (identificadorNota) => {
-    const noteId = identificadorNota;
+export const moverNotaAPapelera = async (noteId) => {
     const notaElement = document.getElementById(noteId);
-    if (!notaElement) {
-        console.error(`Elemento de nota con ID ${noteId} no encontrado.`);
-        return;
-    }
-
+    const { notes } = store.getState();
+    const nota = notes.find(n => n.id === noteId);
+    if (!nota) return;
+ 
     try {
-        // 1. Mueve la nota a la papelera en la base de datos.
+        // 1. Mueve la nota a la papelera en la DB (local y backend).
         await moverNotaAPapeleraEnDB(noteId);
-        // 2. Dispara un evento para que la aplicación principal recargue los datos.
-        // Esto asegura que el store se actualice con la fuente de verdad (la DB).
-        document.dispatchEvent(new CustomEvent('data-changed', { detail: { source: 'moverNotaAPapelera' } }));
-        console.log(`Nota con ID ${identificadorNota} movida a la papelera correctamente.`);
+ 
+        // 2. Actualiza el estado de la nota en el store a 'trashed' en lugar de eliminarla.
+        // Esto asegura que la vista de la papelera la pueda encontrar inmediatamente.
+        store.upsertNote({ ...nota, status: 'trashed' });
+ 
+        // 3. Si el elemento existe en el DOM, lo eliminamos de Muuri.
+        // El store ya se encargó de la lógica, pero esto es un fallback visual inmediato.
+        if (notaElement) {
+            const item = gridPinned.getItem(notaElement) || gridUnpinned.getItem(notaElement);
+            if (item) {
+                item.getGrid().remove([item], { removeElements: true });
+            }
+        }
+ 
+        console.log(`Nota con ID ${noteId} movida a la papelera correctamente.`);
+        showNotification('Nota movida a la papelera.', 'info');
     } catch (error) {
-        console.error(`Error en el proceso de eliminación de la nota ${identificadorNota}:`, error);
+        console.error(`Error en el proceso de eliminación de la nota ${noteId}:`, error);
+        showNotification('No se pudo mover la nota a la papelera.', 'error');
     }
 };
 

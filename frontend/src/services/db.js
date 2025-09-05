@@ -200,6 +200,30 @@ const moverNotaAPapeleraEnDB = async (id) => {
   }
 };
 
+/**
+ * Mueve un lote de notas a la papelera en una sola transacción.
+ * @param {string[]} noteIds - Un array de IDs de las notas a mover.
+ */
+export const moverNotasAPapeleraEnDB = async (noteIds) => {
+  if (!noteIds || noteIds.length === 0) return;
+  try {
+    const db = getDb();
+    // Actualiza el estado de todas las notas a 'trashed' en una sola operación.
+    await db[notesStoreName].where('id').anyOf(noteIds).modify({ status: 'trashed' });
+    console.log(`${noteIds.length} notas movidas a la papelera en la base de datos local.`);
+
+    const user = localStorage.getItem('user');
+    if (user) {
+      // Idealmente, el backend también tendría un endpoint para mover notas en lote.
+      // Por ahora, las movemos una por una. Promise.all asegura que se hagan en paralelo.
+      await Promise.all(noteIds.map(id => moveNoteToTrashInBackend(id)));
+    }
+  } catch (error) {
+    console.error('Error al mover notas a la papelera en lote:', error);
+    throw error;
+  }
+};
+
 const restaurarNotaEnDB = async (id) => {
   try {
     const db = getDb();

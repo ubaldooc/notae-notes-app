@@ -90,6 +90,16 @@ export const store = {
     },
 
     /**
+     * Elimina múltiples notas del estado.
+     * @param {string[]} noteIds - Un array de IDs de las notas a eliminar.
+     */
+    removeNotes: (noteIds) => {
+        const idsToRemove = new Set(noteIds);
+        state.notes = state.notes.filter(n => !idsToRemove.has(n.id));
+        notify();
+    },
+
+    /**
      * Añade o actualiza un grupo en el estado.
      * @param {object} group - El grupo a añadir o actualizar.
      */

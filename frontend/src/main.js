@@ -509,10 +509,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // 2. Añadir o actualizar notas
-        notes.forEach(nota => {
+        // Filtramos para renderizar solo las notas activas en la vista principal.
+        // La vista de la papelera se gestiona por separado en FilterManager.
+        notes.filter(n => n.status === 'active').forEach(nota => {
             // La función renderizarNotaEnDOM ya es inteligente:
             // actualiza si existe, crea si no.
-            renderizarNotaEnDOM(nota, { isTrashed: isTrashVisible });
+            renderizarNotaEnDOM(nota);
         });
 
         // Hacemos lo mismo para los grupos (más simple porque no usan Muuri)
@@ -528,7 +530,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Mensaje de "sin notas"
-        if (notes.length === 0 && groups.length === 0 && !isTrashVisible) {
+        // El mensaje de "sin notas" solo debe considerar las notas activas.
+        if (notes.filter(n => n.status === 'active').length === 0 && groups.length === 0 && !isTrashVisible) {
             noNotesMessage.style.display = 'block';
             noNotesMessage.innerHTML = user
                 ? 'Crea tu primera nota para empezar.'
@@ -677,7 +680,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 6. Cargar los datos definitivos desde la DB local y renderizar.
             const [finalNotes, finalGroups] = await Promise.all([
-                cargarNotasDesdeDB('active'), // Cargar solo las notas activas para la vista principal
+                cargarNotasDesdeDB('all'), // <-- CAMBIO CLAVE: Cargar TODAS las notas (activas y en papelera)
                 cargarGruposDesdeDB()
             ]);
     
