@@ -14,6 +14,7 @@ const GUEST_NAME = 'Invitado';
 export const initHeader = () => {
 
     const perfilContainer = document.querySelector(".perfil-container");
+    const logoImg = document.querySelector(".logo");
     const perfilImg = perfilContainer.querySelector(".perfil-img");
     const perfilNombre = perfilContainer.querySelector(".perfil-nombre");
     const dropdownPerfilImg = document.querySelector(".dropdown-profile-header .dropdown-perfil-img");
@@ -23,6 +24,11 @@ export const initHeader = () => {
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const logoutBtn = document.getElementById("logout-btn");
     const feedbackBtn = document.getElementById("feedback-btn");
+
+    // Hacemos que las imágenes principales no sean arrastrables
+    if (logoImg) logoImg.draggable = false;
+    if (perfilImg) perfilImg.draggable = false;
+    if (dropdownPerfilImg) dropdownPerfilImg.draggable = false;
 
     // --- LÓGICA DE INICIO DE PÁGINA ---
 
