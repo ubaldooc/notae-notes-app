@@ -300,7 +300,7 @@ export const cambiarColorGrupo = (groupID) => {
     colorDropdown.classList.add("color-palette-dropdown");
     document.querySelector(".aside").appendChild(colorDropdown);
 
-    const colors = ["#FF69B4", "#FF0000", "#FFA500", "#FFFF00", "#ADFF2F", "#008000", "#00FFFF", "#0000FF", "#8A2BE2", "#EE82EE", "#000000", "#E74C3C", "#C0392B", "#FF00FF", "#FF1493", "#F39C12", "#32CD32", "#2ECC71", "#008080", "#3498DB", "#00008B", "#4B0082", "#D2691E", "#800020", "#FF7F50", "#DC143C", "#F8BBD0", "#FFA07A", "#FFD700", "#00FF00", "#FFFACD", "#87CEEB", "#000080", "#E6E6FA", "#A0522D"];
+    const colors = ["#FF0000", "#FFA500", "#FFFF00", "#008000", "#00FFFF", "#0000FF", "#8A2BE2", "#FF00FF", "#FF1493", "#32CD32", "#3498DB", "#00008B", "#800020", "#DC143C", "#00FF00", "#A0522D"];
 
     colors.forEach(color => {
         const colorOption = document.createElement("div");
@@ -314,7 +314,7 @@ export const cambiarColorGrupo = (groupID) => {
 
     const rect = colorSelectorTarget.getBoundingClientRect();
     colorDropdown.style.position = "absolute";
-    colorDropdown.style.top = `calc(${rect.top + window.scrollY}px - 196px)`;
+    colorDropdown.style.top = `calc(${rect.top + window.scrollY}px - 126px)`;
     colorDropdown.style.left = `calc(${rect.left + window.scrollX}px + 16px)`;
     
 
