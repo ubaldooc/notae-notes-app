@@ -435,8 +435,29 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
         if (deleteBtn) {
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
+                // 1. Obtenemos el modal y sus botones.
                 const confirmModal = new Modal('confirm-modal-delete-note');
-                // ... (la lógica del modal de confirmación no cambia)
+                const modalElement = document.getElementById('confirm-modal-delete-note');
+                const confirmBtn = document.getElementById('confirmDeleteNoteBtn');
+                const cancelBtn = document.getElementById('cancelDeleteNoteBtn');
+                const closeBtn = modalElement.querySelector('.delete-group-close-button');
+
+                // 2. Asignamos las acciones a los botones del modal.
+                confirmBtn.onclick = () => confirmModal.confirm();
+                cancelBtn.onclick = () => confirmModal.cancel();
+                closeBtn.onclick = () => confirmModal.cancel();
+                modalElement.onclick = (event) => { if (event.target === modalElement) confirmModal.cancel(); };
+
+                // 3. Abrimos el modal y definimos qué hacer si el usuario confirma.
+                confirmModal.open({
+                    triggerElement: deleteBtn,
+                    onConfirm: async () => {
+                        await eliminarNotaPermanentementeDeDB(noteData.id);
+                        store.removeNote(noteData.id); // Elimina del store
+                        noteCardContainer.remove(); // Elimina del DOM
+                        showNotification('Nota eliminada permanentemente.', 'success');
+                    }
+                });
             };
         }
     } else {
