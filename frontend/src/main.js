@@ -484,60 +484,107 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Esta función se suscribirá a los cambios del store.
      */
     const renderAppFromState = (currentState) => {
-        console.log("Renderizando la aplicación desde el estado del store...");
+        console.log("Renderizando la aplicación desde el estado del store...", currentState);
         const { notes, groups, user, isTrashVisible } = currentState;
-        const noNotesMessage = document.getElementById('no-notes-message');
-        const groupsContainer = document.querySelector('.notes-group__container');
 
-        // --- Optimización: Renderizado Diferencial ---
-        const previousNotes = previousState ? new Map(previousState.notes.map(n => [n.id, n])) : new Map();
-        const currentNotes = new Map(notes.map(n => [n.id, n]));
+        // --- 1. CÁLCULO DE DIFERENCIAS (QUÉ CAMBIÓ) ---
+        const previousNotesMap = previousState ? new Map(previousState.notes.map(n => [n.id, n])) : new Map();
+        const currentNotesMap = new Map(notes.map(n => [n.id, n]));
+        const previousGroupsMap = previousState ? new Map(previousState.groups.map(g => [g.id, g])) : new Map();
+        const currentGroupsMap = new Map(groups.map(g => [g.id, g]));
 
-        // 1. Eliminar notas que ya no están en el estado actual
-        previousNotes.forEach((_, noteId) => {
-            if (!currentNotes.has(noteId)) {
-                const noteElement = document.getElementById(noteId);
-                if (noteElement) {
-                    const item = gridPinned.getItem(noteElement) || gridUnpinned.getItem(noteElement);
-                    if (item) {
-                        item.getGrid().remove([item], { removeElements: true });
-                    } else {
-                        noteElement.remove(); // Fallback
-                    }
-                }
+        const notesToRemove = [];
+        const notesToUpsert = [];
+        const groupsToRemove = [];
+        const groupsToUpsert = [];
+
+        // Notas a eliminar: existen en el estado anterior pero no en el actual.
+        previousNotesMap.forEach((_, noteId) => {
+            if (!currentNotesMap.has(noteId)) {
+                notesToRemove.push(noteId);
             }
         });
 
-        // 2. Añadir o actualizar notas
-        // Filtramos para renderizar solo las notas activas en la vista principal.
-        // La vista de la papelera se gestiona por separado en FilterManager.
-        notes.filter(n => n.status === 'active').forEach(nota => {
-            // La función renderizarNotaEnDOM ya es inteligente:
-            // actualiza si existe, crea si no.
-            renderizarNotaEnDOM(nota);
+        // Notas a añadir/actualizar: no existen en el estado anterior o su `updatedAt` ha cambiado.
+        currentNotesMap.forEach((currentNote, noteId) => {
+            const previousNote = previousNotesMap.get(noteId);
+            // Una nota necesita actualizarse si:
+            // 1. Es nueva (!previousNote).
+            // 2. Su fecha de modificación cambió (contenido editado).
+            // 3. Su estado cambió (movida a/desde la papelera).
+            // 4. Su estado de 'fijado' cambió.
+            // 5. Su grupo asignado cambió.
+            if (!previousNote || previousNote.updatedAt !== currentNote.updatedAt || previousNote.status !== currentNote.status ||
+                previousNote.pinned !== currentNote.pinned || previousNote.groupId !== currentNote.groupId) {
+                notesToUpsert.push(currentNote);
+            }
         });
 
-        // Hacemos lo mismo para los grupos (más simple porque no usan Muuri)
-        groupsContainer.innerHTML = ''; // Por simplicidad, seguimos re-renderizando los grupos.
-        groups.forEach(grupo => renderizarGrupoEnDOM(grupo));
+        // Grupos a eliminar
+        previousGroupsMap.forEach((_, groupId) => {
+            if (!currentGroupsMap.has(groupId)) {
+                groupsToRemove.push(groupId);
+            }
+        });
 
-        // 3. Re-ordenar los grids si es necesario
-        // Esto es menos costoso que re-renderizar todo.
+        // Grupos a añadir/actualizar
+        currentGroupsMap.forEach((currentGroup, groupId) => {
+            const previousGroup = previousGroupsMap.get(groupId);
+            if (!previousGroup || previousGroup.updatedAt !== currentGroup.updatedAt) {
+                groupsToUpsert.push(currentGroup);
+            }
+        });
+
+        // --- 2. APLICACIÓN DE CAMBIOS EN LA UI ---
+        
+        // Aplicar cambios a las notas
+        notesToRemove.forEach(noteId => {
+            const noteElement = document.getElementById(noteId);
+            if (noteElement) {
+                const item = gridPinned.getItem(noteElement) || gridUnpinned.getItem(noteElement);
+                if (item) item.getGrid().remove([item], { removeElements: true });
+            }
+        });
+
+        notesToUpsert.forEach(nota => {
+            // Renderizar solo las notas activas en la vista principal.
+            // La vista de papelera se gestiona por separado en FilterManager.
+            if (nota.status === 'active') {
+                renderizarNotaEnDOM(nota);
+            }
+        });
+
+        // Aplicar cambios a los grupos
+        groupsToRemove.forEach(groupId => {
+            const groupElement = document.getElementById(groupId);
+            if (groupElement) groupElement.remove();
+        });
+
+        groupsToUpsert.forEach(group => {
+            const existingGroup = document.getElementById(group.id);
+            if (existingGroup) existingGroup.remove(); // Simple reemplazo por ahora
+            renderizarGrupoEnDOM(group);
+        });
+
+        // --- 3. ACTUALIZACIÓN FINAL DEL LAYOUT ---
+
+        // Re-ordenar los grids. Es menos costoso que re-renderizar todo.
         if (gridPinned && gridUnpinned) {
             const sortFunction = getSortFunction();
             gridPinned.sort(sortFunction, { layout: 'instant' });
             gridUnpinned.sort(sortFunction, { layout: 'instant' });
         }
 
-        // Mensaje de "sin notas"
-        // El mensaje de "sin notas" solo debe considerar las notas activas.
-        if (notes.filter(n => n.status === 'active').length === 0 && groups.length === 0 && !isTrashVisible) {
-            noNotesMessage.style.display = 'block';
-            noNotesMessage.innerHTML = user
-                ? 'Crea tu primera nota para empezar.'
-                : 'Tus notas se guardarán aquí, en tu navegador.';
-        } else {
-            noNotesMessage.style.display = 'none';
+        // Gestionar mensaje de "sin notas"
+        const noNotesMessage = document.getElementById('no-notes-message');
+        if (noNotesMessage) {
+            const activeNotesCount = notes.filter(n => n.status === 'active').length;
+            if (activeNotesCount === 0 && groups.length === 0 && !isTrashVisible) {
+                noNotesMessage.style.display = 'block';
+                noNotesMessage.innerHTML = user ? 'Crea tu primera nota para empezar.' : 'Tus notas se guardarán aquí, en tu navegador.';
+            } else {
+                noNotesMessage.style.display = 'none';
+            }
         }
 
         // Guardamos el estado actual para la próxima comparación.

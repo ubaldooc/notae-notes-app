@@ -1087,14 +1087,14 @@ export const moverNotaAPapelera = async (noteId) => {
         // 2. Actualiza el estado de la nota en el store a 'trashed' en lugar de eliminarla.
         // Esto asegura que la vista de la papelera la pueda encontrar inmediatamente.
         store.upsertNote({ ...nota, status: 'trashed' });
- 
-        // 3. Si el elemento existe en el DOM, lo eliminamos de Muuri.
-        // El store ya se encargó de la lógica, pero esto es un fallback visual inmediato.
+
+        // 3. Eliminamos la nota de la instancia de Muuri para que desaparezca de la UI.
+        // Esto es crucial porque el store no manipula el DOM directamente.
         if (notaElement) {
             const item = gridPinned.getItem(notaElement) || gridUnpinned.getItem(notaElement);
             if (item) {
                 item.getGrid().remove([item], { removeElements: true });
-            }
+            } else notaElement.remove(); // Fallback por si no está en Muuri
         }
  
         console.log(`Nota con ID ${noteId} movida a la papelera correctamente.`);
