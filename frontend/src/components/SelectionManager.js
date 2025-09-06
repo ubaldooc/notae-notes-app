@@ -82,11 +82,16 @@ const deleteSelectedNotes = async () => {
  * Duplica todas las notas seleccionadas.
  */
 const duplicateSelectedNotes = async () => {
-    const promises = [];
+    // Usamos un bucle for...of para procesar las duplicaciones secuencialmente
+    // y evitar problemas de concurrencia.
     for (const noteId of selectedNotes) {
-        promises.push(duplicarNota(noteId));
+        // La función duplicarNota ahora devolverá la nueva nota creada.
+        const nuevaNota = await duplicarNota(noteId);
+        if (nuevaNota) {
+            // Añadimos la nueva nota directamente al store.
+            store.upsertNote(nuevaNota);
+        }
     }
-    await Promise.all(promises);
     cancelSelection();
 };
 

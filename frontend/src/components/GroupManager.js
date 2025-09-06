@@ -675,7 +675,7 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
             // Caso 1: Se está actualizando una nota existente.
             // Esto es verdad si el dropdown se abrió desde una tarjeta de nota o desde el editor con una nota cargada.
             if (isForNote && targetID) {
-                const noteId = targetID;                
+                const noteId = targetID;
                 const { notes } = store.getState();
                 const notaParaActualizar = notes.find(n => n.id === noteId);
 
@@ -683,24 +683,11 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
                 if (notaParaActualizar) {
                     const notaActualizada = { ...notaParaActualizar, groupId: selectedGroupId };
                     await guardarNotaEnDB(notaActualizada);
-                    // ¡Paso clave! Actualizamos el store inmediatamente.
+                    // Actualizamos el store. Esto disparará la actualización de la UI.
                     store.upsertNote(notaActualizada);
                     console.log(`Nota ${noteId} actualizada con nuevo groupId: ${selectedGroupId}`);
                 } else {
                     console.error(`No se encontró la nota con ID ${noteId} para actualizar.`);
-                }
-
-                // Actualizar la UI de la tarjeta de nota
-                const noteCardElement = document.getElementById(noteId);
-                if (noteCardElement) {
-                    actualizarInfoGrupoEnNoteCard(noteId, selectedGroupId);
-                    noteCardElement.setAttribute('data-group-id', domGroupId);
-
-                    // --- INICIO: Actualización de Layout ---
-                    // Forzamos a Muuri a recalcular el layout. Esto hará que la nota se oculte
-                    // si ya no pertenece al grupo filtrado, sin causar un parpadeo.
-                    gridUnpinned.layout(true);
-                    // --- FIN: Actualización de Layout ---
                 }
 
                 // Si el editor está abierto para esta nota, actualizar su UI también

@@ -923,32 +923,27 @@ export const duplicarNota = async (noteId) => {
         const notaOriginal = notes.find(n => n.id === noteId);
         if (!notaOriginal) {
             console.error(`No se encontró la nota con ID ${noteId} para duplicar.`);
-            return;
+            return null;
         }
 
         // 2. Crear el objeto de la nueva nota (la copia)
         const notaDuplicada = {
             ...notaOriginal, // Copia todas las propiedades de la nota original
             id: `note-${crypto.randomUUID()}`, // Asigna un nuevo ID único
-            title: `${notaOriginal.title} (Copia)`, // Añade "(Copia)" al título para diferenciarla
+            title: notaOriginal.title ? `${notaOriginal.title} (Copia)` : 'Copia', // Maneja títulos vacíos
             createdAt: new Date().toISOString(), // Establece la fecha de creación actual
             updatedAt: new Date().toISOString(), // Establece la fecha de actualización actual,
-            // No es necesario especificar el resto de campos como groupId, pinned, etc.,
-            // ya que el operador 'spread' (...notaOriginal) ya los ha copiado.
         };
 
         // 3. Guardar la nueva nota en la base de datos
         await guardarNotaEnDB(notaDuplicada);
-
-        // 4. Disparar un evento para que la aplicación principal recargue los datos.
-        // Esto asegura que el store se actualice con la fuente de verdad (la DB)
-        // y evita problemas de estado inconsistente.
-        document.dispatchEvent(new CustomEvent('data-changed', { detail: { source: 'duplicarNota' } }));
-
-        console.log(`Nota ${noteId} duplicada exitosamente con el nuevo ID ${notaDuplicada.id}`);
-
+        console.log(`Nota ${noteId} duplicada exitosamente con el nuevo ID ${notaDuplicada.id}.`);
+        
+        // 4. Devolver la nota recién creada para que el llamador pueda actualizar el store.
+        return notaDuplicada;
     } catch (error) {
         console.error(`Error al duplicar la nota ${noteId}:`, error);
+        return null;
     }
 };
 
