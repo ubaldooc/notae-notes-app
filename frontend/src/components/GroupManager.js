@@ -120,23 +120,38 @@ export const inicializarDragAndDropGrupos = () => {
     const groupsContainer = document.querySelector(".notes-group__container");
     if (!groupsContainer) return;
 
-    new Sortable(groupsContainer, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        onEnd: async () => {
-            const items = Array.from(groupsContainer.children);
-            const gruposActualizados = items.map((item, index) => {
-                // Solo necesitamos el 'id' del elemento y su nueva posición ('index')
-                // para actualizar el orden en la base de datos.
-                return {
-                    id: item.id,
-                    order: index
-                };
-            });
-            try {
-                await actualizarOrdenGruposEnDB(gruposActualizados);
-            } catch (error) {
-                console.error("Fallo al guardar el nuevo orden de los grupos:", error);
+    // Si ya existe una instancia de Sortable, la destruimos para evitar duplicados.
+    if (Sortable.get(groupsContainer)) {
+        Sortable.get(groupsContainer).destroy();
+    }
+
+    Sortable.create(groupsContainer, {
+        animation: 150, // Duración de la animación en ms
+        ghostClass: 'sortable-ghost', // Clase CSS para el elemento fantasma
+        // Se dispara cuando el usuario suelta el elemento
+        onEnd: async (evt) => {
+            const items = Array.from(evt.from.children);
+            const gruposActualizados = items.map((item, index) => ({
+                id: item.id,
+                order: index
+            }));
+
+            if (gruposActualizados.length > 0) {
+                try {
+                    await actualizarOrdenGruposEnDB(gruposActualizados);
+                    // ¡Paso clave! Actualizamos el estado en el store para que refleje el nuevo orden
+                    // creando un nuevo array ordenado.
+                    const { groups } = store.getState();
+                    const groupMap = new Map(groups.map(g => [g.id, g]));
+                    
+                    // Creamos un nuevo array de grupos en el orden correcto.
+                    const reorderedGroups = items.map(item => groupMap.get(item.id))
+                                                 .filter(Boolean); // Filtramos por si algún grupo no se encontrara
+
+                    store.setData(store.getState().notes, reorderedGroups);
+                } catch (error) {
+                    console.error("Fallo al guardar el nuevo orden de los grupos:", error);
+                }
             }
         }
     });
@@ -240,10 +255,14 @@ export const renombrarGrupo = (groupID) => {
         placeholderDiv.remove();
 
         try {
-            await actualizarPropiedadesGrupoEnDB(groupID, { name: finalName });
-            // Actualiza el grupo en el store
-            store.upsertGroup({ ...store.getState().groups.find(g => g.id === groupID), name: finalName });
-            // Actualizamos el nombre en todas las tarjetas de nota asociadas
+            // 1. Obtenemos el grupo completo desde el store para no perder otras propiedades como 'order'.
+            const groupToUpdate = store.getState().groups.find(g => g.id === groupID);
+            if (!groupToUpdate) throw new Error("No se encontró el grupo en el store.");
+
+            // 2. Actualizamos el nombre y guardamos el objeto completo.
+            groupToUpdate.name = finalName;
+            await actualizarPropiedadesGrupoEnDB(groupID, { name: finalName, order: groupToUpdate.order });
+            store.upsertGroup(groupToUpdate); // Actualiza el grupo en el store con el objeto completo.
             actualizarInfoGrupoEnNoteCards(groupID, { name: finalName }); // Esta función ahora usa el store
         } catch (error) {
             console.error("Error al actualizar el nombre del grupo en la DB:", error);
