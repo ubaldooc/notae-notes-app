@@ -56,6 +56,21 @@ const deleteSelectedNotes = async () => {
                 store.upsertNote({ ...nota, status: 'trashed' });
             }
         });
+
+        // --- INICIO: Eliminación visual de las notas ---
+        // Este es el paso que faltaba.
+        // Iteramos sobre los IDs y eliminamos cada nota de la instancia de Muuri correspondiente.
+        const itemsToRemovePinned = [];
+        const itemsToRemoveUnpinned = [];
+        noteIdsToDelete.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                const item = gridPinned.getItem(element) || gridUnpinned.getItem(element);
+                if (item) item.getGrid().remove([item], { removeElements: true });
+            }
+        });
+        // --- FIN: Eliminación visual de las notas ---
+
     } catch (error) {
         console.error("Error al eliminar las notas seleccionadas:", error);
         // Aquí podrías mostrar una notificación de error al usuario.
