@@ -91,15 +91,12 @@ const duplicateSelectedNotes = async () => {
     // 2. Esperamos a que todas las notas se hayan duplicado y guardado en la DB.
     const nuevasNotas = await Promise.all(duplicationPromises);
 
-    // 3. Actualizamos el store con todas las notas nuevas a la vez.
-    nuevasNotas.forEach(nuevaNota => {
-      if (nuevaNota) store.upsertNote(nuevaNota);
-    });
+    // 3. Filtramos por si alguna promesa falló y actualizamos el store con todas las notas nuevas a la vez.
+    const notasValidas = nuevasNotas.filter(Boolean);
+    if (notasValidas.length > 0) {
+      store.upsertNotes(notasValidas);
+    }
 
-    // 4. Forzamos un reordenamiento y actualización del layout de Muuri.
-    // Esto asegura que las nuevas notas se coloquen en el orden correcto.
-    gridPinned.sort();
-    gridUnpinned.sort();
   } catch (error) {
     console.error("Error al duplicar las notas seleccionadas:", error);
   }

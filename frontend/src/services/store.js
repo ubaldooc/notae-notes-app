@@ -81,6 +81,22 @@ export const store = {
     },
 
     /**
+     * Añade o actualiza múltiples notas en el estado en una sola operación.
+     * @param {object[]} notes - Un array de notas a añadir o actualizar.
+     */
+    upsertNotes: (notes) => {
+        const notesMap = new Map(state.notes.map(n => [n.id, n]));
+        notes.forEach(note => {
+            notesMap.set(note.id, note);
+        });
+        // Convertimos el mapa de nuevo a un array para el estado.
+        // Esto maneja tanto inserciones como actualizaciones de forma eficiente.
+        state.notes = Array.from(notesMap.values());
+        notify();
+    },
+
+
+    /**
      * Elimina una nota del estado.
      * @param {string} noteId - El ID de la nota a eliminar.
      */
