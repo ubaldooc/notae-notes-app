@@ -696,15 +696,11 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
                     actualizarInfoGrupoEnNoteCard(noteId, selectedGroupId);
                     noteCardElement.setAttribute('data-group-id', domGroupId);
 
-                    // --- INICIO: Re-aplicar filtro ---
-                    // Después de cambiar el grupo, verificamos si hay un filtro activo
-                    // y lo volvemos a aplicar para que la nota se mueva o desaparezca si es necesario.
-                    const activeFilterElement = document.querySelector('.notes-group.active, .aside__all-notes.active');
-                    if (activeFilterElement) {
-                        const activeGroupId = activeFilterElement.classList.contains('aside__all-notes') ? 'all' : activeFilterElement.id;
-                        handleFilter(activeGroupId);
-                    }
-                    // --- FIN: Re-aplicar filtro ---
+                    // --- INICIO: Actualización de Layout ---
+                    // Forzamos a Muuri a recalcular el layout. Esto hará que la nota se oculte
+                    // si ya no pertenece al grupo filtrado, sin causar un parpadeo.
+                    gridUnpinned.layout(true);
+                    // --- FIN: Actualización de Layout ---
                 }
 
                 // Si el editor está abierto para esta nota, actualizar su UI también
