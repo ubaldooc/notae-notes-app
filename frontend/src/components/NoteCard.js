@@ -9,7 +9,7 @@ import { store } from '../services/store.js';
 
 import Muuri from 'muuri';
 
-import { gridUnpinned, gridPinned } from '../main.js';
+import { gridUnpinned, gridPinned, gridTrash } from '../main.js';
 
 
 
@@ -422,8 +422,14 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
                 e.stopPropagation();
                 try {
                     const notaRestaurada = await restaurarNotaEnDB(noteData.id);
-                    store.upsertNote(notaRestaurada);
-                    noteCardContainer.remove();
+                    store.upsertNote(notaRestaurada); // Actualiza el store
+
+                    // Eliminamos la nota del grid de la papelera para que el layout se actualice.
+                    const itemToRemove = gridTrash.getItem(noteCardContainer);
+                    if (itemToRemove) {
+                        gridTrash.remove([itemToRemove], { removeElements: true });
+                    } else noteCardContainer.remove(); // Fallback por si no se encuentra en Muuri
+
                     renderizarNotaEnDOM(notaRestaurada);
                 } catch (error) {
                     console.error(`Error al restaurar la nota ${noteData.id}:`, error);
@@ -453,8 +459,14 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
                     triggerElement: deleteBtn,
                     onConfirm: async () => {
                         await eliminarNotaPermanentementeDeDB(noteData.id);
-                        store.removeNote(noteData.id); // Elimina del store
-                        noteCardContainer.remove(); // Elimina del DOM
+                        store.removeNote(noteData.id); // 1. Elimina del store
+                        
+                        // 2. Eliminamos la nota de la instancia de Muuri para que el layout se actualice.
+                        const itemToRemove = gridTrash.getItem(noteCardContainer);
+                        if (itemToRemove) {
+                            gridTrash.remove([itemToRemove], { removeElements: true });
+                        } else noteCardContainer.remove(); // Fallback por si no se encuentra en Muuri
+
                         showNotification('Nota eliminada permanentemente.', 'success');
                     }
                 });
@@ -486,10 +498,8 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
 
     // --- LÓGICA DE INSERCIÓN EN EL DOM ---
     if (isTrashed) {
-        const trashContainer = document.getElementById('trash-notes-container');
-        if (trashContainer) {
-            trashContainer.appendChild(noteCardContainer);
-        }
+        // Ahora usamos el grid de Muuri para la papelera
+        if (gridTrash) gridTrash.add(noteCardContainer);
     } else {
         const targetGrid = noteData.pinned ? gridPinned : gridUnpinned;
         if (targetGrid) {

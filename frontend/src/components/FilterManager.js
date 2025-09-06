@@ -8,6 +8,7 @@ import { store } from '../services/store.js';
 // Module-level variables to hold grid instances
 let gridPinned;
 let gridUnpinned;
+let gridTrash;
 
 // ESTILOS GRUPO ACTIVO
 export const actualizarGrupoActivoUI = (groupId) => {
@@ -67,50 +68,41 @@ export const handleFilter = (groupId) => {
 };
 
 const showTrashView = async () => {
-    // 1. Ocultar los grids principales de Muuri y mostrar un contenedor para la papelera
-    document.querySelector('.grid-pinned').style.display = 'none';
-    document.querySelector('.grid-unpinned').style.display = 'none';
-    gridPinned?.hide(gridPinned.getItems(), { instant: true });
-    gridUnpinned?.hide(gridUnpinned.getItems(), { instant: true });
+    // 1. Ocultar los contenedores de los grids principales y mostrar el de la papelera
+    document.getElementById('pinned-notes-container').style.display = 'none';
+    document.getElementById('unpinned-notes-container').style.display = 'none';
 
-    // 2. Crear o encontrar el contenedor de la papelera y su cabecera
-    let trashViewContainer = document.getElementById('trash-view-container');
-    if (!trashViewContainer) {
-        trashViewContainer = document.createElement('div');
-        trashViewContainer.id = 'trash-view-container';
-        trashViewContainer.innerHTML = `
-            <div class="trash-header">
-                <button id="empty-trash-btn" class="empty-trash-button">Vaciar Papelera</button>
-            </div>
-            <div id="trash-notes-container" class="trash-grid"></div>
-        `;
-        document.querySelector('.grid-wrapper').appendChild(trashViewContainer);
-    }
+    // 2. Encontrar el contenedor de la papelera (que ya existe en el HTML)
+    const trashViewContainer = document.getElementById('trash-view-container');
     trashViewContainer.style.display = 'block';
 
-    const trashNotesContainer = document.getElementById('trash-notes-container');
     const emptyTrashBtn = document.getElementById('empty-trash-btn');
-    trashNotesContainer.innerHTML = ''; // Limpiar contenido previo
+    
+    // Limpiar el grid de la papelera antes de añadir nuevos elementos
+    if (gridTrash.getItems().length > 0) {
+        gridTrash.remove(gridTrash.getItems(), { removeElements: true });
+    }
 
-    // 3. Cargar notas y configurar el botón
-    // Obtenemos las notas de la papelera desde el store, que es la fuente de verdad.
+    // 3. Cargar notas de la papelera desde el store y renderizarlas
+    // La función renderizarNotaEnDOM ahora las añadirá al gridTrash
     const trashedNotes = store.getState().notes.filter(n => n.status === 'trashed');
-    const noNotesMessage = document.getElementById('no-notes-message');
+    trashedNotes.forEach(note => {
+        renderizarNotaEnDOM(note, { isTrashed: true });
+    });
 
-    if (trashedNotes.length > 0) {
-        noNotesMessage.style.display = 'none';
-        emptyTrashBtn.style.display = 'inline-block'; // Mostrar botón
-        trashedNotes.forEach(note => {
-            renderizarNotaEnDOM(note, { isTrashed: true });
-        });
-    } else {
+    // 4. Gestionar la visibilidad del botón y el mensaje de "papelera vacía"
+    const noNotesMessage = document.getElementById('no-notes-message');
+    const hasTrashedNotes = trashedNotes.length > 0;
+    emptyTrashBtn.style.display = hasTrashedNotes ? 'inline-block' : 'none';
+    noNotesMessage.style.display = hasTrashedNotes ? 'none' : 'block';
+    if (!hasTrashedNotes) {
         noNotesMessage.style.display = 'block';
         noNotesMessage.innerHTML = 'La papelera está vacía.';
-        emptyTrashBtn.style.display = 'none'; // Ocultar botón
     }
 
     // 5. Añadir listener para abrir notas en modo solo lectura
-    trashNotesContainer.addEventListener('click', async (event) => {
+    const trashNotesContainer = document.getElementById('trash-notes-container');
+    trashNotesContainer.onclick = async (event) => { // Usamos .onclick para reemplazar listeners previos
         const noteCard = event.target.closest('.note-card-container');
         if (!noteCard) return;
 
@@ -128,9 +120,9 @@ const showTrashView = async () => {
         } catch (error) {
             console.error(`Error al abrir la nota ${noteId} desde la papelera:`, error);
         }
-    });
+    };
 
-    // 4. Asignar el evento al botón (se reasigna cada vez, lo que es seguro)
+    // 6. Asignar el evento al botón (se reasigna cada vez, lo que es seguro)
     // Usando la clase Modal para consistencia
     emptyTrashBtn.onclick = () => {
         const confirmModal = new Modal('confirm-modal-empty-trash');
@@ -150,8 +142,8 @@ const showTrashView = async () => {
                 try {
                     const trashedNoteIds = store.getState().notes.filter(n => n.status === 'trashed').map(n => n.id);
                     await vaciarPapeleraEnDB();
-                    trashNotesContainer.innerHTML = '';
-                    // Usamos la acción específica para eliminar múltiples notas del store.
+                    // Limpiamos el grid de Muuri
+                    gridTrash.remove(gridTrash.getItems(), { removeElements: true });
                     store.removeNotes(trashedNoteIds);
                     noNotesMessage.style.display = 'block';
                     noNotesMessage.innerHTML = 'La papelera está vacía.';
@@ -173,12 +165,8 @@ const showMainView = () => {
     }
 
     // Mostrar los grids principales
-    document.querySelector('.grid-pinned').style.display = ''; // Usar '' para volver al estilo por defecto de CSS
-    document.querySelector('.grid-unpinned').style.display = '';
-    
-    // Mostrar todos los items en los grids de Muuri
-    gridPinned?.show(gridPinned.getItems(), { instant: true });
-    gridUnpinned?.show(gridUnpinned.getItems(), { instant: true });
+    document.getElementById('pinned-notes-container').style.display = ''; // Usar '' para volver al estilo por defecto de CSS
+    document.getElementById('unpinned-notes-container').style.display = '';
     
     // Forzar un relayout para evitar problemas visuales
     if (gridPinned) gridPinned.refreshItems().layout();
@@ -191,6 +179,7 @@ const showMainView = () => {
 export const initFilters = (grids) => {
     gridPinned = grids.gridPinned;
     gridUnpinned = grids.gridUnpinned;
+    gridTrash = grids.gridTrash;
 
     if (!gridPinned || !gridUnpinned) return;
 
@@ -211,8 +200,7 @@ export const initFilters = (grids) => {
         const noNotesMessage = document.getElementById('no-notes-message');
         if (noNotesMessage) {
             // Solo mostrar el mensaje si no estamos en la vista de papelera
-            const trashContainer = document.getElementById('trash-notes-container');
-            const isTrashVisible = trashContainer && trashContainer.style.display !== 'none';
+            const isTrashVisible = document.getElementById('trash-view-container').style.display === 'block';
 
             if (visibleItemPinnedCount === 0 && visibleItemUnpinnedCount === 0 && !isTrashVisible) {
                 noNotesMessage.style.display = 'block';

@@ -278,6 +278,7 @@ const initSortManager = () => {
 
 export let gridUnpinned;
 export let gridPinned;
+export let gridTrash;
 document.addEventListener('DOMContentLoaded', async () => {  
     // --- INICIALIZACIÓN DE LA APLICACIÓN ---
     // La lógica de inicialización ahora espera a que el SessionManager
@@ -342,6 +343,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         // showDuration: 0,
         // hideDuration: 0,
+    });
+
+    // Inicializa la tercera instancia de Muuri para la papelera
+    gridTrash = new Muuri('#trash-notes-container', {
+        // La papelera no necesita drag & drop
+        dragEnabled: false, 
+        layout: {
+            fillGaps: true
+        },
     });
 
     // --- LÓGICA DEL MODAL DE ORDEN PERSONALIZADO ---
@@ -776,7 +786,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGroupManager();
     initNoteEditor();
     initNoteCard();
-    initFilters({ gridPinned, gridUnpinned });
+    initFilters({ gridPinned, gridUnpinned, gridTrash });
     initKeyboardShortcuts();
     initSelectionManager({ gridPinned, gridUnpinned });
     initViewSwitcher();

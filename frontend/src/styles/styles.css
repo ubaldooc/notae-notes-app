@@ -1547,7 +1547,7 @@ body.dark-mode #no-notes-message {
 
 /* Contenedor de muuri para notas no fijadas*/
 #unpinned-notes-container {
-    position: relative;
+    position: relative; /* Muuri necesita que sus contenedores tengan un posicionamiento no estático */
     /* background: #87CEEB; */
     /* min-width: 900px; */
     width: 100%;
@@ -1555,6 +1555,11 @@ body.dark-mode #no-notes-message {
 }
 
 
+/* Contenedor de muuri para la papelera */
+#trash-notes-container {
+    position: relative; /* Cambiado de absolute a relative para que respete el flujo del documento */
+    width: 100%;
+}
 
 
 
@@ -2659,6 +2664,14 @@ body.selection-mode-active .note-card-container.is-selected {
 
 
 /* ESTILOS PARA LA CABECERA DE LA PAPELERA */
+
+.trash-grid {
+    /* Usamos CSS Grid para organizar las notas en la papelera */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
 
 .trash-header {
     padding: 10px 20px;
