@@ -82,17 +82,28 @@ const deleteSelectedNotes = async () => {
  * Duplica todas las notas seleccionadas.
  */
 const duplicateSelectedNotes = async () => {
-    // Usamos un bucle for...of para procesar las duplicaciones secuencialmente
-    // y evitar problemas de concurrencia.
-    for (const noteId of selectedNotes) {
-        // La función duplicarNota ahora devolverá la nueva nota creada.
-        const nuevaNota = await duplicarNota(noteId);
-        if (nuevaNota) {
-            // Añadimos la nueva nota directamente al store.
-            store.upsertNote(nuevaNota);
-        }
-    }
-    cancelSelection();
+    const noteIdsToDuplicate = Array.from(selectedNotes);
+  if (noteIdsToDuplicate.length === 0) return;
+
+  try {
+    // 1. Creamos todas las promesas de duplicación para ejecutarlas en paralelo.
+    const duplicationPromises = noteIdsToDuplicate.map(id => duplicarNota(id));
+    // 2. Esperamos a que todas las notas se hayan duplicado y guardado en la DB.
+    const nuevasNotas = await Promise.all(duplicationPromises);
+
+    // 3. Actualizamos el store con todas las notas nuevas a la vez.
+    nuevasNotas.forEach(nuevaNota => {
+      if (nuevaNota) store.upsertNote(nuevaNota);
+    });
+
+    // 4. Forzamos un reordenamiento y actualización del layout de Muuri.
+    // Esto asegura que las nuevas notas se coloquen en el orden correcto.
+    gridPinned.sort();
+    gridUnpinned.sort();
+  } catch (error) {
+    console.error("Error al duplicar las notas seleccionadas:", error);
+  }
+  cancelSelection();
 };
 
 /**

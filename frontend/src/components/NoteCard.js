@@ -937,6 +937,9 @@ export const duplicarNota = async (noteId) => {
 
         // 3. Guardar la nueva nota en la base de datos
         await guardarNotaEnDB(notaDuplicada);
+        // La función `duplicarNota` ahora es más limpia. Su única responsabilidad es
+        // crear el objeto de la nota duplicada y guardarlo en la DB.
+        // No actualiza el store directamente. Quien la llama (SelectionManager) se encargará de eso.
         console.log(`Nota ${noteId} duplicada exitosamente con el nuevo ID ${notaDuplicada.id}.`);
         
         // 4. Devolver la nota recién creada para que el llamador pueda actualizar el store.
@@ -1054,7 +1057,12 @@ const opcionesNota = (notaID) => {
                     break;
                 case "duplicate-note":
                     try {
-                        await duplicarNota(targetNotaId);
+                        // 1. Llamamos a duplicarNota, que ahora devuelve la nota recién creada.
+                        const nuevaNota = await duplicarNota(targetNotaId);
+                        // 2. Si la duplicación fue exitosa, actualizamos el store.
+                        // El store se encargará de que la UI se renderice de nuevo.
+                        if (nuevaNota) store.upsertNote(nuevaNota);
+
                     } catch (error) {
                         showNotification('No se pudo duplicar la nota.', 'error');
                         console.error("No se pudo completar la duplicación de la nota.");
