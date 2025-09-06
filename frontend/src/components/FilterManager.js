@@ -194,22 +194,18 @@ export const initFilters = (grids) => {
 
     if (!gridPinned || !gridUnpinned) return;
 
-    const visiblePinnedItems = gridPinned.getItems().filter(item => item.isVisible());
-    const visibleItemPinnedCount = visiblePinnedItems.length;
-
-    const pinnedNotesContainer = document.getElementById('pinned-notes-container');
-    if (visibleItemPinnedCount === 0) {
-        pinnedNotesContainer.style.marginBottom = '0px';
-    } else {
-        pinnedNotesContainer.style.marginBottom = '60px';
-    }
-
     // Manejar el mensaje de "no hay notas" después de cualquier cambio de layout
     const handleLayoutEnd = () => {
         const visiblePinnedItems = gridPinned.getItems().filter(item => item.isVisible());
         const visibleUnpinnedItems = gridUnpinned.getItems().filter(item => item.isVisible());
         const visibleItemPinnedCount = visiblePinnedItems.length;
         const visibleItemUnpinnedCount = visibleUnpinnedItems.length;
+
+        // --- LÓGICA DE MARGEN MEJORADA ---
+        // Ajustamos dinámicamente el margen del contenedor de notas fijadas.
+        const pinnedNotesContainer = document.getElementById('pinned-notes-container');
+        pinnedNotesContainer.style.marginBottom = visibleItemPinnedCount > 0 ? '60px' : '0px';
+
         console.log(`Visible items count: ${visibleItemPinnedCount} pinned, ${visibleItemUnpinnedCount} unpinned`); // Log for debugging
 
         const noNotesMessage = document.getElementById('no-notes-message');

@@ -1505,20 +1505,6 @@ main {
     background: var(--main-area-bg);
 }
 
-/* Ya no se usa esta clase */
-
-/* Ya no se usa este contenedor */
-.all-notes-container {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 10px;
-    gap: 10px;
-
-    /* height: 1000px; */
-    display: none;
-}
-
-
 
 #no-notes-message {
     display: none;
@@ -1555,7 +1541,7 @@ body.dark-mode #no-notes-message {
     /* background: #87CEEB; */
     width: 100%;
     /* min-height: 0px; */
-    margin-bottom: 60px;
+    /* margin-bottom: 60px; */
     /* flex: 1 1 auto; */
 }
 

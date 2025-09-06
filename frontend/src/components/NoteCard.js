@@ -26,6 +26,76 @@ const SVG_ICONS_TRASH = {
     DELETE_PERMANENTLY: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M14 11V17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 7H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19 5L5 19" stroke="#c02121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
 };
 
+/**
+ * Genera el string HTML para una tarjeta de nota.
+ * @param {object} noteData - Los datos de la nota.
+ * @param {boolean} isTrashed - Si la nota está en la papelera.
+ * @returns {string} El string HTML del elemento de la nota.
+ */
+const createNoteHTML = (noteData, isTrashed) => {
+    const sanitizedTitle = DOMPurify.sanitize(noteData.title);
+    const sanitizedBody = DOMPurify.sanitize(noteData.body);
+    const lastModified = `Ultima edición: ${formatFechaNoteCard(noteData.updatedAt)}`;
+
+    const pinIcons = `
+        <div class="note-pin">
+            <svg class="note-unpinned note-hidden-options" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: ${noteData.pinned ? 'none' : 'block'};"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M15.9894 4.9502L16.52 4.42014V4.42014L15.9894 4.9502ZM19.0716 8.03562L18.541 8.56568L19.0716 8.03562ZM8.73837 19.429L8.20777 19.9591L8.73837 19.429ZM4.62169 15.3081L5.15229 14.7781L4.62169 15.3081ZM17.5669 14.9943L17.3032 14.2922L17.5669 14.9943ZM15.6498 15.7146L15.9136 16.4167H15.9136L15.6498 15.7146ZM8.3322 8.38177L7.62798 8.12375L8.3322 8.38177ZM9.02665 6.48636L9.73087 6.74438V6.74438L9.02665 6.48636ZM5.84504 10.6735L6.04438 11.3965L5.84504 10.6735ZM7.30167 10.1351L6.86346 9.52646L6.86346 9.52646L7.30167 10.1351ZM7.67582 9.79038L8.24665 10.2768H8.24665L7.67582 9.79038ZM14.251 16.3805L14.742 16.9475L14.742 16.9475L14.251 16.3805ZM13.3806 18.2012L12.6574 18.0022V18.0022L13.3806 18.2012ZM13.9169 16.7466L13.3075 16.3094L13.3075 16.3094L13.9169 16.7466ZM2.71846 12.7552L1.96848 12.76L1.96848 12.76L2.71846 12.7552ZM2.93045 11.9521L2.28053 11.5778H2.28053L2.93045 11.9521ZM11.3052 21.3431L11.3064 20.5931H11.3064L11.3052 21.3431ZM12.0933 21.1347L11.7215 20.4833L11.7215 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8588 2.76845L11.6973 2.03606ZM1.4694 21.4699C1.17666 21.763 1.1769 22.2379 1.46994 22.5306C1.76298 22.8233 2.23786 22.8231 2.5306 22.5301L1.4694 21.4699ZM7.18383 17.8721C7.47657 17.5791 7.47633 17.1042 7.18329 16.8114C6.89024 16.5187 6.41537 16.5189 6.12263 16.812L7.18383 17.8721ZM15.4588 5.48026L18.541 8.56568L19.6022 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26897 18.8989L5.15229 14.7781L4.09109 15.8382L8.20777 19.9591L9.26897 18.8989ZM17.3032 14.2922L15.386 15.0125L15.9136 16.4167L17.8307 15.6964L17.3032 14.2922ZM9.03642 8.63979L9.73087 6.74438L8.32243 6.22834L7.62798 8.12375L9.03642 8.63979ZM6.04438 11.3965C6.75583 11.2003 7.29719 11.0625 7.73987 10.7438L6.86346 9.52646C6.69053 9.65097 6.46601 9.72428 5.6457 9.95044L6.04438 11.3965ZM7.62798 8.12375C7.33502 8.92332 7.24338 9.14153 7.10499 9.30391L8.24665 10.2768C8.60041 9.86175 8.7823 9.33337 9.03642 8.63979L7.62798 8.12375ZM7.73987 10.7438C7.92696 10.6091 8.09712 10.4523 8.24665 10.2768L7.10499 9.30391C7.0337 9.38757 6.9526 9.46229 6.86346 9.52646L7.73987 10.7438ZM15.386 15.0125C14.697 15.2714 14.1716 15.4571 13.76 15.8135L14.742 16.9475C14.9028 16.8082 15.1192 16.7152 15.9136 16.4167L15.386 15.0125ZM14.1037 18.4001C14.329 17.5813 14.4021 17.3569 14.5263 17.1838L13.3075 16.3094C12.9902 16.7517 12.8529 17.2919 12.6574 18.0022L14.1037 18.4001ZM13.76 15.8135C13.5903 15.9605 13.4384 16.1269 13.3075 16.3094L14.5263 17.1838C14.5887 17.0968 14.6611 17.0175 14.742 16.9475L13.76 15.8135ZM5.15229 14.7781C4.50615 14.1313 4.06799 13.691 3.78366 13.3338C3.49835 12.9753 3.46889 12.8201 3.46845 12.7505L1.96848 12.76C1.97215 13.3422 2.26127 13.8297 2.61002 14.2679C2.95976 14.7073 3.47115 15.2176 4.09109 15.8382L5.15229 14.7781ZM5.6457 9.95044C4.80048 10.1835 4.10396 10.3743 3.58296 10.5835C3.06341 10.792 2.57116 11.0732 2.28053 11.5778L3.58038 12.3264C3.615 12.2663 3.71693 12.146 4.1418 11.9755C4.56523 11.8055 5.16337 11.6394 6.04438 11.3965L5.6457 9.95044ZM3.46845 12.7505C3.46751 12.6016 3.50616 12.4553 3.58038 12.3264L2.28053 11.5778C2.07354 11.9372 1.96586 12.3452 1.96848 12.76L3.46845 12.7505ZM8.20777 19.9591C8.83164 20.5836 9.34464 21.0987 9.78647 21.4506C10.227 21.8015 10.7179 22.0922 11.3041 22.0931L11.3064 20.5931C11.2369 20.593 11.0814 20.5644 10.721 20.2773C10.3618 19.9912 9.91923 19.5499 9.26897 18.8989L8.20777 19.9591ZM12.6574 18.0022C12.4133 18.8897 12.2462 19.4924 12.0751 19.9188C11.9033 20.3467 11.7821 20.4487 11.7215 20.4833L12.465 21.7861C12.974 21.4956 13.2573 21.0004 13.4671 20.4775C13.6776 19.9532 13.8694 19.2516 14.1037 18.4001L12.6574 18.0022ZM11.3041 22.0931C11.7112 22.0937 12.1114 21.9879 12.465 21.7861L11.7215 20.4833C11.595 20.5555 11.4519 20.5933 11.3064 20.5931L11.3041 22.0931ZM18.541 8.56568C19.6045 9.63022 20.3403 10.3695 20.7917 10.9788C21.2353 11.5774 21.2863 11.8959 21.2321 12.1464L22.6982 12.4634C22.8881 11.5854 22.5382 10.8162 21.9969 10.0857C21.4635 9.36592 20.6305 8.53486 19.6022 7.50556L18.541 8.56568ZM17.8307 15.6964C19.1921 15.1849 20.294 14.773 21.0771 14.3384C21.8718 13.8973 22.5083 13.3416 22.6982 12.4634L21.2321 12.1464C21.178 12.3968 21.0001 12.6655 20.3491 13.0268C19.6865 13.3946 18.7112 13.7632 17.3032 14.2922L17.8307 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1908 1.46165 12.4175 1.10912 11.5357 1.30367L11.8588 2.76845C12.1086 2.71335 12.4277 2.7633 13.0304 3.21075C13.6433 3.66579 14.3876 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73087 6.74438C10.2525 5.32075 10.6161 4.33403 10.9812 3.66315C11.3402 3.00338 11.609 2.82357 11.8588 2.76845L11.5357 1.30367C10.654 1.49819 10.1005 2.14332 9.66362 2.94618C9.23278 3.73793 8.82688 4.85154 8.32243 6.22834L9.73087 6.74438ZM2.5306 22.5301L7.18383 17.8721L6.12263 16.812L1.4694 21.4699L2.5306 22.5301Z" fill="#1C274C"></path></g></svg>
+            <svg class="note-pinned" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: ${noteData.pinned ? 'block' : 'none'};"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z" fill="#1C274C"></path></g></svg>
+        </div>
+    `;
+
+    const optionsIcon = `<svg class="note-options-btn note-hidden-options" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z"></path><path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"></path><path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z"></path></g></svg>`;
+
+    let rightSideTools = '';
+    if (isTrashed) {
+        rightSideTools = `
+            <div class="note-trash-actions">
+                <button title="Restaurar nota" class="note-trash-btn note-trash-restore-btn">${SVG_ICONS_TRASH.RESTORE}</button>
+                <button title="Eliminar permanentemente" class="note-trash-btn note-trash-delete-btn">${SVG_ICONS_TRASH.DELETE_PERMANENTLY}</button>
+            </div>
+        `;
+    } else {
+        rightSideTools = `
+            ${pinIcons}
+            ${optionsIcon}
+        `;
+    }
+
+    let deletionInfo = '';
+    if (isTrashed) {
+        const expirationDate = new Date(noteData.updatedAt);
+        expirationDate.setDate(expirationDate.getDate() + 30);
+        const daysRemaining = Math.ceil((expirationDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+        let text = 'Se eliminará pronto';
+        if (daysRemaining > 1) text = `Se eliminará en ${daysRemaining} días`;
+        else if (daysRemaining === 1) text = `Se eliminará en 1 día`;
+        deletionInfo = `<div class="note-deletion-info">${text}</div>`;
+    }
+
+    return `
+        <div class="note-card ${isTrashed ? 'is-trashed' : ''}">
+            ${!isTrashed ? '<div class="note-multiple-selector note-hidden-options"></div>' : ''}
+            <div class="note-tools-container">
+                <div class="note-group">
+                    <div class="note-group-color ${isTrashed ? 'disabled' : ''}"></div>
+                    <div class="note-group-name"></div>
+                </div>
+                <div class="note-tools-right-side">
+                    ${rightSideTools}
+                </div>
+            </div>
+            <div class="note-text">
+                <div class="note-title" spellcheck="false">${sanitizedTitle}</div>
+                <div class="note-body" spellcheck="false">${sanitizedBody}</div>
+            </div>
+            <div class="note-footer">
+                <div class="note-last-modified note-hidden-options">${lastModified}</div>
+                ${deletionInfo}
+            </div>
+        </div>
+    `;
+};
+
 
 
 
@@ -334,6 +404,132 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
     noteCardContainer.dataset.updatedAt = noteData.updatedAt; // <-- Atributo para la fecha
     noteCardContainer.dataset.customOrder = noteData.customOrder || -1; // <-- Atributo para el orden personalizado
 
+
+    // Usamos la plantilla para generar el HTML y lo asignamos de una sola vez.
+    noteCardContainer.innerHTML = createNoteHTML(noteData, isTrashed);
+
+    // --- ASIGNACIÓN DE EVENTOS ---
+    // Ahora que el HTML está en el DOM, buscamos los elementos interactivos y les asignamos sus listeners.
+    // Esto se llama "delegación de eventos" a nivel de componente.
+
+    if (isTrashed) {
+        // Listeners para la vista de papelera
+        const restoreBtn = noteCardContainer.querySelector('.note-trash-restore-btn');
+        const deleteBtn = noteCardContainer.querySelector('.note-trash-delete-btn');
+
+        if (restoreBtn) {
+            restoreBtn.onclick = async (e) => {
+                e.stopPropagation();
+                try {
+                    const notaRestaurada = await restaurarNotaEnDB(noteData.id);
+                    store.upsertNote(notaRestaurada);
+                    noteCardContainer.remove();
+                    renderizarNotaEnDOM(notaRestaurada);
+                } catch (error) {
+                    console.error(`Error al restaurar la nota ${noteData.id}:`, error);
+                    showNotification('No se pudo restaurar la nota.', 'error');
+                }
+            };
+        }
+
+        if (deleteBtn) {
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                const confirmModal = new Modal('confirm-modal-delete-note');
+                // ... (la lógica del modal de confirmación no cambia)
+            };
+        }
+    } else {
+        // Listeners para la vista principal
+        const notePin = noteCardContainer.querySelector('.note-pin');
+        if (notePin) {
+            notePin.addEventListener('click', (event) => {
+                event.stopPropagation();
+                togglePinEstado(noteData.id);
+            });
+        }
+
+        const multipleSelector = noteCardContainer.querySelector('.note-multiple-selector');
+        if (multipleSelector) {
+            multipleSelector.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const selectionEvent = new CustomEvent('toggle-note-selection', {
+                    detail: { noteId: noteData.id },
+                    bubbles: true,
+                    composed: true
+                });
+                noteCardContainer.dispatchEvent(selectionEvent);
+            });
+        }
+    }
+
+    // --- LÓGICA DE INSERCIÓN EN EL DOM ---
+    if (isTrashed) {
+        const trashContainer = document.getElementById('trash-notes-container');
+        if (trashContainer) {
+            trashContainer.appendChild(noteCardContainer);
+        }
+    } else {
+        const targetGrid = noteData.pinned ? gridPinned : gridUnpinned;
+        if (targetGrid) {
+            targetGrid.add(noteCardContainer, { index: 0 });
+        }
+    }
+
+    // Finalmente, coloreamos la nota.
+    actualizarInfoGrupoEnNoteCard(noteData.id, noteData.groupId);
+};
+
+
+// REENDERIZAR LAS NOTE CARDS EN EL CONTENEDOR DE MUURI
+export const renderizarNotaEnDOM_OLD = (noteData, { isTrashed = false } = {}) => {
+    const existingNoteCard = document.getElementById(noteData.id);
+
+    // --- LÓGICA DE ACTUALIZACIÓN (SI LA NOTA YA EXISTE) ---
+    // Esto es mucho más eficiente que destruir y recrear el elemento.
+    if (existingNoteCard) {
+        // Actualiza los datasets que usa Muuri para ordenar y filtrar
+        if (existingNoteCard.dataset.groupId !== noteData.groupId) {
+            existingNoteCard.dataset.groupId = noteData.groupId;
+            // Actualiza el color y nombre del grupo solo si el grupo cambió
+            actualizarInfoGrupoEnNoteCard(noteData.id, noteData.groupId);
+        }
+        if (existingNoteCard.dataset.pinned !== String(noteData.pinned)) {
+            existingNoteCard.dataset.pinned = noteData.pinned;
+            // Actualiza el icono del pin solo si el estado cambió
+            const pinnedIcon = existingNoteCard.querySelector('.note-pinned');
+            const unpinnedIcon = existingNoteCard.querySelector('.note-unpinned');
+            if (pinnedIcon && unpinnedIcon) {
+                pinnedIcon.style.display = noteData.pinned ? 'block' : 'none';
+                unpinnedIcon.style.display = noteData.pinned ? 'none' : 'block';
+            }
+            // Verifica si la nota debe moverse entre los grids de fijadas/no fijadas
+            verificarYReubicarNota(noteData.id, noteData.pinned);
+        }
+        if (existingNoteCard.dataset.updatedAt !== noteData.updatedAt) {
+            existingNoteCard.dataset.updatedAt = noteData.updatedAt;
+            const lastModEl = existingNoteCard.querySelector('.note-last-modified');
+            if (lastModEl) lastModEl.textContent = `Ultima edición: ${formatFechaNoteCard(noteData.updatedAt)}`;
+        }
+
+        // Actualiza el contenido visible de la nota
+        const titleEl = existingNoteCard.querySelector('.note-title');
+        if (titleEl && titleEl.innerHTML !== noteData.title) titleEl.innerHTML = DOMPurify.sanitize(noteData.title);
+        
+        const bodyEl = existingNoteCard.querySelector('.note-body');
+        if (bodyEl && bodyEl.innerHTML !== noteData.body) bodyEl.innerHTML = DOMPurify.sanitize(noteData.body);
+        return; // Salimos de la función porque ya terminamos de actualizar.
+    }
+
+    // --- LÓGICA DE CREACIÓN (SI LA NOTA NO EXISTE) ---
+    const noteCardContainer = document.createElement('article');
+    noteCardContainer.className = 'note-card-container';
+    noteCardContainer.id = noteData.id;
+    noteCardContainer.dataset.groupId = noteData.groupId;
+    noteCardContainer.dataset.pinned = noteData.pinned; // <-- Atributo para el estado de pin
+    noteCardContainer.dataset.updatedAt = noteData.updatedAt; // <-- Atributo para la fecha
+    noteCardContainer.dataset.customOrder = noteData.customOrder || -1; // <-- Atributo para el orden personalizado
+
     // Definimos el namespace SVG para usarlo en createElementNS, SIRVE PARA VARIOS SVG DEL MISMO ORIGEN
     const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -499,6 +695,7 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
     if (isTrashed) {
         noteCardContainer.classList.add('is-trashed');
         noteGroupColor.classList.add('disabled');
+
         const trashActions = document.createElement('div');
         trashActions.className = 'note-trash-actions';
 
@@ -559,10 +756,10 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
         noteToolsRightSide.appendChild(notePin);
         noteToolsRightSide.appendChild(noteOptionsBtn);
     }
-
+    
+    noteToolsContainer.appendChild(multipleSelector);
     noteToolsContainer.appendChild(noteGroup);
     noteToolsContainer.appendChild(noteToolsRightSide);
-
     noteText.appendChild(noteTitle);
     noteText.appendChild(noteBody);
 
@@ -590,18 +787,10 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
         noteFooter.appendChild(deletionInfo);
     }
 
-    
-    const noteCard = document.createElement('div');
-    noteCard.classList.add('note-card');
+    noteCardContainer.appendChild(noteToolsContainer);
+    noteCardContainer.appendChild(noteText);
+    noteCardContainer.appendChild(noteFooter);
 
-    if (!isTrashed) {
-        noteCard.appendChild(multipleSelector);
-    }
-    noteCard.appendChild(noteToolsContainer);
-    noteCard.appendChild(noteText);
-    noteCard.appendChild(noteFooter);
-
-    noteCardContainer.appendChild(noteCard);
 
 
     
@@ -626,13 +815,15 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
 
     // --- Event Listener para el Pin ---
     // Usamos stopPropagation para evitar que al hacer clic en el pin se abra el editor.
-    notePin.addEventListener('click', (event) => {
-        event.stopPropagation();
-        togglePinEstado(noteData.id);
-    });
+    if (notePin) {
+        notePin.addEventListener('click', (event) => {
+            event.stopPropagation();
+            togglePinEstado(noteData.id);
+        });
+    }
 
     // --- Event Listener para Selección Múltiple ---
-    multipleSelector.addEventListener('click', (event) => {
+    if (multipleSelector) multipleSelector.addEventListener('click', (event) => {
         event.stopPropagation();
         // Creamos y despachamos un evento personalizado para que el main.js lo maneje
         const selectionEvent = new CustomEvent('toggle-note-selection', {
@@ -642,6 +833,7 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
         });
         noteCardContainer.dispatchEvent(selectionEvent);
     });
+
 
     // Si la nota es nueva (no existía), la añadimos al contenedor.
     // Si ya existía, ya está en su sitio, no hace falta añadirla de nuevo.
