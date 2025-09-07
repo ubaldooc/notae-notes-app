@@ -598,6 +598,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderizarGrupoEnDOM(group);
         });
 
+                // Si se actualizó al menos una nota, disparamos un evento 'resize' después de un breve
+        // retraso para darle tiempo al DOM a actualizarse. Esto fuerza a Muuri a recalcular
+        // el layout, lo cual es crucial para la vista masonry si el tamaño de una nota cambió.
+        if (notesToUpsert.length > 0) {
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 500); // 0.5 segundos de retraso
+        }
+
         // --- 3. ACTUALIZACIÓN FINAL DEL LAYOUT ---
 
         // Re-ordenar los grids. Es menos costoso que re-renderizar todo.
