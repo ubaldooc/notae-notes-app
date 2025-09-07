@@ -1859,6 +1859,8 @@ body.dark-mode #no-notes-message {
 .grid-wrapper.masonry-view-active .note-card-container {
     /* En masonry, la altura es automática para que cada tarjeta se ajuste a su contenido */
     height: auto;
+    /* max-height: 480px; */
+    /* overflow: hidden; */
 }
 
 .grid-wrapper.masonry-view-active .note-card {
@@ -1868,23 +1870,19 @@ body.dark-mode #no-notes-message {
 
 .grid-wrapper.masonry-view-active .note-title {
     /* Permitimos que el título se expanda si es necesario */
-    max-height: none;
+    /* max-height: none; */
 }
 
 .grid-wrapper.masonry-view-active .note-body {
     /* La altura del cuerpo también debe ser automática */
     height: auto;
+    max-height: 420px;
+    overflow: hidden;
 }
 
-/* 
-@keyframes noteOptions {
-    0% {
-        clip-path: inset(0 0 100% 0);
-    }
-    100% {
-        clip-path: inset(0 0 0 0);
-    }
-} */
+.grid-wrapper.masonry-view-active .note-footer {
+    /* height: 20px; */
+}
 
 
 
@@ -1956,7 +1954,7 @@ body.dark-mode #no-notes-message {
     /* word-break: break-all; */
     text-overflow: ellipsis;
     min-height: 0px;
-    max-height: 32px;
+    max-height: 31px;
     display: flex;
     flex: 0 0 auto;
     /* border: 1px solid red; */
@@ -1971,13 +1969,6 @@ body.dark-mode #no-notes-message {
 .note-title:empty {
     display: none;
   }
-
-/* .note-title:focus {
-    border: 1px solid #007bff;
-    background-color: #eca9ff;
-    max-height: 150px;
-    white-space: normal;
-} */
 
 .note-body {
     border-radius: 0;
@@ -2002,18 +1993,11 @@ body.dark-mode #no-notes-message {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5; */
 
-
   --max-lines: 4;
   --line-height: 1.3;
     height: calc(var(--max-lines) * 1em * var(--line-height));
     line-height: var(--line-height);
 }
-
-/* .note-body:focus {
-    border: 1px solid #007bff;
-    background-color: #eca9ff;
-    scrollbar-width:thin;
-} */
 
 .note-body::-webkit-scrollbar {
     /* display: none;. */
@@ -2027,15 +2011,16 @@ body.dark-mode #no-notes-message {
     /* transform: translateX(-50%); */
     /* background: #4b1a5220; */
     /* flex: 0 0 28px; */
+    height: 16px;
     display: flex;
-    flex: 0 0 auto;
+    /* flex: 0 0 auto; */
     align-items: center;
     justify-content: start;
     /* padding: 1px 10px; */
     padding: 1px 10px;
     column-gap: 6px;
     user-select: none;
-    overflow: hidden;
+    /* overflow: hidden; */
     /* display: none; */
 }
 
