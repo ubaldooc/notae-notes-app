@@ -658,4 +658,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await sincronizarYcargarDatos();
     });
 
+    // Hacemos visible el body una vez que todo el JS inicial se ha ejecutado.
+    // Esto, junto con el CSS, previene el FOUC.
+    document.body.classList.add('loaded');
 });

@@ -127,6 +127,12 @@ Este proyecto tiene una base sólida, pero aquí hay algunas ideas para llevarlo
 
 ---
 
+## 📧 Contacto
+
+Si tienes alguna pregunta, sugerencia o quieres reportar un bug, no dudes en contactarme a través de mi correo: [ubaldooc.54@gmail.com](mailto:ubaldooc.54@gmail.com)
+
+---
+
 ## 📄 Licencia
 
 Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.

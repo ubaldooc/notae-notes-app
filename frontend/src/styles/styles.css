@@ -1,3 +1,10 @@
+/* Oculta el cuerpo de la página por defecto para prevenir el FOUC */
+body:not(.loaded) {
+    visibility: hidden;
+    opacity: 0;
+}
+
+
 /* Estilo para el elemento "fantasma" que sigue al cursor */
 /* .sortable-ghost {
   opacity: 0.4;
