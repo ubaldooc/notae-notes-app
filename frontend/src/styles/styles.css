@@ -1855,6 +1855,26 @@ body.dark-mode #no-notes-message {
     max-height: 250px; /* Un límite para que no se haga gigante */
 }
 
+/* ESTILOS PARA LA VISTA MASONRY */
+.grid-wrapper.masonry-view-active .note-card-container {
+    /* En masonry, la altura es automática para que cada tarjeta se ajuste a su contenido */
+    height: auto;
+}
+
+.grid-wrapper.masonry-view-active .note-card {
+    /* El padding puede ser el mismo que en la vista de cuadrícula */
+    padding: 4px 4px 10px 4px;
+}
+
+.grid-wrapper.masonry-view-active .note-title {
+    /* Permitimos que el título se expanda si es necesario */
+    max-height: none;
+}
+
+.grid-wrapper.masonry-view-active .note-body {
+    /* La altura del cuerpo también debe ser automática */
+    height: auto;
+}
 
 /* 
 @keyframes noteOptions {

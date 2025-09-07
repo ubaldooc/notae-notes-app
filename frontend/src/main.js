@@ -124,32 +124,42 @@ const editorcharCounter = document.getElementById("editor-character-counter");
  * @param {string} view - La vista a aplicar ('list' o 'grid').
  */
 const applyInitialView = (view) => {
-    const gridWrapper = document.querySelector('.grid-wrapper');
-    const viewListBtn = document.getElementById('view-list-btn');
-    const viewGridBtn = document.getElementById('view-grid-btn');
-    if (view === 'list') {
-        gridWrapper.classList.add('list-view-active');
-        viewListBtn.classList.add('active');
-        viewGridBtn.classList.remove('active');
-    } else {
-        gridWrapper.classList.remove('list-view-active');
-        viewGridBtn.classList.add('active');
-        viewListBtn.classList.remove('active');
-    }
+  const gridWrapper = document.querySelector('.grid-wrapper');
+  const viewListBtn = document.getElementById('view-list-btn');
+  const viewGridBtn = document.getElementById('view-grid-btn');
+  const viewMasonryBtn = document.getElementById('view-masonry-btn');
+
+  // Quitar todas las clases de vista y de 'active' de los botones
+  gridWrapper.classList.remove('list-view-active', 'grid-view-active', 'masonry-view-active');
+  [viewListBtn, viewGridBtn, viewMasonryBtn].forEach(btn => btn.classList.remove('active'));
+
+  // Aplicar la clase correcta según la vista
+  if (view === 'list') {
+    gridWrapper.classList.add('list-view-active');
+    viewListBtn.classList.add('active');
+  } else if (view === 'masonry') {
+    gridWrapper.classList.add('masonry-view-active');
+    viewMasonryBtn.classList.add('active');
+  } else { // 'grid' es el por defecto
+    gridWrapper.classList.add('grid-view-active');
+    viewGridBtn.classList.add('active');
+  }
 };
 
 const initViewSwitcher = () => {
     const viewGridBtn = document.getElementById('view-grid-btn');
     const viewListBtn = document.getElementById('view-list-btn');
+    const viewMasonryBtn = document.getElementById('view-masonry-btn');
     const gridWrapper = document.querySelector('.grid-wrapper');
 
-    if (!viewGridBtn || !viewListBtn || !gridWrapper) {
+    if (!viewGridBtn || !viewListBtn || !viewMasonryBtn || !gridWrapper) {
         console.error('No se encontraron los elementos para el cambio de vista.');
         return;
     }
 
     const switchView = (view) => {
-        if (gridWrapper.classList.contains('view-changing')) {
+        // Si ya estamos en la vista correcta, no hacemos nada.
+        if (gridWrapper.classList.contains(`${view}-view-active`)) {
             return;
         }
 
@@ -158,15 +168,20 @@ const initViewSwitcher = () => {
 
         // 2. Esperar a que termine la animación para cambiar el layout
         setTimeout(() => {
+            // Aplicamos la nueva vista (clases CSS)
             applyInitialView(view);
+
+            // Forzamos a Muuri a recalcular el layout de las notas.
+            // El 'true' en layout() hace que la animación sea instantánea,
+            // lo que se ve mejor con nuestra propia animación de fade.
             if (gridPinned && gridUnpinned) {
                 gridPinned.refreshItems().layout(true);
                 gridUnpinned.refreshItems().layout(true);
             }
 
-            // 5. Quitar la clase para iniciar la animación de fade-in
+            // 3. Quitar la clase para iniciar la animación de fade-in
             gridWrapper.classList.remove('view-changing');
-        }, 200); // Esta duración debe coincidir con la transición CSS de opacidad
+        }, 150); // Esta duración debe coincidir con la transición CSS de opacidad
     };
 
     const saveViewPreference = (view) => {
@@ -182,9 +197,10 @@ const initViewSwitcher = () => {
     // Asignar eventos a los botones
     viewListBtn.addEventListener('click', () => { saveViewPreference('list'); switchView('list'); });
     viewGridBtn.addEventListener('click', () => { saveViewPreference('grid'); switchView('grid'); });
+    viewMasonryBtn.addEventListener('click', () => { saveViewPreference('masonry'); switchView('masonry'); });
 
     // Aplicar la vista guardada al cargar la página
-    applyInitialView(localStorage.getItem('noteView') || 'grid');
+    applyInitialView(localStorage.getItem('noteView') || 'masonry');
 };
 
 /**
