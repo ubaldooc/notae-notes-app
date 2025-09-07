@@ -1,10 +1,9 @@
 // Importaciones de la capa de servicio/base de datos (DB)
 import { guardarNotaEnDB, cargarNotasDesdeDB, obtenerNotasPorGrupoDesdeDB,
     guardarGrupoEnDB, cargarGruposDesdeDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB,
-    obtenerNotaPorIdDesdeDB, actualizarOrdenGruposEnDB, buscarYCorregirDuplicados, actualizarOrdenNotasEnDB
+    obtenerNotaPorIdDesdeDB, actualizarOrdenGruposEnDB, buscarYCorregirDuplicados, actualizarOrdenNotasEnDB, closeDb
 } from './services/db.js';
-import { updateUserPreferencesInBackend } from './services/api.js';
-import { 
+import { updateUserPreferencesInBackend,
     fetchNotesFromBackend, fetchGroupsFromBackend, syncNoteWithBackend, createGroupInBackend, updateGroupInBackend
 } from './services/api.js';
 
@@ -19,6 +18,8 @@ import { initNoteCard, renderizarNotaEnDOM } from './components/NoteCard.js';
 import { initHeader } from './components/Header.js';
 
 import { initFilters } from './components/FilterManager.js';
+
+import { initViewManager, applyView, updateSortButtonUI, applySort } from './components/ViewManager.js';
 
 import { initUtils, getSortFunction } from './utils.js';
 
@@ -35,18 +36,6 @@ import { store } from './services/store.js';
 import { Modal } from './components/ModalManager.js';
 
 import './styles/styles.css';
-
-/**
- * Mapa de los iconos SVG para cada tipo de ordenamiento.
- * Se define aquí para que sea accesible por varias funciones.
- */
-const sortIcons = {
-    newest: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 8H13" stroke-width="2" stroke-linecap="round"></path> <path d="M4 16H9" stroke-width="2" stroke-linecap="round"></path> <path d="M17 4L17 20M17 20L20 17M17 20L14 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
-    oldest: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 8H13" stroke-width="2" stroke-linecap="round"></path> <path d="M4 16H9" stroke-width="2" stroke-linecap="round"></path> <path d="M17 20V4M17 4L20 7M17 4L14 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
-    'title-asc': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 4V20M17 4L14 7M17 4L20 7M4 16V10C4 8.89543 4.89543 8 6 8H8C9.10457 8 10 8.89543 10 10V16M4 13H10M4 20H10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
-    'title-desc': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 20V4M17 20L14 17M17 20L20 17M4 16V10C4 8.89543 4.89543 8 6 8H8C9.10457 8 10 8.89543 10 10V16M4 13H10M4 20H10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
-    custom: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14 18V15.5C14 14.1193 12.8807 13 11.5 13C10.1193 13 9 14.1193 9 15.5V21H6C5.44772 21 5 20.5523 5 20V11.134C5 10.493 5.30953 9.89823 5.82843 9.48528L9.29289 6.70711C9.68342 6.39464 10.2178 6.39464 10.6083 6.70711L14.0728 9.48528C14.5917 9.89823 14.9 10.493 14.9 11.134V12M14 18H17.5C18.3284 18 19 17.3284 19 16.5V14.5C19 13.6716 18.3284 13 17.5 13C16.6716 13 16 13.6716 16 14.5V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
-};
 
 import Muuri from 'muuri';
 
@@ -117,179 +106,6 @@ const editorcharCounter = document.getElementById("editor-character-counter");
 //     // La comparación de fechas funciona restándolas. dateB - dateA da el orden descendente.
 //     return dateB - dateA;
 // }
-
-
-/**
- * Aplica la preferencia de vista (cuadrícula/lista) a la UI sin animación.
- * @param {string} view - La vista a aplicar ('list' o 'grid').
- */
-const applyInitialView = (view) => {
-  const gridWrapper = document.querySelector('.grid-wrapper');
-  const viewListBtn = document.getElementById('view-list-btn');
-  const viewGridBtn = document.getElementById('view-grid-btn');
-  const viewMasonryBtn = document.getElementById('view-masonry-btn');
-
-  // Quitar todas las clases de vista y de 'active' de los botones
-  gridWrapper.classList.remove('list-view-active', 'grid-view-active', 'masonry-view-active');
-  [viewListBtn, viewGridBtn, viewMasonryBtn].forEach(btn => btn.classList.remove('active'));
-
-  // Aplicar la clase correcta según la vista
-  if (view === 'list') {
-    gridWrapper.classList.add('list-view-active');
-    viewListBtn.classList.add('active');
-  } else if (view === 'masonry') {
-    gridWrapper.classList.add('masonry-view-active');
-    viewMasonryBtn.classList.add('active');
-  } else { // 'grid' es el por defecto
-    gridWrapper.classList.add('grid-view-active');
-    viewGridBtn.classList.add('active');
-  }
-};
-
-const initViewSwitcher = () => {
-    const viewGridBtn = document.getElementById('view-grid-btn');
-    const viewListBtn = document.getElementById('view-list-btn');
-    const viewMasonryBtn = document.getElementById('view-masonry-btn');
-    const gridWrapper = document.querySelector('.grid-wrapper');
-
-    if (!viewGridBtn || !viewListBtn || !viewMasonryBtn || !gridWrapper) {
-        console.error('No se encontraron los elementos para el cambio de vista.');
-        return;
-    }
-
-    const switchView = (view) => {
-        // Si ya estamos en la vista correcta, no hacemos nada.
-        if (gridWrapper.classList.contains(`${view}-view-active`)) {
-            return;
-        }
-
-        // 1. Añadir clase para iniciar la animación de fade-out
-        gridWrapper.classList.add('view-changing');
-
-        // 2. Esperar a que termine la animación para cambiar el layout
-        setTimeout(() => {
-            // Aplicamos la nueva vista (clases CSS)
-            applyInitialView(view);
-
-            // Forzamos a Muuri a recalcular el layout de las notas.
-            // El 'true' en layout() hace que la animación sea instantánea,
-            // lo que se ve mejor con nuestra propia animación de fade.
-            if (gridPinned && gridUnpinned) {
-                gridPinned.refreshItems().layout(true);
-                gridUnpinned.refreshItems().layout(true);
-            }
-
-            // 3. Quitar la clase para iniciar la animación de fade-in
-            gridWrapper.classList.remove('view-changing');
-        }, 150); // Esta duración debe coincidir con la transición CSS de opacidad
-    };
-
-    const saveViewPreference = (view) => {
-        localStorage.setItem('noteView', view);
-        const user = localStorage.getItem('user');
-        if (user) {
-            // No esperamos la respuesta para no bloquear la UI.
-            updateUserPreferencesInBackend({ noteView: view })
-                .catch(err => console.warn("No se pudo guardar la preferencia de vista en el backend:", err));
-        }
-    };
-
-    // Asignar eventos a los botones
-    viewListBtn.addEventListener('click', () => { saveViewPreference('list'); switchView('list'); });
-    viewGridBtn.addEventListener('click', () => { saveViewPreference('grid'); switchView('grid'); });
-    viewMasonryBtn.addEventListener('click', () => { saveViewPreference('masonry'); switchView('masonry'); });
-
-    // Aplicar la vista guardada al cargar la página
-    applyInitialView(localStorage.getItem('noteView') || 'masonry');
-};
-
-/**
- * Actualiza la UI del botón de ordenamiento (icono y estado activo)
- * basándose en la preferencia guardada en localStorage.
- */
-const updateSortButtonUI = () => {
-    const sortType = localStorage.getItem('noteSortOrder') || 'newest';
-    const sortBtn = document.getElementById('sort-options-btn');
-    const sortOptions = document.querySelectorAll('.sort-option');
-
-    if (sortIcons[sortType]) {
-        sortBtn.innerHTML = sortIcons[sortType];
-    }
-    sortOptions.forEach(opt => {
-        opt.classList.toggle('active', opt.dataset.sort === sortType);
-    });
-};
-
-// Hacemos que applySort sea accesible en todo el módulo para poder llamarla desde el modal.
-let applySort;
-const initSortManager = () => {
-    const sortBtn = document.getElementById('sort-options-btn');
-    const sortDropdown = document.getElementById('sort-options-dropdown');
-    const sortOptions = document.querySelectorAll('.sort-option');
-    const gridWrapper = document.querySelector('.grid-wrapper');
-
-    if (!sortBtn || !sortDropdown || !sortOptions.length || !gridWrapper) {
-        console.error('No se encontraron los elementos para el ordenamiento.');
-        return;
-    }
-
-    // --- Lógica de la UI del Dropdown ---
-    sortBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sortDropdown.classList.toggle('active');
-    });
-
-    document.addEventListener('click', () => {
-        if (sortDropdown.classList.contains('active')) {
-            sortDropdown.classList.remove('active');
-        }
-    });
-
-    // --- Lógica de Ordenamiento ---
-    applySort = (sortType, withAnimation = true) => {
-        localStorage.setItem('noteSortOrder', sortType);
-
-        // Solo sincronizamos con el backend si es una acción del usuario (con animación)
-        const user = localStorage.getItem('user');
-        if (withAnimation && user) {
-            updateUserPreferencesInBackend({ noteSortOrder: sortType })
-                .catch(err => console.warn("No se pudo guardar la preferencia de orden en el backend:", err));
-        }
-
-        updateSortButtonUI();
-
-        const sortFunction = getSortFunction(sortType);
-        // La función getSortFunction ahora maneja 'custom' devolviendo la función correcta,
-        // por lo que ya no se necesita un caso especial aquí.
-        if (!sortFunction) {
-            console.warn(`El tipo de ordenamiento "${sortType}" no es soportado o no tiene una función de comparación.`);
-            return;
-        }
-
-        if (gridPinned && gridUnpinned) {
-            if (withAnimation && !gridWrapper.classList.contains('view-changing')) {
-                gridPinned.sort(sortFunction);
-                gridUnpinned.sort(sortFunction);
-            } else {
-                gridPinned.sort(sortFunction, { layout: 'instant' });
-                gridUnpinned.sort(sortFunction, { layout: 'instant' });
-            }
-        }
-    };
-
-    sortOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const sortType = e.currentTarget.dataset.sort;
-            applySort(sortType);
-            sortDropdown.classList.remove('active');
-        });
-    });
-
-    // Aplicar el orden guardado al cargar la página
-    updateSortButtonUI();
-};
-
 
 
 export let gridUnpinned;
@@ -371,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- LÓGICA DEL MODAL DE ORDEN PERSONALIZADO ---
-    const showCustomOrderModal = (triggerElement) => {
+    const showCustomOrderModal = async (triggerElement) => {
         const customOrderModal = new Modal('custom-order-modal');
         const modalElement = document.getElementById('custom-order-modal');
         const setNewOrderBtn = document.getElementById('setNewCustomOrderBtn');
@@ -387,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             applySort(currentSortOrder, false); // Re-aplica el orden actual para revertir el arrastre.
         };
 
-                // Asignamos las acciones a los botones.
+        // Asignamos las acciones a los botones.
         // Los botones de acción principal llaman a `confirm()` y los de cancelación a `cancel()`.
         setNewOrderBtn.onclick = () => customOrderModal.confirm();
         switchToOrderBtn.onclick = () => customOrderModal.confirm();
@@ -720,15 +536,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             };
     
-            // 4. Sincronizar notas y grupos.
+            // 4. Sincronizar notas y grupos. No usamos `await` aquí para no bloquear el renderizado.
+            // La UI se puede mostrar con los datos locales mientras la sincronización ocurre en segundo plano.
             console.log('--- Sincronizando Notas ---');
             sincronizarEntidades(localNotesMap, backendNotesMap, guardarNotaEnDB, syncNoteWithBackend, syncNoteWithBackend);
     
             console.log('--- Sincronizando Grupos ---');
             sincronizarEntidades(localGroupsMap, backendGroupsMap, guardarGrupoEnDB, createGroupInBackend, updateGroupInBackend);
     
-            // 5. Esperar a que todas las operaciones de sincronización terminen.
-            await Promise.all(syncPromises);
+            // 5. Ejecutar todas las promesas de sincronización en segundo plano.
+            Promise.all(syncPromises).then(() => {
+                console.log('Sincronización en segundo plano completada.');
+            }).catch(err => {
+                console.error("Ocurrió un error durante la sincronización en segundo plano:", err);
+            });
             console.log('Sincronización completada.');
     
             // 5.5 (Paso de Recuperación): Asegurarse de que todas las notas tengan un estado válido.
@@ -798,7 +619,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Después de iniciar sesión, las preferencias del usuario se guardan en localStorage.
         // Actualizamos la UI de los controles para que reflejen estas preferencias inmediatamente.
-        applyInitialView(localStorage.getItem('noteView') || 'grid');
+        applyView(localStorage.getItem('noteView') || 'masonry', false);
         updateSortButtonUI();
 
         // Ahora, limpiamos la UI y cargamos los datos, que ya usarán las preferencias correctas.
@@ -820,8 +641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initFilters({ gridPinned, gridUnpinned, gridTrash });
     initKeyboardShortcuts();
     initSelectionManager({ gridPinned, gridUnpinned });
-    initViewSwitcher();
-    initSortManager();
+    initViewManager({ gridPinned, gridUnpinned });
 
     // Suscribimos la función de renderizado a los cambios del store.
     store.subscribe(renderAppFromState);
