@@ -143,8 +143,8 @@ const showTrashView = async () => {
                     const trashedNoteIds = store.getState().notes.filter(n => n.status === 'trashed').map(n => n.id);
                     await vaciarPapeleraEnDB();
                     // Limpiamos el grid de Muuri
-                    gridTrash.remove(gridTrash.getItems(), { removeElements: true });
-                    store.removeNotes(trashedNoteIds);
+                    gridTrash.remove(gridTrash.getItems(), { removeElements: true }); // Limpia la UI
+                    store.dispatch({ type: 'REMOVE_NOTES', payload: trashedNoteIds }); // Actualiza el estado
                     noNotesMessage.style.display = 'block';
                     noNotesMessage.innerHTML = 'La papelera está vacía.';
                     emptyTrashBtn.style.display = 'none';

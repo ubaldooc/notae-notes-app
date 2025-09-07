@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 import { formatFechaNoteCard, generateDynamicBackgroundColor, validarIDOConvertirElemento, getSortFunction } from '../utils.js';
-import { obtenerNotaPorIdDesdeDB, guardarNotaEnDB, moverNotaAPapeleraEnDB, actualizarOrdenGruposEnDB, restaurarNotaEnDB, eliminarNotaPermanentementeDeDB } from '../services/db.js';
+import { obtenerNotaPorIdDesdeDB, guardarNotaEnDB, moverNotaAPapeleraEnDB, restaurarNotaEnDB, eliminarNotaPermanentementeDeDB } from '../services/db.js';
 import { abrirEditorNota, initNoteEditor } from './NoteEditor.js';
 import { showNotification } from './Notifier.js';
 import { Modal } from './ModalManager.js';
@@ -99,266 +99,17 @@ const createNoteHTML = (noteData, isTrashed) => {
 
 
 
-
-
-
-
-
-
-
-// // REENDERIZAR LAS NOTE CARDS EN EL CONTENEDOR DE MUURI
-// export const renderizarNotaEnDOM = (noteData) => {
-//     // Comprobar si la nota ya existe en el DOM
-//     const existingNoteCard = document.getElementById(noteData.id);
-
-//     // Si existe, la vamos a reemplazar. Si no, creamos una nueva.
-//     const noteCardContainer = existingNoteCard || document.createElement('article');
-
-//     // Limpiamos el contenido anterior por si estamos actualizando
-//     noteCardContainer.innerHTML = '';
-
-//     noteCardContainer.className = 'note-card-container';
-//     noteCardContainer.id = noteData.id;
-//     noteCardContainer.dataset.groupId = noteData.groupId;
-//     noteCardContainer.dataset.pinned = noteData.pinned; // <-- Atributo para el estado de pin
-//     noteCardContainer.dataset.updatedAt = noteData.updatedAt; // <-- Atributo para la fecha
-
-//     // Definimos el namespace SVG para usarlo en createElementNS, SIRVE PARA VARIOS SVG DEL MISMO ORIGEN
-//     const svgNS = 'http://www.w3.org/2000/svg';
-
-//     // Creamos toda la estructura del HTML    
-//     noteCardContainer.classList.add('note-card-container');
-//     noteCardContainer.id = noteData.id; // Asignamos el ID de la nota al contenedor
-//     noteCardContainer.dataset.groupId = noteData.groupId; // Asignamos el groupId como dataset
-
-//     const noteText = document.createElement('div');
-//     noteText.classList.add('note-text');
-
-//     const noteTitle = document.createElement('div');
-//     noteTitle.classList.add('note-title');
-//     noteTitle.spellcheck = false;
-
-//     const noteBody = document.createElement('div');
-//     noteBody.classList.add('note-body');
-//     noteBody.spellcheck = false;
-
-//     const noteFooter = document.createElement('div');
-//     noteFooter.classList.add('note-footer');
-
-//     const noteLastModified = document.createElement('div');
-//     noteLastModified.classList.add('note-last-modified');
-
-//     const noteLength = document.createElement('div');
-//     noteLength.classList.add('note-length');
-
-//     const noteCreation = document.createElement('div');
-//     noteCreation.classList.add('note-date-creation');
-
-//     // NOTE TOOLS
-//     const noteToolsContainer = document.createElement('div');
-//     noteToolsContainer.classList.add('note-tools-container');
-
-//     const noteGroup = document.createElement('div');
-//     noteGroup.classList.add('note-group');
-
-//     const noteGroupColor = document.createElement('div');
-//     noteGroupColor.classList.add('note-group-color');
-
-//     const noteGroupName = document.createElement('div');
-//     noteGroupName.classList.add('note-group-name');
-    
-//     const noteToolsRightSide = document.createElement('div');
-//     noteToolsRightSide.classList.add('note-tools-right-side');
-
-//     const notePin = document.createElement('div');
-//     notePin.classList.add('note-pin');
-
-//     // SVG UNPINNED
-//     const svgUnpinned = document.createElementNS(svgNS, 'svg');
-//     svgUnpinned.classList.add("note-unpinned");
-//     svgUnpinned.setAttribute('viewBox', '0 0 24 24');
-//     svgUnpinned.setAttribute('fill', 'none');
-//     svgUnpinned.setAttribute('xmlns', svgNS);
-
-//     // Crear los grupos <g> dentro de svgPinned
-//     const gUnpinnedBgCarrier = document.createElementNS(svgNS, 'g');
-//     gUnpinnedBgCarrier.id = 'SVGRepo_bgCarrier';
-//     gUnpinnedBgCarrier.setAttribute('stroke-width', '0');
-//     svgUnpinned.appendChild(gUnpinnedBgCarrier);
-
-//     const gUnpinnedTracerCarrier = document.createElementNS(svgNS, 'g');
-//     gUnpinnedTracerCarrier.id = 'SVGRepo_tracerCarrier';
-//     gUnpinnedTracerCarrier.setAttribute('stroke-linecap', 'round');
-//     gUnpinnedTracerCarrier.setAttribute('stroke-linejoin', 'round');
-//     svgUnpinned.appendChild(gUnpinnedTracerCarrier);
-
-//     const gUnpinnedIconCarrier = document.createElementNS(svgNS, 'g');
-//     gUnpinnedIconCarrier.id = 'SVGRepo_iconCarrier';
-
-//     // Crear el elemento <path> dentro de gPinnedIconCarrier
-//     const pathUnpinned = document.createElementNS(svgNS, 'path');
-//     pathUnpinned.setAttribute('d', 'M15.9894 4.9502L16.52 4.42014V4.42014L15.9894 4.9502ZM19.0716 8.03562L18.541 8.56568L19.0716 8.03562ZM8.73837 19.429L8.20777 19.9591L8.73837 19.429ZM4.62169 15.3081L5.15229 14.7781L4.62169 15.3081ZM17.5669 14.9943L17.3032 14.2922L17.5669 14.9943ZM15.6498 15.7146L15.9136 16.4167H15.9136L15.6498 15.7146ZM8.3322 8.38177L7.62798 8.12375L8.3322 8.38177ZM9.02665 6.48636L9.73087 6.74438V6.74438L9.02665 6.48636ZM5.84504 10.6735L6.04438 11.3965L5.84504 10.6735ZM7.30167 10.1351L6.86346 9.52646L6.86346 9.52646L7.30167 10.1351ZM7.67582 9.79038L8.24665 10.2768H8.24665L7.67582 9.79038ZM14.251 16.3805L14.742 16.9475L14.742 16.9475L14.251 16.3805ZM13.3806 18.2012L12.6574 18.0022V18.0022L13.3806 18.2012ZM13.9169 16.7466L13.3075 16.3094L13.3075 16.3094L13.9169 16.7466ZM2.71846 12.7552L1.96848 12.76L1.96848 12.76L2.71846 12.7552ZM2.93045 11.9521L2.28053 11.5778H2.28053L2.93045 11.9521ZM11.3052 21.3431L11.3064 20.5931H11.3064L11.3052 21.3431ZM12.0933 21.1347L11.7215 20.4833L11.7215 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8588 2.76845L11.6973 2.03606ZM1.4694 21.4699C1.17666 21.763 1.1769 22.2379 1.46994 22.5306C1.76298 22.8233 2.23786 22.8231 2.5306 22.5301L1.4694 21.4699ZM7.18383 17.8721C7.47657 17.5791 7.47633 17.1042 7.18329 16.8114C6.89024 16.5187 6.41537 16.5189 6.12263 16.812L7.18383 17.8721ZM15.4588 5.48026L18.541 8.56568L19.6022 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26897 18.8989L5.15229 14.7781L4.09109 15.8382L8.20777 19.9591L9.26897 18.8989ZM17.3032 14.2922L15.386 15.0125L15.9136 16.4167L17.8307 15.6964L17.3032 14.2922ZM9.03642 8.63979L9.73087 6.74438L8.32243 6.22834L7.62798 8.12375L9.03642 8.63979ZM6.04438 11.3965C6.75583 11.2003 7.29719 11.0625 7.73987 10.7438L6.86346 9.52646C6.69053 9.65097 6.46601 9.72428 5.6457 9.95044L6.04438 11.3965ZM7.62798 8.12375C7.33502 8.92332 7.24338 9.14153 7.10499 9.30391L8.24665 10.2768C8.60041 9.86175 8.7823 9.33337 9.03642 8.63979L7.62798 8.12375ZM7.73987 10.7438C7.92696 10.6091 8.09712 10.4523 8.24665 10.2768L7.10499 9.30391C7.0337 9.38757 6.9526 9.46229 6.86346 9.52646L7.73987 10.7438ZM15.386 15.0125C14.697 15.2714 14.1716 15.4571 13.76 15.8135L14.742 16.9475C14.9028 16.8082 15.1192 16.7152 15.9136 16.4167L15.386 15.0125ZM14.1037 18.4001C14.329 17.5813 14.4021 17.3569 14.5263 17.1838L13.3075 16.3094C12.9902 16.7517 12.8529 17.2919 12.6574 18.0022L14.1037 18.4001ZM13.76 15.8135C13.5903 15.9605 13.4384 16.1269 13.3075 16.3094L14.5263 17.1838C14.5887 17.0968 14.6611 17.0175 14.742 16.9475L13.76 15.8135ZM5.15229 14.7781C4.50615 14.1313 4.06799 13.691 3.78366 13.3338C3.49835 12.9753 3.46889 12.8201 3.46845 12.7505L1.96848 12.76C1.97215 13.3422 2.26127 13.8297 2.61002 14.2679C2.95976 14.7073 3.47115 15.2176 4.09109 15.8382L5.15229 14.7781ZM5.6457 9.95044C4.80048 10.1835 4.10396 10.3743 3.58296 10.5835C3.06341 10.792 2.57116 11.0732 2.28053 11.5778L3.58038 12.3264C3.615 12.2663 3.71693 12.146 4.1418 11.9755C4.56523 11.8055 5.16337 11.6394 6.04438 11.3965L5.6457 9.95044ZM3.46845 12.7505C3.46751 12.6016 3.50616 12.4553 3.58038 12.3264L2.28053 11.5778C2.07354 11.9372 1.96586 12.3452 1.96848 12.76L3.46845 12.7505ZM8.20777 19.9591C8.83164 20.5836 9.34464 21.0987 9.78647 21.4506C10.227 21.8015 10.7179 22.0922 11.3041 22.0931L11.3064 20.5931C11.2369 20.593 11.0814 20.5644 10.721 20.2773C10.3618 19.9912 9.91923 19.5499 9.26897 18.8989L8.20777 19.9591ZM12.6574 18.0022C12.4133 18.8897 12.2462 19.4924 12.0751 19.9188C11.9033 20.3467 11.7821 20.4487 11.7215 20.4833L12.465 21.7861C12.974 21.4956 13.2573 21.0004 13.4671 20.4775C13.6776 19.9532 13.8694 19.2516 14.1037 18.4001L12.6574 18.0022ZM11.3041 22.0931C11.7112 22.0937 12.1114 21.9879 12.465 21.7861L11.7215 20.4833C11.595 20.5555 11.4519 20.5933 11.3064 20.5931L11.3041 22.0931ZM18.541 8.56568C19.6045 9.63022 20.3403 10.3695 20.7917 10.9788C21.2353 11.5774 21.2863 11.8959 21.2321 12.1464L22.6982 12.4634C22.8881 11.5854 22.5382 10.8162 21.9969 10.0857C21.4635 9.36592 20.6305 8.53486 19.6022 7.50556L18.541 8.56568ZM17.8307 15.6964C19.1921 15.1849 20.294 14.773 21.0771 14.3384C21.8718 13.8973 22.5083 13.3416 22.6982 12.4634L21.2321 12.1464C21.178 12.3968 21.0001 12.6655 20.3491 13.0268C19.6865 13.3946 18.7112 13.7632 17.3032 14.2922L17.8307 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1908 1.46165 12.4175 1.10912 11.5357 1.30367L11.8588 2.76845C12.1086 2.71335 12.4277 2.7633 13.0304 3.21075C13.6433 3.66579 14.3876 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73087 6.74438C10.2525 5.32075 10.6161 4.33403 10.9812 3.66315C11.3402 3.00338 11.609 2.82357 11.8588 2.76845L11.5357 1.30367C10.654 1.49819 10.1005 2.14332 9.66362 2.94618C9.23278 3.73793 8.82688 4.85154 8.32243 6.22834L9.73087 6.74438ZM2.5306 22.5301L7.18383 17.8721L6.12263 16.812L1.4694 21.4699L2.5306 22.5301Z');
-//     pathUnpinned.setAttribute('fill', '#1C274C');
-//     gUnpinnedIconCarrier.appendChild(pathUnpinned);
-
-//     // Añadir el grupo de iconos al SVG principal
-//     svgUnpinned.appendChild(gUnpinnedIconCarrier);
-
-
-//     // SVG PINNED
-//     const svgPinned = document.createElementNS(svgNS, 'svg');
-//     // svgUnpinned.id = 'editor-unpinned';
-//     svgPinned.classList.add("note-pinned");
-//     svgPinned.setAttribute('viewBox', '0 0 24 24');
-//     svgPinned.setAttribute('fill', 'none');
-//     svgPinned.setAttribute('xmlns', svgNS);
-
-//     // Crear los grupos <g> dentro de svgUnpinned
-//     const gPinnedBgCarrier = document.createElementNS(svgNS, 'g');
-//     gPinnedBgCarrier.id = 'SVGRepo_bgCarrier';
-//     gPinnedBgCarrier.setAttribute('stroke-width', '0');
-//     svgPinned.appendChild(gPinnedBgCarrier);
-
-//     const gPinnedTracerCarrier = document.createElementNS(svgNS, 'g');
-//     gPinnedTracerCarrier.id = 'SVGRepo_tracerCarrier';
-//     gPinnedTracerCarrier.setAttribute('stroke-linecap', 'round');
-//     gPinnedTracerCarrier.setAttribute('stroke-linejoin', 'round');
-//     svgPinned.appendChild(gPinnedTracerCarrier);
-
-//     const gPinnedIconCarrier = document.createElementNS(svgNS, 'g');
-//     gPinnedIconCarrier.id = 'SVGRepo_iconCarrier';
-
-//     // Crear el elemento <path> dentro de gUnpinnedIconCarrier
-//     const pathPinned = document.createElementNS(svgNS, 'path');
-//     pathPinned.setAttribute('d', 'M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z');
-//     pathPinned.setAttribute('fill', '#1C274C');
-//     gPinnedIconCarrier.appendChild(pathPinned);
-
-//     // Añadir el grupo de iconos al SVG principal
-//     svgPinned.appendChild(gPinnedIconCarrier);
-
-//     // SVG DE OPCIONES
-//     const noteOptionsBtn = document.createElementNS(svgNS, 'svg');
-//     noteOptionsBtn.setAttribute('viewBox', '0 0 24 24');
-//     noteOptionsBtn.setAttribute('fill', 'none');
-//     noteOptionsBtn.setAttribute('xmlns', svgNS);
-//     noteOptionsBtn.setAttribute('transform', 'rotate(90)');
-//     noteOptionsBtn.classList.add('note-options-btn');
-
-//     const gBgCarrier = document.createElementNS(svgNS, 'g');
-//     gBgCarrier.id = 'SVGRepo_bgCarrier';
-//     gBgCarrier.setAttribute('stroke-width', '0');
-//     noteOptionsBtn.appendChild(gBgCarrier);
-
-//     const gTracerCarrier = document.createElementNS(svgNS, 'g');
-//     gTracerCarrier.id = 'SVGRepo_tracerCarrier';
-//     gTracerCarrier.setAttribute('stroke-linecap', 'round');
-//     gTracerCarrier.setAttribute('stroke-linejoin', 'round');
-//     noteOptionsBtn.appendChild(gTracerCarrier);
-
-//     const gIconCarrier = document.createElementNS(svgNS, 'g');
-//     gIconCarrier.id = 'SVGRepo_iconCarrier';
-
-//     const path1 = document.createElementNS(svgNS, 'path');
-//     path1.setAttribute('d', 'M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z');
-//     path1.setAttribute('fill', '#1C274C');
-//     gIconCarrier.appendChild(path1);
-
-//     const path2 = document.createElementNS(svgNS, 'path');
-//     path2.setAttribute('d', 'M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z');
-//     path2.setAttribute('fill', '#1C274C');
-//     gIconCarrier.appendChild(path2);
-
-//     const path3 = document.createElementNS(svgNS, 'path');
-//     path3.setAttribute('d', 'M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z');
-//     path3.setAttribute('fill', '#1C274C');
-//     gIconCarrier.appendChild(path3);
-
-//     noteOptionsBtn.appendChild(gIconCarrier);
-
-//     // Selector multiple de notas
-//     const multipleSelector = document.createElement('div');
-//     multipleSelector.classList.add('note-multiple-selector');
-
-//     // Opciones que se ocultaran hasta hacer hover en la nota
-//     multipleSelector.classList.add('note-hidden-options');
-//     noteOptionsBtn.classList.add('note-hidden-options');
-//     svgUnpinned.classList.add('note-hidden-options');
-//     noteLastModified.classList.add('note-hidden-options');
-
-//     // Insertar todo en sus respectivos contenedores
-//     noteGroup.appendChild(noteGroupColor);
-//     noteGroup.appendChild(noteGroupName);  
-
-//     notePin.appendChild(svgUnpinned);
-//     notePin.appendChild(svgPinned);
-
-//     noteToolsRightSide.appendChild(notePin);
-//     noteToolsRightSide.appendChild(noteOptionsBtn);
-
-//     noteToolsContainer.appendChild(multipleSelector);
-//     noteToolsContainer.appendChild(noteGroup);
-//     noteToolsContainer.appendChild(noteToolsRightSide);
-
-//     noteText.appendChild(noteTitle);
-//     noteText.appendChild(noteBody);
-
-//     noteFooter.appendChild(noteLastModified);
-//     // noteFooter.appendChild(noteCreation);
-//     // noteFooter.appendChild(noteLength);
-
-//     noteCardContainer.appendChild(noteToolsContainer);
-//     noteCardContainer.appendChild(noteText);
-//     noteCardContainer.appendChild(noteFooter);
-    
-
-//     // Insertamos los datos del noteData en la nota guardada.
-//     noteTitle.innerHTML = DOMPurify.sanitize(noteData.title);
-//     noteBody.innerHTML = DOMPurify.sanitize(noteData.body);
-//     // Asumiendo que formatFechaNoteCard está definida globalmente
-//     noteCreation.textContent = `Creado: ${formatFechaNoteCard(noteData.createdAt)}`; // Usar createdAt para la creación
-//     // noteLastModified.textContent = `Editado: ${formatFechaNoteCard(noteData.updatedAt)}`;
-//     noteLastModified.textContent = `Ultima edición: ${formatFechaNoteCard(noteData.updatedAt)}`;
-//     noteLength.textContent = `${noteData.charCount} caracteres`;
-
-//     // Lógica para el estado del pin
-//     if (noteData.pinned) {
-//         svgPinned.style.display = "block";
-//         svgUnpinned.style.display = "none";
-//     } else {
-//         svgPinned.style.display = "none";
-//         svgUnpinned.style.display = "block";
-//     }
-
-//     // --- Event Listener para el Pin ---
-//     // Usamos stopPropagation para evitar que al hacer clic en el pin se abra el editor.
-//     notePin.addEventListener('click', (event) => {
-//         event.stopPropagation();
-//         togglePinEstado(noteData.id);
-//     });
-
-//     // Si la nota es nueva (no existía), la añadimos al contenedor.
-//     // Si ya existía, ya está en su sitio, no hace falta añadirla de nuevo.
-//     if (!existingNoteCard) {
-
-//         // noteCardContainer.classList.add("note-fade");
-
-//         // Añadir al contenedor muuri en la posicion 0, al incio hasta arriba
-//         grid.add(noteCardContainer, { index: 0 });
-//         grid.sort(ordenarNotas);
-//     }
-
-//     // Finalmente, coloreamos la nota (esto lo haces al final)
-//     actualizarInfoGrupoEnNoteCardspecific(noteData.id, noteData.groupId);
-// };
-
-
-
+/**
+ * Actualiza o inserta una nota en el store despachando una acción.
+ * @param {object} noteData - Los datos completos de la nota a actualizar o insertar.
+ */
+export const actualizarNotaEnStore = (noteData) => {
+    store.dispatch({ type: 'UPSERT_NOTE', payload: noteData });
+};
 
 // REENDERIZAR LAS NOTE CARDS EN EL CONTENEDOR DE MUURI
 export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
     const existingNoteCard = document.getElementById(noteData.id);
-
     // --- LÓGICA DE ACTUALIZACIÓN (SI LA NOTA YA EXISTE) ---
     // Esto es mucho más eficiente que destruir y recrear el elemento.
     if (existingNoteCard) {
@@ -422,7 +173,7 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
                 e.stopPropagation();
                 try {
                     const notaRestaurada = await restaurarNotaEnDB(noteData.id);
-                    store.upsertNote(notaRestaurada); // Actualiza el store
+                    actualizarNotaEnStore(notaRestaurada); // Actualiza el store
 
                     // Eliminamos la nota del grid de la papelera para que el layout se actualice.
                     const itemToRemove = gridTrash.getItem(noteCardContainer);
@@ -459,7 +210,7 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
                     triggerElement: deleteBtn,
                     onConfirm: async () => {
                         await eliminarNotaPermanentementeDeDB(noteData.id);
-                        store.removeNote(noteData.id); // 1. Elimina del store
+                        store.dispatch({ type: 'REMOVE_NOTE', payload: noteData.id }); // 1. Elimina del store
                         
                         // 2. Eliminamos la nota de la instancia de Muuri para que el layout se actualice.
                         const itemToRemove = gridTrash.getItem(noteCardContainer);
@@ -512,387 +263,6 @@ export const renderizarNotaEnDOM = (noteData, { isTrashed = false } = {}) => {
 };
 
 
-// REENDERIZAR LAS NOTE CARDS EN EL CONTENEDOR DE MUURI
-export const renderizarNotaEnDOM_OLD = (noteData, { isTrashed = false } = {}) => {
-    const existingNoteCard = document.getElementById(noteData.id);
-
-    // --- LÓGICA DE ACTUALIZACIÓN (SI LA NOTA YA EXISTE) ---
-    // Esto es mucho más eficiente que destruir y recrear el elemento.
-    if (existingNoteCard) {
-        // Actualiza los datasets que usa Muuri para ordenar y filtrar
-        if (existingNoteCard.dataset.groupId !== noteData.groupId) {
-            existingNoteCard.dataset.groupId = noteData.groupId;
-            // Actualiza el color y nombre del grupo solo si el grupo cambió
-            actualizarInfoGrupoEnNoteCard(noteData.id, noteData.groupId);
-        }
-        if (existingNoteCard.dataset.pinned !== String(noteData.pinned)) {
-            existingNoteCard.dataset.pinned = noteData.pinned;
-            // Actualiza el icono del pin solo si el estado cambió
-            const pinnedIcon = existingNoteCard.querySelector('.note-pinned');
-            const unpinnedIcon = existingNoteCard.querySelector('.note-unpinned');
-            if (pinnedIcon && unpinnedIcon) {
-                pinnedIcon.style.display = noteData.pinned ? 'block' : 'none';
-                unpinnedIcon.style.display = noteData.pinned ? 'none' : 'block';
-            }
-            // Verifica si la nota debe moverse entre los grids de fijadas/no fijadas
-            verificarYReubicarNota(noteData.id, noteData.pinned);
-        }
-        if (existingNoteCard.dataset.updatedAt !== noteData.updatedAt) {
-            existingNoteCard.dataset.updatedAt = noteData.updatedAt;
-            const lastModEl = existingNoteCard.querySelector('.note-last-modified');
-            if (lastModEl) lastModEl.textContent = `Ultima edición: ${formatFechaNoteCard(noteData.updatedAt)}`;
-        }
-
-        // Actualiza el contenido visible de la nota
-        const titleEl = existingNoteCard.querySelector('.note-title');
-        if (titleEl && titleEl.innerHTML !== noteData.title) titleEl.innerHTML = DOMPurify.sanitize(noteData.title);
-        
-        const bodyEl = existingNoteCard.querySelector('.note-body');
-        if (bodyEl && bodyEl.innerHTML !== noteData.body) bodyEl.innerHTML = DOMPurify.sanitize(noteData.body);
-        return; // Salimos de la función porque ya terminamos de actualizar.
-    }
-
-    // --- LÓGICA DE CREACIÓN (SI LA NOTA NO EXISTE) ---
-    const noteCardContainer = document.createElement('article');
-    noteCardContainer.className = 'note-card-container';
-    noteCardContainer.id = noteData.id;
-    noteCardContainer.dataset.groupId = noteData.groupId;
-    noteCardContainer.dataset.pinned = noteData.pinned; // <-- Atributo para el estado de pin
-    noteCardContainer.dataset.updatedAt = noteData.updatedAt; // <-- Atributo para la fecha
-    noteCardContainer.dataset.customOrder = noteData.customOrder || -1; // <-- Atributo para el orden personalizado
-
-    // Definimos el namespace SVG para usarlo en createElementNS, SIRVE PARA VARIOS SVG DEL MISMO ORIGEN
-    const svgNS = 'http://www.w3.org/2000/svg';
-
-    // Creamos toda la estructura del HTML    
-    noteCardContainer.classList.add('note-card-container');
-    noteCardContainer.id = noteData.id; // Asignamos el ID de la nota al contenedor
-    noteCardContainer.dataset.groupId = noteData.groupId; // Asignamos el groupId como dataset
-
-    const noteText = document.createElement('div');
-    noteText.classList.add('note-text');
-
-    const noteTitle = document.createElement('div');
-    noteTitle.classList.add('note-title');
-    noteTitle.spellcheck = false;
-
-    const noteBody = document.createElement('div');
-    noteBody.classList.add('note-body');
-    noteBody.spellcheck = false;
-
-    const noteFooter = document.createElement('div');
-    noteFooter.classList.add('note-footer');
-
-    const noteLastModified = document.createElement('div');
-    noteLastModified.classList.add('note-last-modified');
-
-    const noteLength = document.createElement('div');
-    noteLength.classList.add('note-length');
-
-    const noteCreation = document.createElement('div');
-    noteCreation.classList.add('note-date-creation');
-
-    // NOTE TOOLS
-    const noteToolsContainer = document.createElement('div');
-    noteToolsContainer.classList.add('note-tools-container');
-
-    const noteGroup = document.createElement('div');
-    noteGroup.classList.add('note-group');
-
-    const noteGroupColor = document.createElement('div');
-    noteGroupColor.classList.add('note-group-color');
-
-    const noteGroupName = document.createElement('div');
-    noteGroupName.classList.add('note-group-name');
-    
-    const noteToolsRightSide = document.createElement('div');
-    noteToolsRightSide.classList.add('note-tools-right-side');
-
-    const notePin = document.createElement('div');
-    notePin.classList.add('note-pin');
-
-    // SVG UNPINNED
-    const svgUnpinned = document.createElementNS(svgNS, 'svg');
-    svgUnpinned.classList.add("note-unpinned");
-    svgUnpinned.setAttribute('viewBox', '0 0 24 24');
-    svgUnpinned.setAttribute('fill', 'none');
-    svgUnpinned.setAttribute('xmlns', svgNS);
-
-    // Crear los grupos <g> dentro de svgPinned
-    const gUnpinnedBgCarrier = document.createElementNS(svgNS, 'g');
-    gUnpinnedBgCarrier.id = 'SVGRepo_bgCarrier';
-    gUnpinnedBgCarrier.setAttribute('stroke-width', '0');
-    svgUnpinned.appendChild(gUnpinnedBgCarrier);
-
-    const gUnpinnedTracerCarrier = document.createElementNS(svgNS, 'g');
-    gUnpinnedTracerCarrier.id = 'SVGRepo_tracerCarrier';
-    gUnpinnedTracerCarrier.setAttribute('stroke-linecap', 'round');
-    gUnpinnedTracerCarrier.setAttribute('stroke-linejoin', 'round');
-    svgUnpinned.appendChild(gUnpinnedTracerCarrier);
-
-    const gUnpinnedIconCarrier = document.createElementNS(svgNS, 'g');
-    gUnpinnedIconCarrier.id = 'SVGRepo_iconCarrier';
-
-    // Crear el elemento <path> dentro de gPinnedIconCarrier
-    const pathUnpinned = document.createElementNS(svgNS, 'path');
-    pathUnpinned.setAttribute('d', 'M15.9894 4.9502L16.52 4.42014V4.42014L15.9894 4.9502ZM19.0716 8.03562L18.541 8.56568L19.0716 8.03562ZM8.73837 19.429L8.20777 19.9591L8.73837 19.429ZM4.62169 15.3081L5.15229 14.7781L4.62169 15.3081ZM17.5669 14.9943L17.3032 14.2922L17.5669 14.9943ZM15.6498 15.7146L15.9136 16.4167H15.9136L15.6498 15.7146ZM8.3322 8.38177L7.62798 8.12375L8.3322 8.38177ZM9.02665 6.48636L9.73087 6.74438V6.74438L9.02665 6.48636ZM5.84504 10.6735L6.04438 11.3965L5.84504 10.6735ZM7.30167 10.1351L6.86346 9.52646L6.86346 9.52646L7.30167 10.1351ZM7.67582 9.79038L8.24665 10.2768H8.24665L7.67582 9.79038ZM14.251 16.3805L14.742 16.9475L14.742 16.9475L14.251 16.3805ZM13.3806 18.2012L12.6574 18.0022V18.0022L13.3806 18.2012ZM13.9169 16.7466L13.3075 16.3094L13.3075 16.3094L13.9169 16.7466ZM2.71846 12.7552L1.96848 12.76L1.96848 12.76L2.71846 12.7552ZM2.93045 11.9521L2.28053 11.5778H2.28053L2.93045 11.9521ZM11.3052 21.3431L11.3064 20.5931H11.3064L11.3052 21.3431ZM12.0933 21.1347L11.7215 20.4833L11.7215 20.4833L12.0933 21.1347ZM11.6973 2.03606L11.8588 2.76845L11.6973 2.03606ZM1.4694 21.4699C1.17666 21.763 1.1769 22.2379 1.46994 22.5306C1.76298 22.8233 2.23786 22.8231 2.5306 22.5301L1.4694 21.4699ZM7.18383 17.8721C7.47657 17.5791 7.47633 17.1042 7.18329 16.8114C6.89024 16.5187 6.41537 16.5189 6.12263 16.812L7.18383 17.8721ZM15.4588 5.48026L18.541 8.56568L19.6022 7.50556L16.52 4.42014L15.4588 5.48026ZM9.26897 18.8989L5.15229 14.7781L4.09109 15.8382L8.20777 19.9591L9.26897 18.8989ZM17.3032 14.2922L15.386 15.0125L15.9136 16.4167L17.8307 15.6964L17.3032 14.2922ZM9.03642 8.63979L9.73087 6.74438L8.32243 6.22834L7.62798 8.12375L9.03642 8.63979ZM6.04438 11.3965C6.75583 11.2003 7.29719 11.0625 7.73987 10.7438L6.86346 9.52646C6.69053 9.65097 6.46601 9.72428 5.6457 9.95044L6.04438 11.3965ZM7.62798 8.12375C7.33502 8.92332 7.24338 9.14153 7.10499 9.30391L8.24665 10.2768C8.60041 9.86175 8.7823 9.33337 9.03642 8.63979L7.62798 8.12375ZM7.73987 10.7438C7.92696 10.6091 8.09712 10.4523 8.24665 10.2768L7.10499 9.30391C7.0337 9.38757 6.9526 9.46229 6.86346 9.52646L7.73987 10.7438ZM15.386 15.0125C14.697 15.2714 14.1716 15.4571 13.76 15.8135L14.742 16.9475C14.9028 16.8082 15.1192 16.7152 15.9136 16.4167L15.386 15.0125ZM14.1037 18.4001C14.329 17.5813 14.4021 17.3569 14.5263 17.1838L13.3075 16.3094C12.9902 16.7517 12.8529 17.2919 12.6574 18.0022L14.1037 18.4001ZM13.76 15.8135C13.5903 15.9605 13.4384 16.1269 13.3075 16.3094L14.5263 17.1838C14.5887 17.0968 14.6611 17.0175 14.742 16.9475L13.76 15.8135ZM5.15229 14.7781C4.50615 14.1313 4.06799 13.691 3.78366 13.3338C3.49835 12.9753 3.46889 12.8201 3.46845 12.7505L1.96848 12.76C1.97215 13.3422 2.26127 13.8297 2.61002 14.2679C2.95976 14.7073 3.47115 15.2176 4.09109 15.8382L5.15229 14.7781ZM5.6457 9.95044C4.80048 10.1835 4.10396 10.3743 3.58296 10.5835C3.06341 10.792 2.57116 11.0732 2.28053 11.5778L3.58038 12.3264C3.615 12.2663 3.71693 12.146 4.1418 11.9755C4.56523 11.8055 5.16337 11.6394 6.04438 11.3965L5.6457 9.95044ZM3.46845 12.7505C3.46751 12.6016 3.50616 12.4553 3.58038 12.3264L2.28053 11.5778C2.07354 11.9372 1.96586 12.3452 1.96848 12.76L3.46845 12.7505ZM8.20777 19.9591C8.83164 20.5836 9.34464 21.0987 9.78647 21.4506C10.227 21.8015 10.7179 22.0922 11.3041 22.0931L11.3064 20.5931C11.2369 20.593 11.0814 20.5644 10.721 20.2773C10.3618 19.9912 9.91923 19.5499 9.26897 18.8989L8.20777 19.9591ZM12.6574 18.0022C12.4133 18.8897 12.2462 19.4924 12.0751 19.9188C11.9033 20.3467 11.7821 20.4487 11.7215 20.4833L12.465 21.7861C12.974 21.4956 13.2573 21.0004 13.4671 20.4775C13.6776 19.9532 13.8694 19.2516 14.1037 18.4001L12.6574 18.0022ZM11.3041 22.0931C11.7112 22.0937 12.1114 21.9879 12.465 21.7861L11.7215 20.4833C11.595 20.5555 11.4519 20.5933 11.3064 20.5931L11.3041 22.0931ZM18.541 8.56568C19.6045 9.63022 20.3403 10.3695 20.7917 10.9788C21.2353 11.5774 21.2863 11.8959 21.2321 12.1464L22.6982 12.4634C22.8881 11.5854 22.5382 10.8162 21.9969 10.0857C21.4635 9.36592 20.6305 8.53486 19.6022 7.50556L18.541 8.56568ZM17.8307 15.6964C19.1921 15.1849 20.294 14.773 21.0771 14.3384C21.8718 13.8973 22.5083 13.3416 22.6982 12.4634L21.2321 12.1464C21.178 12.3968 21.0001 12.6655 20.3491 13.0268C19.6865 13.3946 18.7112 13.7632 17.3032 14.2922L17.8307 15.6964ZM16.52 4.42014C15.4841 3.3832 14.6481 2.54353 13.9246 2.00638C13.1908 1.46165 12.4175 1.10912 11.5357 1.30367L11.8588 2.76845C12.1086 2.71335 12.4277 2.7633 13.0304 3.21075C13.6433 3.66579 14.3876 4.40801 15.4588 5.48026L16.52 4.42014ZM9.73087 6.74438C10.2525 5.32075 10.6161 4.33403 10.9812 3.66315C11.3402 3.00338 11.609 2.82357 11.8588 2.76845L11.5357 1.30367C10.654 1.49819 10.1005 2.14332 9.66362 2.94618C9.23278 3.73793 8.82688 4.85154 8.32243 6.22834L9.73087 6.74438ZM2.5306 22.5301L7.18383 17.8721L6.12263 16.812L1.4694 21.4699L2.5306 22.5301Z');
-    gUnpinnedIconCarrier.appendChild(pathUnpinned);
-
-    // Añadir el grupo de iconos al SVG principal
-    svgUnpinned.appendChild(gUnpinnedIconCarrier);
-
-
-    // SVG PINNED
-    const svgPinned = document.createElementNS(svgNS, 'svg');
-    // svgUnpinned.id = 'editor-unpinned';
-    svgPinned.classList.add("note-pinned");
-    svgPinned.setAttribute('viewBox', '0 0 24 24');
-    svgPinned.setAttribute('fill', 'none');
-    svgPinned.setAttribute('xmlns', svgNS);
-
-    // Crear los grupos <g> dentro de svgUnpinned
-    const gPinnedBgCarrier = document.createElementNS(svgNS, 'g');
-    gPinnedBgCarrier.id = 'SVGRepo_bgCarrier';
-    gPinnedBgCarrier.setAttribute('stroke-width', '0');
-    svgPinned.appendChild(gPinnedBgCarrier);
-
-    const gPinnedTracerCarrier = document.createElementNS(svgNS, 'g');
-    gPinnedTracerCarrier.id = 'SVGRepo_tracerCarrier';
-    gPinnedTracerCarrier.setAttribute('stroke-linecap', 'round');
-    gPinnedTracerCarrier.setAttribute('stroke-linejoin', 'round');
-    svgPinned.appendChild(gPinnedTracerCarrier);
-
-    const gPinnedIconCarrier = document.createElementNS(svgNS, 'g');
-    gPinnedIconCarrier.id = 'SVGRepo_iconCarrier';
-
-    // Crear el elemento <path> dentro de gUnpinnedIconCarrier
-    const pathPinned = document.createElementNS(svgNS, 'path');
-    pathPinned.setAttribute('d', 'M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z');
-    gPinnedIconCarrier.appendChild(pathPinned);
-
-    // Añadir el grupo de iconos al SVG principal
-    svgPinned.appendChild(gPinnedIconCarrier);
-
-    // SVG DE OPCIONES
-    const noteOptionsBtn = document.createElementNS(svgNS, 'svg');
-    noteOptionsBtn.setAttribute('viewBox', '0 0 24 24');
-    noteOptionsBtn.setAttribute('fill', 'none');
-    noteOptionsBtn.setAttribute('xmlns', svgNS);
-    noteOptionsBtn.setAttribute('transform', 'rotate(90)');
-    noteOptionsBtn.classList.add('note-options-btn');
-
-    const gBgCarrier = document.createElementNS(svgNS, 'g');
-    gBgCarrier.id = 'SVGRepo_bgCarrier';
-    gBgCarrier.setAttribute('stroke-width', '0');
-    noteOptionsBtn.appendChild(gBgCarrier);
-
-    const gTracerCarrier = document.createElementNS(svgNS, 'g');
-    gTracerCarrier.id = 'SVGRepo_tracerCarrier';
-    gTracerCarrier.setAttribute('stroke-linecap', 'round');
-    gTracerCarrier.setAttribute('stroke-linejoin', 'round');
-    noteOptionsBtn.appendChild(gTracerCarrier);
-
-    const gIconCarrier = document.createElementNS(svgNS, 'g');
-    gIconCarrier.id = 'SVGRepo_iconCarrier';
-
-    const path1 = document.createElementNS(svgNS, 'path');
-    path1.setAttribute('d', 'M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z');
-    gIconCarrier.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, 'path');
-    path2.setAttribute('d', 'M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z');
-    gIconCarrier.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, 'path');
-    path3.setAttribute('d', 'M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z');
-    gIconCarrier.appendChild(path3);
-
-    noteOptionsBtn.appendChild(gIconCarrier);
-
-    // Selector multiple de notas
-    const multipleSelector = document.createElement('div');
-    multipleSelector.classList.add('note-multiple-selector');
-
-    // Opciones que se ocultaran hasta hacer hover en la nota
-    multipleSelector.classList.add('note-hidden-options');
-    noteOptionsBtn.classList.add('note-hidden-options');
-    svgUnpinned.classList.add('note-hidden-options');
-    noteLastModified.classList.add('note-hidden-options');
-
-    // Insertar todo en sus respectivos contenedores
-    noteGroup.appendChild(noteGroupColor);
-    noteGroup.appendChild(noteGroupName);  
-
-    if (isTrashed) {
-        noteCardContainer.classList.add('is-trashed');
-        noteGroupColor.classList.add('disabled');
-
-        const trashActions = document.createElement('div');
-        trashActions.className = 'note-trash-actions';
-
-        const restoreBtn = document.createElement('button');
-        restoreBtn.title = 'Restaurar nota';
-        restoreBtn.className = 'note-trash-btn note-trash-restore-btn';
-        restoreBtn.innerHTML = SVG_ICONS_TRASH.RESTORE;
-        restoreBtn.onclick = async (e) => {
-            e.stopPropagation();
-            try {
-                const notaRestaurada = await restaurarNotaEnDB(noteData.id); // 1. Llama a la DB para cambiar el estado a 'active'.
-                store.upsertNote(notaRestaurada); // 2. Actualiza el store.
-                noteCardContainer.remove(); // 3. Elimina la tarjeta de la vista de papelera.
-                renderizarNotaEnDOM(notaRestaurada); // 4. ¡Paso clave! Vuelve a renderizar la nota en la vista principal.
-            } catch (error) {
-                console.error(`Error al restaurar la nota ${noteData.id}:`, error);
-                showNotification('No se pudo restaurar la nota.', 'error');
-            }
-        };
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.title = 'Eliminar permanentemente';
-        deleteBtn.className = 'note-trash-btn note-trash-delete-btn';
-        deleteBtn.innerHTML = SVG_ICONS_TRASH.DELETE_PERMANENTLY;
-        deleteBtn.onclick = async (e) => {
-            e.stopPropagation();
-
-            const confirmModal = new Modal('confirm-modal-delete-note');
-            const modalElement = document.getElementById('confirm-modal-delete-note');
-            const confirmBtn = document.getElementById('confirmDeleteNoteBtn');
-            const cancelBtn = document.getElementById('cancelDeleteNoteBtn');
-            const closeBtn = modalElement.querySelector('.delete-group-close-button');
-
-            confirmBtn.onclick = () => confirmModal.confirm();
-            cancelBtn.onclick = () => confirmModal.cancel();
-            closeBtn.onclick = () => confirmModal.cancel();
-            modalElement.onclick = (event) => { if (event.target === modalElement) confirmModal.cancel(); };
-
-            confirmModal.open({
-                triggerElement: deleteBtn,
-                onConfirm: async () => {
-                    try {
-                        await eliminarNotaPermanentementeDeDB(noteData.id);
-                        store.removeNote(noteData.id); // Elimina del store
-                        noteCardContainer.remove();
-                    } catch (error) {
-                        showNotification('No se pudo eliminar la nota permanentemente.', 'error');
-                        console.error(`Error al eliminar permanentemente la nota ${noteData.id}:`, error);
-                    }
-                }
-            });
-        };
-        trashActions.append(restoreBtn, deleteBtn);
-        noteToolsRightSide.appendChild(trashActions);
-    } else {
-        notePin.appendChild(svgUnpinned);
-        notePin.appendChild(svgPinned);
-        noteToolsRightSide.appendChild(notePin);
-        noteToolsRightSide.appendChild(noteOptionsBtn);
-    }
-    
-    noteToolsContainer.appendChild(multipleSelector);
-    noteToolsContainer.appendChild(noteGroup);
-    noteToolsContainer.appendChild(noteToolsRightSide);
-    noteText.appendChild(noteTitle);
-    noteText.appendChild(noteBody);
-
-    noteFooter.appendChild(noteLastModified);
-        // noteFooter.appendChild(noteCreation);
-    // noteFooter.appendChild(noteLength);
-
-    if (isTrashed) {
-        const deletionInfo = document.createElement('div');
-        deletionInfo.className = 'note-deletion-info';
-
-        // Creamos una copia de la fecha para no modificar la original
-        const expirationDate = new Date(noteData.updatedAt);
-        expirationDate.setDate(expirationDate.getDate() + 30);
-        const now = new Date();
-        const daysRemaining = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-        if (daysRemaining > 1) {
-            deletionInfo.textContent = `Se eliminará en ${daysRemaining} días`;
-        } else if (daysRemaining === 1) {
-            deletionInfo.textContent = `Se eliminará en 1 día`;
-        } else {
-            deletionInfo.textContent = 'Se eliminará pronto';
-        }
-        noteFooter.appendChild(deletionInfo);
-    }
-
-    noteCardContainer.appendChild(noteToolsContainer);
-    noteCardContainer.appendChild(noteText);
-    noteCardContainer.appendChild(noteFooter);
-
-
-
-    
-
-    // Insertamos los datos del noteData en la nota guardada.
-    noteTitle.innerHTML = DOMPurify.sanitize(noteData.title);
-    noteBody.innerHTML = DOMPurify.sanitize(noteData.body);
-    // Asumiendo que formatFechaNoteCard está definida globalmente
-    noteCreation.textContent = `Creado: ${formatFechaNoteCard(noteData.createdAt)}`; // Usar createdAt para la creación
-    // noteLastModified.textContent = `Editado: ${formatFechaNoteCard(noteData.updatedAt)}`;
-    noteLastModified.textContent = `Ultima edición: ${formatFechaNoteCard(noteData.updatedAt)}`;
-    noteLength.textContent = `${noteData.charCount} caracteres`;
-
-    // Lógica para el estado del pin
-    if (noteData.pinned) {
-        svgPinned.style.display = "block";
-        svgUnpinned.style.display = "none";
-    } else {
-        svgPinned.style.display = "none";
-        svgUnpinned.style.display = "block";
-    }
-
-    // --- Event Listener para el Pin ---
-    // Usamos stopPropagation para evitar que al hacer clic en el pin se abra el editor.
-    if (notePin) {
-        notePin.addEventListener('click', (event) => {
-            event.stopPropagation();
-            togglePinEstado(noteData.id);
-        });
-    }
-
-    // --- Event Listener para Selección Múltiple ---
-    if (multipleSelector) multipleSelector.addEventListener('click', (event) => {
-        event.stopPropagation();
-        // Creamos y despachamos un evento personalizado para que el main.js lo maneje
-        const selectionEvent = new CustomEvent('toggle-note-selection', {
-            detail: { noteId: noteData.id },
-            bubbles: true, // Permitir que el evento burbujee hasta el document
-            composed: true // Permitir que el evento cruce los límites del Shadow DOM (si lo usaras)
-        });
-        noteCardContainer.dispatchEvent(selectionEvent);
-    });
-
-
-    // Si la nota es nueva (no existía), la añadimos al contenedor.
-    // Si ya existía, ya está en su sitio, no hace falta añadirla de nuevo.
-    if (isTrashed) {
-        const trashContainer = document.getElementById('trash-notes-container');
-        if (trashContainer) {
-            trashContainer.appendChild(noteCardContainer);
-        } else {
-            console.error('Contenedor de papelera no encontrado. No se puede renderizar la nota eliminada.');
-        }
-    } else {
-        if (noteData.pinned) {
-            gridPinned.add(noteCardContainer, { index: 0 });
-        } else {
-            gridUnpinned.add(noteCardContainer, { index: 0 });
-        }
-    }
-    // gridPinned.sort(ordenarNotas);
-    // gridUnpinned.sort(ordenarNotas);
-    
-
-    // Finalmente, coloreamos la nota (esto lo haces al final)
-    actualizarInfoGrupoEnNoteCard(noteData.id, noteData.groupId);
-};
-
-
-
-
 // ACTUALIZAR LA INFROMACION DE GRUPO DE TODAS LAS NOTE CARDS DE UN GRUPO, ACTUALIZA EL NOMBRE Y EL COLOR DEL GRUPO AL QUE PERTENECE
 export const actualizarInfoGrupoEnNoteCards = (groupID, updates = {}) => {
     const { notes, groups } = store.getState();
@@ -910,8 +280,8 @@ export const actualizarInfoGrupoEnNoteCards = (groupID, updates = {}) => {
                 if (groupNameEl) groupNameEl.textContent = groupNameDefault;
                 noteCard.style.backgroundColor = generateDynamicBackgroundColor(groupColorDefault);
                 noteCard.dataset.groupId = 'null';
-                // Opcional: Actualizar el estado en el store también
-                store.upsertNote({ ...note, groupId: null });
+                // Actualizar el estado en el store también
+                store.dispatch({ type: 'UPSERT_NOTE', payload: { ...note, groupId: null } });
             }
         });
         return;
@@ -1035,7 +405,7 @@ const togglePinEstado = async (noteId) => {
     };
 
     await guardarNotaEnDB(notaActualizada); // Guarda en la DB y sincroniza
-    store.upsertNote(notaActualizada); // Actualiza el estado en el store
+    actualizarNotaEnStore(notaActualizada); // Actualiza el estado en el store
     actualizarPinUI(noteId, notaActualizada.pinned); // Actualiza el icono del pin con el nuevo estado
 
     // Llama a la nueva función para mover la nota si es necesario.
@@ -1095,9 +465,10 @@ export const verificarYReubicarNota = (noteId, isPinned) => {
         gridPinned.send(itemInPinned, gridUnpinned, 0, { onFinish: onMoveFinish });
     } else {
         // Si la nota no se mueve de grid, simplemente reordenamos ambos grids.
-        // La llamada a refreshItems() anterior ya actualizó las dimensiones.
-        gridPinned.sort(sortFunction);
-        gridUnpinned.sort(sortFunction);
+        // La llamada a refreshItems() anterior ya actualizó las dimensiones,
+        // así que solo necesitamos forzar un relayout para compactar el espacio.
+        const grid = item.getGrid();
+        grid.layout(true);
     }
 };
 
@@ -1113,21 +484,10 @@ export const moverNotaAPapelera = async (noteId) => {
  
     try {
         // 1. Mueve la nota a la papelera en la DB (local y backend).
-        await moverNotaAPapeleraEnDB(noteId);
- 
+        await moverNotaAPapeleraEnDB(nota.id);
         // 2. Actualiza el estado de la nota en el store a 'trashed' en lugar de eliminarla.
-        // Esto asegura que la vista de la papelera la pueda encontrar inmediatamente.
-        store.upsertNote({ ...nota, status: 'trashed' });
-
-        // 3. Eliminamos la nota de la instancia de Muuri para que desaparezca de la UI.
-        // Esto es crucial porque el store no manipula el DOM directamente.
-        if (notaElement) {
-            const item = gridPinned.getItem(notaElement) || gridUnpinned.getItem(notaElement);
-            if (item) {
-                item.getGrid().remove([item], { removeElements: true });
-            } else notaElement.remove(); // Fallback por si no está en Muuri
-        }
- 
+        actualizarNotaEnStore({ ...nota, status: 'trashed' });
+        
         console.log(`Nota con ID ${noteId} movida a la papelera correctamente.`);
         showNotification('Nota movida a la papelera.', 'info');
     } catch (error) {
@@ -1283,8 +643,8 @@ const opcionesNota = (notaID) => {
                         // 1. Llamamos a duplicarNota, que ahora devuelve la nota recién creada.
                         const nuevaNota = await duplicarNota(targetNotaId);
                         // 2. Si la duplicación fue exitosa, actualizamos el store.
-                        // El store se encargará de que la UI se renderice de nuevo.
-                        if (nuevaNota) store.upsertNote(nuevaNota);
+                        // El store se encargará de que la UI se renderice de nuevo.                        
+                        if (nuevaNota) actualizarNotaEnStore(nuevaNota);
 
                     } catch (error) {
                         showNotification('No se pudo duplicar la nota.', 'error');

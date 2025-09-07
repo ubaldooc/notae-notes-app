@@ -82,7 +82,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   picture: String,
   theme: { type: String, default: 'light', enum: ['light', 'dark'] },
-  noteView: { type: String, default: 'grid', enum: ['grid', 'list'] },
+  noteView: { type: String, default: 'masonry', enum: ['grid', 'list', 'masonry'] },
   noteSortOrder: { type: String, default: 'newest', enum: ['newest', 'oldest', 'custom', 'title-asc', 'title-desc'] },
   role: { type: String, default: 'user', enum: ['user', 'admin'] }
 }, { timestamps: true, versionKey: false });
@@ -245,7 +245,7 @@ app.put('/api/user/preferences', async (req, res) => {
   const { noteView, noteSortOrder } = req.body;
   const updateData = {};
 
-  if (noteView && ['grid', 'list'].includes(noteView)) {
+  if (noteView && ['grid', 'list', 'masonry'].includes(noteView)) {
     updateData.noteView = noteView;
   }
   if (noteSortOrder && ['newest', 'oldest', 'custom', 'title-asc', 'title-desc'].includes(noteSortOrder)) {
@@ -323,7 +323,7 @@ app.get('/api/admin/feedback', async (req, res) => {
 
   try {
     // Ejecutamos dos consultas en paralelo para mayor eficiencia
-    const [feedbacks, totalCount] = await Promise.all([
+    const [feedbasount] = await Promise.all([
       Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
       Feedback.countDocuments(filter)
     ]);

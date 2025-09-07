@@ -20,7 +20,7 @@ const handleLoginFlow = async (user) => {
     await initDb(user.id);
 
     // Actualizamos el usuario en el store
-    store.setUser(user);
+    store.dispatch({ type: 'SET_USER', payload: user });
     // Dispara un evento global para que la UI (Header, etc.) se actualice.
     document.dispatchEvent(new CustomEvent('session-initialized', { detail: { user } }));
 };
@@ -99,7 +99,7 @@ export const logout = async () => {
     await initDb(GUEST_USER_ID);
 
     // Limpiamos el usuario en el store
-    store.setUser(null);
+    store.dispatch({ type: 'SET_USER', payload: null });
     document.dispatchEvent(new CustomEvent('session-cleared'));
 };
 
@@ -112,12 +112,12 @@ const checkExistingSession = async () => {
 
     if (user) {
         console.log("Sesión existente encontrada. Inicializando DB de usuario.");
-        store.setUser(user);
+        store.dispatch({ type: 'SET_USER', payload: user });
         await initDb(user.id);
         document.dispatchEvent(new CustomEvent('session-initialized', { detail: { user } }));
     } else {
         console.log("No hay sesión. Inicializando DB de invitado.");
-        store.setUser(null);
+        store.dispatch({ type: 'SET_USER', payload: null });
         await initDb(GUEST_USER_ID);
         document.dispatchEvent(new CustomEvent('session-initialized', { detail: { user: null } }));
     }

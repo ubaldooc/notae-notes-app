@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 
 import { formatFecha, validarORestauraNotaJSON, generateDynamicBackgroundColor } from '../utils.js';
 import { guardarNotaEnDB } from '../services/db.js';
-import { renderizarNotaEnDOM, verificarYReubicarNota } from './NoteCard.js';
+import { actualizarNotaEnStore, verificarYReubicarNota } from './NoteCard.js';
 
 
 
@@ -443,7 +443,7 @@ export const guardarNota = async (notaJSON) => {
     if (notaValida) {
         try {
             await guardarNotaEnDB(notaValida);
-            renderizarNotaEnDOM(notaValida);
+            actualizarNotaEnStore(notaValida);
             // reordenarNotasEnDOM();
             
         } catch (error) {

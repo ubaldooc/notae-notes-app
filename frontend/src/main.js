@@ -540,6 +540,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 3. Su estado cambió (movida a/desde la papelera).
             // 4. Su estado de 'fijado' cambió.
             // 5. Su grupo asignado cambió.
+            // 6. O si la nota fue eliminada (no está en el estado actual pero sí en el anterior).
+            if (previousNote && currentNote.status === 'trashed' && previousNote.status !== 'trashed') {
+                // Si la nota acaba de ser movida a la papelera, la marcamos para ser eliminada de la vista principal.
+                notesToRemove.push(noteId);
+            }
+
             if (!previousNote || previousNote.updatedAt !== currentNote.updatedAt || previousNote.status !== currentNote.status ||
                 previousNote.pinned !== currentNote.pinned || previousNote.groupId !== currentNote.groupId) {
                 notesToUpsert.push(currentNote);
@@ -758,7 +764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ]);
     
             // 7. Actualizar el store con los datos finales. La UI se renderizará automáticamente.
-            store.setData(finalNotes, finalGroups);
+            store.dispatch({ type: 'SET_DATA', payload: { notes: finalNotes, groups: finalGroups } });
     
             // 8. Inicializar funcionalidades.
             inicializarDragAndDropGrupos();
@@ -787,13 +793,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateSortButtonUI();
 
         // Ahora, limpiamos la UI y cargamos los datos, que ya usarán las preferencias correctas.
-        store.clearState(); // Limpia el estado, lo que limpiará la UI
+        store.dispatch({ type: 'CLEAR_STATE' }); // Limpia el estado, lo que limpiará la UI
         await sincronizarYcargarDatos();
     });
 
     document.addEventListener('session-cleared', async () => {
         console.log('Sesión cerrada. Cambiando a modo invitado...');
-        store.clearState(); // Limpia el estado, lo que limpiará la UI
+        store.dispatch({ type: 'CLEAR_STATE' }); // Limpia el estado, lo que limpiará la UI
         await sincronizarYcargarDatos();
     });
 
@@ -813,7 +819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.addEventListener('data-imported', async () => {
         console.log('Evento data-imported detectado. Recargando datos...');
-        store.clearState();
+        store.dispatch({ type: 'CLEAR_STATE' });
         await sincronizarYcargarDatos();
     });
 

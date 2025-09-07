@@ -148,7 +148,7 @@ export const inicializarDragAndDropGrupos = () => {
                     const reorderedGroups = items.map(item => groupMap.get(item.id))
                                                  .filter(Boolean); // Filtramos por si algún grupo no se encontrara
 
-                    store.setData(store.getState().notes, reorderedGroups);
+                    store.dispatch({ type: 'SET_DATA', payload: { notes: store.getState().notes, groups: reorderedGroups } });
                 } catch (error) {
                     console.error("Fallo al guardar el nuevo orden de los grupos:", error);
                 }
@@ -189,7 +189,7 @@ export const crearGrupo = async () => {
     };
 
     await guardarGrupoEnDB(newGroupData); // Guarda en DB y sincroniza
-    store.upsertGroup(newGroupData); // Añade al store, lo que causará el re-render
+    store.dispatch({ type: 'UPSERT_GROUP', payload: newGroupData }); // Añade al store, lo que causará el re-render
     renombrarGrupo(groupID);
 };
 
@@ -262,7 +262,7 @@ export const renombrarGrupo = (groupID) => {
             // 2. Actualizamos el nombre y guardamos el objeto completo.
             groupToUpdate.name = finalName;
             await actualizarPropiedadesGrupoEnDB(groupID, { name: finalName, order: groupToUpdate.order });
-            store.upsertGroup(groupToUpdate); // Actualiza el grupo en el store con el objeto completo.
+            store.dispatch({ type: 'UPSERT_GROUP', payload: groupToUpdate }); // Actualiza el grupo en el store con el objeto completo.
             actualizarInfoGrupoEnNoteCards(groupID, { name: finalName }); // Esta función ahora usa el store
         } catch (error) {
             console.error("Error al actualizar el nombre del grupo en la DB:", error);
@@ -347,7 +347,7 @@ export const cambiarColorGrupo = (groupID) => {
             try {
                 await actualizarPropiedadesGrupoEnDB(groupID, { color: selectedColor });
                 // Actualiza el grupo en el store
-                store.upsertGroup({ ...store.getState().groups.find(g => g.id === groupID), color: selectedColor });
+                store.dispatch({ type: 'UPSERT_GROUP', payload: { ...store.getState().groups.find(g => g.id === groupID), color: selectedColor } });
             } catch (error) {
                 console.error("Error al actualizar el color del grupo en la DB:", error);
             }
@@ -402,12 +402,12 @@ export const eliminarGrupo = (identificadorGrupo) => {
             onConfirm: async () => {
                 try {
                     const updatedNoteIds = await eliminarGrupoDeDB(groupID);
-                    store.removeGroup(groupID); // Elimina del store, la UI se actualizará
+                    store.dispatch({ type: 'REMOVE_GROUP', payload: groupID }); // Elimina del store, la UI se actualizará
 
                     if (updatedNoteIds && updatedNoteIds.length > 0) {
                         updatedNoteIds.forEach(noteId => {
                             actualizarInfoGrupoEnNoteCard(noteId, null);
-                            store.upsertNote({ ...store.getState().notes.find(n => n.id === noteId), groupId: null });
+                            store.dispatch({ type: 'UPSERT_NOTE', payload: { ...store.getState().notes.find(n => n.id === noteId), groupId: null } });
                         });
                     }
 
@@ -684,7 +684,7 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
                     const notaActualizada = { ...notaParaActualizar, groupId: selectedGroupId };
                     await guardarNotaEnDB(notaActualizada);
                     // Actualizamos el store. Esto disparará la actualización de la UI.
-                    store.upsertNote(notaActualizada);
+                    store.dispatch({ type: 'UPSERT_NOTE', payload: notaActualizada });
                     console.log(`Nota ${noteId} actualizada con nuevo groupId: ${selectedGroupId}`);
                 } else {
                     console.error(`No se encontró la nota con ID ${noteId} para actualizar.`);

@@ -47,29 +47,19 @@ const deleteSelectedNotes = async () => {
     if (noteIdsToDelete.length === 0) return;
 
     try {
+        // 1. Mueve las notas a la papelera en la DB (local y backend).
         await moverNotasAPapeleraEnDB(noteIdsToDelete);
-        // Actualizamos el estado de cada nota a 'trashed' en el store.
-        const { notes } = store.getState();
-        noteIdsToDelete.forEach(id => {
-            const nota = notes.find(n => n.id === id);
-            if (nota) {
-                store.upsertNote({ ...nota, status: 'trashed' });
-            }
-        });
-
-        // --- INICIO: Eliminación visual de las notas ---
-        // Este es el paso que faltaba.
-        // Iteramos sobre los IDs y eliminamos cada nota de la instancia de Muuri correspondiente.
-        const itemsToRemovePinned = [];
-        const itemsToRemoveUnpinned = [];
-        noteIdsToDelete.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                const item = gridPinned.getItem(element) || gridUnpinned.getItem(element);
-                if (item) item.getGrid().remove([item], { removeElements: true });
-            }
-        });
-        // --- FIN: Eliminación visual de las notas ---
+        
+        // 2. Actualizamos el estado de las notas a 'trashed' en el store.
+        // El store se encargará de que la UI se actualice.
+        const { notes: allNotes } = store.getState();
+        const notesToUpdate = allNotes
+            .filter(note => noteIdsToDelete.includes(note.id))
+            .map(note => ({ ...note, status: 'trashed' }));
+        
+        if (notesToUpdate.length > 0) {
+            store.dispatch({ type: 'UPSERT_NOTES', payload: notesToUpdate });
+        }
 
     } catch (error) {
         console.error("Error al eliminar las notas seleccionadas:", error);
@@ -94,7 +84,7 @@ const duplicateSelectedNotes = async () => {
     // 3. Filtramos por si alguna promesa falló y actualizamos el store con todas las notas nuevas a la vez.
     const notasValidas = nuevasNotas.filter(Boolean);
     if (notasValidas.length > 0) {
-      store.upsertNotes(notasValidas);
+      store.dispatch({ type: 'UPSERT_NOTES', payload: notasValidas });
     }
 
   } catch (error) {
