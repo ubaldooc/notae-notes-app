@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.2",
+    "dexie": "^4.2.1",
     "dompurify": "^3.2.6",
     "google-auth-library": "^10.3.0",
     "muuri": "^0.9.5",
+    "nodemailer": "^7.0.12",
     "sortablejs": "^1.15.6"
   }
 }
