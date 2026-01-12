@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 
 /**
  * Función auxiliar genérica para realizar llamadas a la API.
@@ -63,13 +63,13 @@ export const loginWithGoogle = (token) =>
   }, 'Verificando token de Google con el backend.');
 
 // Cierra la sesión en el backend (elimina la cookie)
-export const logoutFromBackend = () => 
+export const logoutFromBackend = () =>
   apiCall('/auth/logout', { method: 'POST' }, 'Cerrando sesión en el backend.');
 
 // --- Rutas de la API para Notas ---
 
 // Sincroniza una nota con el backend (crear/actualizar)
-export const syncNoteWithBackend = (note) => 
+export const syncNoteWithBackend = (note) =>
   apiCall('/notes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -77,19 +77,19 @@ export const syncNoteWithBackend = (note) =>
   }, `Nota ${note.id} sincronizada con el backend.`);
 
 // Elimina una nota PERMANENTEMENTE del backend
-export const deleteNoteFromBackend = (noteId) => 
+export const deleteNoteFromBackend = (noteId) =>
   apiCall(`/notes/${noteId}`, { method: 'DELETE' }, `Nota ${noteId} eliminada permanentemente del backend.`);
 
 // Mueve una nota a la papelera en el backend
-export const moveNoteToTrashInBackend = (noteId) => 
+export const moveNoteToTrashInBackend = (noteId) =>
   apiCall(`/notes/${noteId}/trash`, { method: 'PUT' }, `Nota ${noteId} movida a la papelera en el backend.`);
 
 // Restaura una nota desde la papelera en el backend
-export const restoreNoteFromBackend = (noteId) => 
+export const restoreNoteFromBackend = (noteId) =>
   apiCall(`/notes/${noteId}/restore`, { method: 'PUT' }, `Nota ${noteId} restaurada en el backend.`);
 
 // Vacía toda la papelera en el backend
-export const emptyTrashInBackend = () => 
+export const emptyTrashInBackend = () =>
   apiCall('/notes/trashed', { method: 'DELETE' }, 'Papelera vaciada en el backend.');
 
 // Actualiza el orden personalizado de múltiples notas en el backend
@@ -108,7 +108,7 @@ export const fetchNotesFromBackend = () => apiCall('/notes');
 export const fetchGroupsFromBackend = () => apiCall('/groups');
 
 // Crea un nuevo grupo en el backend
-export const createGroupInBackend = (group) => 
+export const createGroupInBackend = (group) =>
   apiCall('/groups', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -116,7 +116,7 @@ export const createGroupInBackend = (group) =>
   }, `Grupo ${group.id} creado en el backend.`);
 
 // Actualiza un grupo en el backend
-export const updateGroupInBackend = (groupId, updates) => 
+export const updateGroupInBackend = (groupId, updates) =>
   apiCall(`/groups/${groupId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -124,11 +124,11 @@ export const updateGroupInBackend = (groupId, updates) =>
   }, `Grupo ${groupId} actualizado en el backend.`);
 
 // Elimina un grupo del backend
-export const deleteGroupFromBackend = (groupId) => 
+export const deleteGroupFromBackend = (groupId) =>
   apiCall(`/groups/${groupId}`, { method: 'DELETE' }, `Grupo ${groupId} eliminado del backend.`);
 
 // Actualiza el orden de múltiples grupos en el backend
-export const updateGroupsOrderInBackend = (groups) => 
+export const updateGroupsOrderInBackend = (groups) =>
   apiCall('/groups/order', {
     method: 'PUT',
     body: JSON.stringify(groups),
