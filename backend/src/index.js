@@ -675,72 +675,38 @@ app.get('/api/status', (req, res) => {
   }
 });
 
+// El backend ahora funciona solo como API.
+// El frontend se sirve desde Vercel.
 
 
-// NO NECESITO SERVIR ARCHIVOS FRONTEND TENGO EL BACKEND EN OTRO SERVIDOR APARTE
-// // --- Servidor de archivos de Frontend ---
-// // Esta sección debe ir DESPUÉS de todas las rutas de la API.
+const deleteOldTrashedNotes = async () => {
+  console.log('Ejecutando tarea de limpieza de papelera...');
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-// // 1. Ruta protegida para servir el panel de administración.
-// app.get('/admin', adminAuthMiddleware, (req, res) => {
-//   // Si el middleware pasa, el usuario es un admin y le servimos la página.
-//   // En producción servimos desde 'dist', en desarrollo desde la raíz
-//   const basePath = process.env.NODE_ENV === 'production' ? 'dist' : '';
-//   res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', basePath, 'admin-panel.html'));
-// });
+  try {
+    const result = await Note.deleteMany({
+      status: 'trashed', // Se podría añadir userId aquí, pero es menos crítico si las rutas ya están protegidas.
+      updatedAt: { $lt: thirtyDaysAgo } // $lt significa "less than" (menor que)
+    });
 
-// // 1.5: Bloquear el acceso directo al archivo del panel de admin
-// app.get('/admin-panel.html', (req, res) => {
-//   // Esta ruta previene que alguien acceda al archivo HTML directamente.
-//   // Solo la ruta '/admin' (que tiene el middleware de admin) debe servirlo.
-//   res.status(403).send('Acceso Prohibido');
-// });
+    if (result.deletedCount > 0) {
+      console.log(`Limpieza de papelera: Se eliminaron ${result.deletedCount} notas con más de 30 días.`);
+    } else {
+      console.log('Limpieza de papelera: No se encontraron notas antiguas para eliminar.');
+    }
+  } catch (error) {
+    console.error('Error durante la limpieza automática de la papelera:', error);
+  }
+};
 
-// // 2. Servir los archivos estáticos del frontend (JS, CSS, imágenes, etc.)
-// // Esto es necesario para que index.html y admin-panel.html puedan cargar sus recursos.
-// const staticPath = process.env.NODE_ENV === 'production'
-//   ? path.resolve(__dirname, '..', '..', 'frontend', 'dist')
-//   : path.resolve(__dirname, '..', '..', 'frontend');
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 
-// app.use(express.static(staticPath));
+  // Ejecutar la limpieza una vez al iniciar el servidor
+  deleteOldTrashedNotes();
 
-// // 3. Ruta "catch-all" para la aplicación principal (Single Page Application).
-// // Cualquier otra petición GET que no sea una API o un archivo estático, servirá index.html.
-// app.get(/^(?!\/api).+/, (req, res) => {
-//   const indexPath = process.env.NODE_ENV === 'production'
-//     ? path.resolve(__dirname, '..', '..', 'frontend', 'dist', 'index.html')
-//     : path.resolve(__dirname, '..', '..', 'frontend', 'index.html');
-//   res.sendFile(indexPath);
-// });
-
-// const deleteOldTrashedNotes = async () => {
-//   console.log('Ejecutando tarea de limpieza de papelera...');
-//   const thirtyDaysAgo = new Date();
-//   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-//   try {
-//     const result = await Note.deleteMany({
-//       status: 'trashed', // Se podría añadir userId aquí, pero es menos crítico si las rutas ya están protegidas.
-//       updatedAt: { $lt: thirtyDaysAgo } // $lt significa "less than" (menor que)
-//     });
-
-//     if (result.deletedCount > 0) {
-//       console.log(`Limpieza de papelera: Se eliminaron ${result.deletedCount} notas con más de 30 días.`);
-//     } else {
-//       console.log('Limpieza de papelera: No se encontraron notas antiguas para eliminar.');
-//     }
-//   } catch (error) {
-//     console.error('Error durante la limpieza automática de la papelera:', error);
-//   }
-// };
-
-// app.listen(port, () => {
-//   console.log(`Servidor corriendo en http://localhost:${port}`);
-
-//   // Ejecutar la limpieza una vez al iniciar el servidor
-//   deleteOldTrashedNotes();
-
-//   // Programar la tarea para que se ejecute cada 24 horas (86,400,000 ms)
-//   const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-//   setInterval(deleteOldTrashedNotes, twentyFourHoursInMs);
-// });
+  // Programar la tarea para que se ejecute cada 24 horas (86,400,000 ms)
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  setInterval(deleteOldTrashedNotes, twentyFourHoursInMs);
+});
