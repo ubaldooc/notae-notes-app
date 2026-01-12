@@ -388,7 +388,7 @@ body.aside-collapsed {
     align-items: center;
     /* border-bottom: 2px solid black; */
     width: 100%;
-    overflow: hidden;
+    overflow: visible;
     padding-left: 10px;
     /* Espacio para el menú */
 }
@@ -416,7 +416,6 @@ header * {
     /* Evita que la imagen sea seleccionable */
     -webkit-user-drag: none;
     /* Específico para navegadores WebKit */
-    z-index: 1000;
 }
 
 .logo-text {

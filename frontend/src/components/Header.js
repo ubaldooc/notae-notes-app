@@ -8,7 +8,7 @@ import { gridUnpinned } from "../main";
 
 
 // Vaolres por defecto cuando no hay sesion iniciada
-const GUEST_IMAGE_PATH = 'src/assets/guest-perfil.jpg';
+const GUEST_IMAGE_PATH = 'src/assets/guest-perfil.webp';
 const GUEST_NAME = 'Invitado';
 
 export const initHeader = () => {
@@ -236,7 +236,7 @@ export const initHeader = () => {
         document.dispatchEvent(new CustomEvent('theme-changed'));
 
         const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        
+
         // Guardar en localStorage para persistencia de invitado y carga rápida
         localStorage.setItem('theme', newTheme);
 
@@ -246,7 +246,7 @@ export const initHeader = () => {
             try {
                 // La API devuelve el tema actualizado, lo que confirma que se guardó.
                 const response = await updateUserThemeInBackend(newTheme);
-                
+
                 // Actualizar el objeto de usuario en localStorage para que la próxima recarga tenga el tema correcto.
                 const user = JSON.parse(userJSON);
                 user.theme = response.user.theme; // Usamos la respuesta del backend como fuente de la verdad.
