@@ -3243,33 +3243,33 @@ body.selection-mode-active .note-card-container.is-selected {
     }
 
     .header-toolbar {
-        gap: 2px;
+        gap: 12px;
         flex: 1;
         min-width: 0;
-        justify-content: center;
-        padding: 0 2px;
+        justify-content: space-evenly;
+        padding: 0 10px;
         overflow: hidden;
     }
 
     .header-toolbar svg {
-        height: 28px !important;
+        height: 30px !important;
         flex-shrink: 0;
     }
 
     .search-container {
         flex: 1;
-        max-width: 140px;
-        min-width: 40px;
-        height: 36px;
-        border-radius: 10px;
-        padding: 0 6px;
+        max-width: 220px;
+        min-width: 60px;
+        height: 40px;
+        border-radius: 12px;
+        padding: 0 10px;
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
     }
 
     .search-inpt {
-        font-size: 14px;
+        font-size: 15px;
         margin-left: 0;
         flex: 1;
         min-width: 0;
@@ -3282,35 +3282,37 @@ body.selection-mode-active .note-card-container.is-selected {
 
     .header-right-side {
         margin-right: 0;
-        gap: 4px;
-        flex-shrink: 1;
-        min-width: 0;
+        gap: 10px;
+        flex-shrink: 0;
     }
 
     .perfil-img {
-        height: 36px !important;
-        width: 36px !important;
+        height: 38px !important;
+        width: 38px !important;
         flex-shrink: 0;
     }
 
     .view-option-btn {
-        padding: 2px;
+        padding: 4px;
     }
 
     .sort-trigger-btn {
-        padding: 4px;
+        padding: 6px;
     }
 
     /* Notas */
     .note-card-container {
-        width: calc(100% - 16px) !important;
-        margin: 8px !important;
+        width: calc(100% - 20px) !important;
+        height: auto !important;
+        min-height: 160px;
+        margin: 10px !important;
     }
 
     .note-card {
-        padding: 18px;
-        border-radius: 18px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        height: 100%;
     }
 
     .note-title {
