@@ -20,3 +20,6 @@ yarn-debug.log*
 # Archivos de sistema y editores
 .DS_Store
 .vscode/
+
+#El archivo de espacio de trabajo de vscode
+mi-app-de-notas-web.code-workspace

@@ -14,7 +14,9 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  // AQUI TENGO 2 LOCALHOST , EL 5173 ES EL BUENO, PERO TENGO EL OTRO array POR SI EJECUTO 2 o 3 PROYECTOS AL MISMO TIEMPO Y CAMBIO DE RUTA DE PUERTO
+  // origin: 'http://localhost:5173', 
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
   credentials: true, // Permite que el frontend envíe cookies
   optionsSuccessStatus: 200
 };
