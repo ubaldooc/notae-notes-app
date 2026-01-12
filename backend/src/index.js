@@ -14,9 +14,7 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 const corsOptions = {
-  // AQUI TENGO 2 LOCALHOST , EL 5173 ES EL BUENO, PERO TENGO EL OTRO array POR SI EJECUTO 2 o 3 PROYECTOS AL MISMO TIEMPO Y CAMBIO DE RUTA DE PUERTO
-  // origin: 'http://localhost:5173', 
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true, // Permite que el frontend envíe cookies
   optionsSuccessStatus: 200
 };
@@ -683,7 +681,9 @@ app.get('/api/status', (req, res) => {
 // 1. Ruta protegida para servir el panel de administración.
 app.get('/admin', adminAuthMiddleware, (req, res) => {
   // Si el middleware pasa, el usuario es un admin y le servimos la página.
-  res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', 'admin-panel.html'));
+  // En producción servimos desde 'dist', en desarrollo desde la raíz
+  const basePath = process.env.NODE_ENV === 'production' ? 'dist' : '';
+  res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', basePath, 'admin-panel.html'));
 });
 
 // 1.5: Bloquear el acceso directo al archivo del panel de admin
@@ -695,12 +695,19 @@ app.get('/admin-panel.html', (req, res) => {
 
 // 2. Servir los archivos estáticos del frontend (JS, CSS, imágenes, etc.)
 // Esto es necesario para que index.html y admin-panel.html puedan cargar sus recursos.
-app.use(express.static(path.resolve(__dirname, '..', '..', 'frontend')));
+const staticPath = process.env.NODE_ENV === 'production'
+  ? path.resolve(__dirname, '..', '..', 'frontend', 'dist')
+  : path.resolve(__dirname, '..', '..', 'frontend');
+
+app.use(express.static(staticPath));
 
 // 3. Ruta "catch-all" para la aplicación principal (Single Page Application).
 // Cualquier otra petición GET que no sea una API o un archivo estático, servirá index.html.
-app.get('/{*path}', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', 'index.html'));
+app.get('*', (req, res) => {
+  const indexPath = process.env.NODE_ENV === 'production'
+    ? path.resolve(__dirname, '..', '..', 'frontend', 'dist', 'index.html')
+    : path.resolve(__dirname, '..', '..', 'frontend', 'index.html');
+  res.sendFile(indexPath);
 });
 
 const deleteOldTrashedNotes = async () => {
