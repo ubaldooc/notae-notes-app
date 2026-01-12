@@ -112,12 +112,12 @@ export const initHeader = () => {
     // CERRAR SESION Y OPCIONES DE PERFIL
     const perfilOptions = document.querySelector(".perfil-options-dropdown");
 
-    perfilContainer.addEventListener("click", (event) => {
-        event.stopPropagation();
+    perfilContainer.addEventListener("click", () => {
         perfilOptions.classList.toggle("active");
     });
 
     document.addEventListener("click", (event) => {
+        // Si el clic es fuera del contenedor del perfil, cerramos el dropdown
         if (perfilOptions.classList.contains("active") && !perfilContainer.contains(event.target)) {
             perfilOptions.classList.remove("active");
         }

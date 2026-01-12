@@ -132,16 +132,19 @@ export const initViewManager = (grids) => {
     const sortDropdown = document.getElementById('sort-options-dropdown');
     const sortOptions = document.querySelectorAll('.sort-option');
 
-    sortBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    sortBtn.addEventListener('click', () => {
         sortDropdown.classList.toggle('active');
     });
 
-    document.addEventListener('click', () => sortDropdown.classList.remove('active'));
+    document.addEventListener('click', (event) => {
+        const sortContainer = document.querySelector('.sort-options-container');
+        if (sortDropdown.classList.contains('active') && !sortContainer.contains(event.target)) {
+            sortDropdown.classList.remove('active');
+        }
+    });
 
     sortOptions.forEach(option => {
         option.addEventListener('click', (e) => {
-            e.stopPropagation();
             applySort(e.currentTarget.dataset.sort);
             sortDropdown.classList.remove('active');
         });
