@@ -55,16 +55,15 @@ function initializeGoogleSignIn() {
         google.accounts.id.initialize({
             client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
+            use_fedcm_for_prompt: true, // Activa Federated Credential Management (FedCM)
         });
 
         const customBtn = document.getElementById('custom-google-signin-btn');
         if (customBtn) {
             customBtn.addEventListener('click', () => {
-                google.accounts.id.prompt((notification) => {
-                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        console.warn('El prompt de Google no se mostró.');
-                    }
-                });
+                // Con FedCM activado, dejamos que el navegador gestione la interfaz del prompt
+                // de forma más integrada y segura, reduciendo la dependencia de callbacks manuales.
+                google.accounts.id.prompt();
             });
         }
     } catch (error) {
