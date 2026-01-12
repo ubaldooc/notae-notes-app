@@ -17,7 +17,6 @@ body {
     overflow-y: hidden;
 }
 
-.header,
 .main,
 .grid-wrapper {
     overflow-x: hidden;
@@ -3258,7 +3257,7 @@ body.selection-mode-active .note-card-container.is-selected {
         min-width: 0;
         justify-content: space-evenly;
         padding: 0 10px;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .header-toolbar svg {
