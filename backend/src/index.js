@@ -703,7 +703,7 @@ app.use(express.static(staticPath));
 
 // 3. Ruta "catch-all" para la aplicación principal (Single Page Application).
 // Cualquier otra petición GET que no sea una API o un archivo estático, servirá index.html.
-app.get('*', (req, res) => {
+app.get(/^(?!\/api).+/, (req, res) => {
   const indexPath = process.env.NODE_ENV === 'production'
     ? path.resolve(__dirname, '..', '..', 'frontend', 'dist', 'index.html')
     : path.resolve(__dirname, '..', '..', 'frontend', 'index.html');
