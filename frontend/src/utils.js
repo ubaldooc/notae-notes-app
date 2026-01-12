@@ -17,7 +17,7 @@ export const activarAside = () => {
     // reorganizar las notas y ocupar el nuevo espacio disponible.
     setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
-    }, 200); // Este tiempo debe coincidir con la duración de la transición en styles.css
+    }, 400); // Sincronizado con la transición de 0.4s en styles.css
 }
 
 // FUNCION PARA ORDENAR LAS NOTAS POR FECHA. Esta funcion se usa con grid.sort(ordenarNotas); para que funcione

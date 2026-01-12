@@ -1,15 +1,17 @@
 // Importaciones de la capa de servicio/base de datos (DB)
-import { guardarNotaEnDB, cargarNotasDesdeDB, obtenerNotasPorGrupoDesdeDB,
+import {
+    guardarNotaEnDB, cargarNotasDesdeDB, obtenerNotasPorGrupoDesdeDB,
     guardarGrupoEnDB, cargarGruposDesdeDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB,
     obtenerNotaPorIdDesdeDB, actualizarOrdenGruposEnDB, buscarYCorregirDuplicados, actualizarOrdenNotasEnDB, closeDb
 } from './services/db.js';
-import { updateUserPreferencesInBackend,
+import {
+    updateUserPreferencesInBackend,
     fetchNotesFromBackend, fetchGroupsFromBackend, syncNoteWithBackend, createGroupInBackend, updateGroupInBackend
 } from './services/api.js';
 
 
 // Importaciones de componentes de la interfaz de usuario (UI)
-import { initGroupManager, renderizarGrupoEnDOM, inicializarDragAndDropGrupos} from './components/GroupManager.js';
+import { initGroupManager, renderizarGrupoEnDOM, inicializarDragAndDropGrupos } from './components/GroupManager.js';
 
 import { initNoteEditor } from './components/NoteEditor.js';
 
@@ -67,7 +69,7 @@ const editorUnpinnedIcon = document.getElementById("editor-unpinned");
 const editorSaveNote = document.getElementById("editor-save-btn");
 const guardarEditorNoteBtn = document.querySelector(".editor-save-btn");
 
-const editorTitle = document.getElementById("editor-title");   
+const editorTitle = document.getElementById("editor-title");
 const editorBody = document.getElementById("editor-body");
 const editorCreation = document.getElementById("editor-creation");
 const editorLastMod = document.getElementById("editor-last-mod");
@@ -85,11 +87,11 @@ const editorcharCounter = document.getElementById("editor-character-counter");
 //     // Obtener los elementos DOM de los ítems de Muuri
 //     const elementA = itemA.getElement();
 //     const elementB = itemB.getElement();
-    
+
 //     // Obtener el estado 'pinned' y la fecha de cada elemento
 //     const isPinnedA = elementA.getAttribute('data-pinned') === 'true';
 //     const isPinnedB = elementB.getAttribute('data-pinned') === 'true';
-    
+
 //     const dateA = new Date(elementA.getAttribute('data-updated-at'));
 //     const dateB = new Date(elementB.getAttribute('data-updated-at'));
 
@@ -111,7 +113,7 @@ const editorcharCounter = document.getElementById("editor-character-counter");
 export let gridUnpinned;
 export let gridPinned;
 export let gridTrash;
-document.addEventListener('DOMContentLoaded', async () => {  
+document.addEventListener('DOMContentLoaded', async () => {
     // --- INICIALIZACIÓN DE LA APLICACIÓN ---
     // La lógica de inicialización ahora espera a que el SessionManager
     // termine de configurar la sesión y la UI del Header.
@@ -134,11 +136,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     //     // layout: {
     //     //     fillGaps: true // Esta es la opción clave
     //     // }
-       
+
     //     // Opciones para deshabilitar las animaciones de entrada y salida
     //     showDuration: 0,
     //     hideDuration: 0,
-        
+
     //     // Otras opciones que controlan la velocidad de las animaciones
     //     // layoutDuration: 0,
     //     // dragSortDuration: 0,
@@ -155,18 +157,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         layout: {
             fillGaps: true // Esta es la opción clave
         },
-       
+
         // Opciones para deshabilitar las animaciones de entrada y salida
         // showDuration: 0,
         // hideDuration: 0,
-        
+
         // Otras opciones que controlan la velocidad de las animaciones
         // layoutDuration: 0,
         // dragSortDuration: 0,
         // sortDuration: 0,
     });
-    
-      // Inicializa la segunda instancia de Muuri para el grid-2
+
+    // Inicializa la segunda instancia de Muuri para el grid-2
     gridPinned = new Muuri('#pinned-notes-container', {
         dragEnabled: true,
 
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializa la tercera instancia de Muuri para la papelera
     gridTrash = new Muuri('#trash-notes-container', {
         // La papelera no necesita drag & drop
-        dragEnabled: false, 
+        dragEnabled: false,
         layout: {
             fillGaps: true
         },
@@ -246,9 +248,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const handleDragEnd = async (item) => {        
+    const handleDragEnd = async (item) => {
         const currentSortOrder = localStorage.getItem('noteSortOrder') || 'newest';
-        
+
         if (currentSortOrder === 'custom') {
             // Si el modo actual es 'custom', guardamos el nuevo orden directamente.
             const finalItems = gridPinned.getItems().concat(gridUnpinned.getItems());
@@ -288,11 +290,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
 
+    // --- LÓGICA MÓVIL (FAB, BACKDROP Y DELETE ZONE) ---
+    const mobileFab = document.getElementById('mobile-fab-add-note');
+    if (mobileFab) {
+        mobileFab.addEventListener('click', () => abrirEditorNota());
+    }
+
+    const asideBackdrop = document.querySelector('.aside-backdrop');
+    if (asideBackdrop) {
+        asideBackdrop.addEventListener('click', () => activarAside());
+    }
+
+    const mobileDeleteZone = document.getElementById('mobile-delete-zone');
+    const handleDragMove = (item, event) => {
+        if (window.innerWidth > 768 || !mobileDeleteZone) return;
+        const rect = mobileDeleteZone.getBoundingClientRect();
+        const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+        const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+
+        const isOver = (
+            clientX >= rect.left &&
+            clientX <= rect.right &&
+            clientY >= rect.top &&
+            clientY <= rect.bottom
+        );
+
+        if (isOver) mobileDeleteZone.classList.add('hover');
+        else mobileDeleteZone.classList.remove('hover');
+    };
+
+    const handleDragStartMobile = () => {
+        if (window.innerWidth <= 768 && mobileDeleteZone) mobileDeleteZone.classList.add('active');
+        handleDragStart();
+    };
+
+    const handleDragEndMobile = async (item) => {
+        if (window.innerWidth <= 768 && mobileDeleteZone && mobileDeleteZone.classList.contains('hover')) {
+            const { moverNotaAPapelera } = await import('./components/NoteCard.js');
+            await moverNotaAPapelera(item.getElement().id);
+        }
+        if (mobileDeleteZone) {
+            mobileDeleteZone.classList.remove('active');
+            mobileDeleteZone.classList.remove('hover');
+        }
+        handleDragEnd(item);
+    };
+
     // Asignamos el listener a ambas instancias de Muuri
-    gridUnpinned.on('dragStart', handleDragStart);
-    gridPinned.on('dragStart', handleDragStart);
-    gridUnpinned.on('dragEnd', handleDragEnd);
-    gridPinned.on('dragEnd', handleDragEnd);
+    gridUnpinned.on('dragStart', handleDragStartMobile);
+    gridPinned.on('dragStart', handleDragStartMobile);
+    gridUnpinned.on('dragMove', handleDragMove);
+    gridPinned.on('dragMove', handleDragMove);
+    gridUnpinned.on('dragEnd', handleDragEndMobile);
+    gridPinned.on('dragEnd', handleDragEndMobile);
 
     // Llamar al método sort() con tu función personalizada
     // Aplicamos el ordenamiento inicial leyendo la preferencia del usuario.
@@ -310,7 +360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("Limpiando la interfaz de usuario...");
         gridPinned.remove(gridPinned.getItems(), { removeElements: true });
         gridUnpinned.remove(gridUnpinned.getItems(), { removeElements: true });
-        
+
         const groupsContainer = document.querySelector('.notes-group__container');
         if (groupsContainer) groupsContainer.innerHTML = '';
 
@@ -384,7 +434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // --- 2. APLICACIÓN DE CAMBIOS EN LA UI ---
-        
+
         // Aplicar cambios a las notas
         notesToRemove.forEach(noteId => {
             const noteElement = document.getElementById(noteId);
@@ -414,7 +464,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderizarGrupoEnDOM(group);
         });
 
-                // Si se actualizó al menos una nota, disparamos un evento 'resize' después de un breve
+        // Si se actualizó al menos una nota, disparamos un evento 'resize' después de un breve
         // retraso para darle tiempo al DOM a actualizarse. Esto fuerza a Muuri a recalcular
         // el layout, lo cual es crucial para la vista masonry si el tamaño de una nota cambió.
         if (notesToUpsert.length > 0) {
@@ -449,7 +499,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         previousState = structuredClone(currentState);
     };
 
-    
+
     // --- Lógica de Sincronización y Carga Inicial ---
     /**
      * Sincroniza los datos entre IndexedDB y el backend, fusionando los cambios.
@@ -462,10 +512,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const user = JSON.parse(localStorage.getItem('user'));
         const noNotesMessage = document.getElementById('no-notes-message');
- 
+
         try {
             console.log('Iniciando sincronización y carga de datos...');
-    
+
             // Helper para ejecutar promesas de forma segura, devolviendo un valor por defecto en caso de error.
             // Esto hace que la carga inicial sea más robusta frente a fallos de red o del backend.
             const safePromise = async (promise, defaultValue = []) => {
@@ -490,9 +540,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const backendNotesMap = new Map(allBackendNotes.map(n => [n.id, n]));
             const localGroupsMap = new Map(localGroups.map(g => [g.id, g]));
             const backendGroupsMap = new Map(backendGroups.map(g => [g.id, g]));
-    
+
             const syncPromises = [];
-    
+
             // 3. Función genérica para sincronizar un tipo de dato (notas o grupos).
             const sincronizarEntidades = (localMap, backendMap, localSaveFn, backendCreateFn, backendUpdateFn) => {
                 // Si no hay sesión, no hay nada que sincronizar con el backend.
@@ -502,11 +552,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 const allIds = new Set([...localMap.keys(), ...backendMap.keys()]);
-    
+
                 allIds.forEach(id => {
                     const localItem = localMap.get(id); // Esto incluye notas activas y en papelera si se cargaron todas
                     const backendItem = backendMap.get(id);
-    
+
                     if (localItem && !backendItem) {
                         // Existe localmente pero no en el backend (creado offline).
                         console.log(`Sync: Creando en backend item ${id}`);
@@ -517,12 +567,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         // Solo guardamos si no está en la papelera, o si estamos en la vista de papelera
                         // Para la carga inicial, solo queremos los activos.
                         // La lógica de sincronización se complica. Por ahora, guardamos todo.
-                        syncPromises.push(localSaveFn(backendItem, false)); 
+                        syncPromises.push(localSaveFn(backendItem, false));
                     } else if (localItem && backendItem) {
                         // Existe en ambos. Comparamos por fecha de actualización.
                         const localDate = new Date(localItem.updatedAt);
                         const backendDate = new Date(backendItem.updatedAt);
-    
+
                         if (backendDate > localDate) {
                             // El del backend es más nuevo.
                             console.log(`Sync: Actualizando localmente item ${id}`);
@@ -535,15 +585,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
             };
-    
+
             // 4. Sincronizar notas y grupos. No usamos `await` aquí para no bloquear el renderizado.
             // La UI se puede mostrar con los datos locales mientras la sincronización ocurre en segundo plano.
             console.log('--- Sincronizando Notas ---');
             sincronizarEntidades(localNotesMap, backendNotesMap, guardarNotaEnDB, syncNoteWithBackend, syncNoteWithBackend);
-    
+
             console.log('--- Sincronizando Grupos ---');
             sincronizarEntidades(localGroupsMap, backendGroupsMap, guardarGrupoEnDB, createGroupInBackend, updateGroupInBackend);
-    
+
             // 5. Ejecutar todas las promesas de sincronización en segundo plano.
             Promise.all(syncPromises).then(() => {
                 console.log('Sincronización en segundo plano completada.');
@@ -551,7 +601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error("Ocurrió un error durante la sincronización en segundo plano:", err);
             });
             console.log('Sincronización completada.');
-    
+
             // 5.5 (Paso de Recuperación): Asegurarse de que todas las notas tengan un estado válido.
             // Esto "recupera" notas antiguas que podrían no tener el campo 'status'.
             console.log('Verificando integridad de los datos locales...');
@@ -562,9 +612,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.warn(`Se encontraron ${notesToFix.length} notas sin un estado válido. Reparando...`);
                 const fixPromises = notesToFix.map(note => {
                     // Asigna 'active' como estado por defecto para recuperarlas.
-                    note.status = 'active'; 
+                    note.status = 'active';
                     // Guarda la nota corregida en la DB local sin volver a sincronizar con el backend.
-                    return guardarNotaEnDB(note, false); 
+                    return guardarNotaEnDB(note, false);
                 });
                 await Promise.all(fixPromises);
                 console.log('Reparación de notas completada.');
@@ -592,10 +642,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cargarNotasDesdeDB('all'), // <-- CAMBIO CLAVE: Cargar TODAS las notas (activas y en papelera)
                 cargarGruposDesdeDB()
             ]);
-    
+
             // 7. Actualizar el store con los datos finales. La UI se renderizará automáticamente.
             store.dispatch({ type: 'SET_DATA', payload: { notes: finalNotes, groups: finalGroups } });
-    
+
             // 8. Inicializar funcionalidades.
             inicializarDragAndDropGrupos();
             console.log('Drag and drop de grupos inicializado.');
@@ -616,7 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Escuchamos sus eventos para recargar los datos.
     document.addEventListener('session-initialized', async (event) => {
         console.log('Sesión inicializada/cambiada. Actualizando UI y recargando datos...');
-        
+
         // Después de iniciar sesión, las preferencias del usuario se guardan en localStorage.
         // Actualizamos la UI de los controles para que reflejen estas preferencias inmediatamente.
         applyView(localStorage.getItem('noteView') || 'masonry', false);
@@ -633,7 +683,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await sincronizarYcargarDatos();
     });
 
-    
+
     // Inicializar los listeners de los demas archivos
     initGroupManager();
     initNoteEditor();

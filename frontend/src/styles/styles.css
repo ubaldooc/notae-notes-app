@@ -3076,45 +3076,127 @@ body.selection-mode-active .note-card-container.is-selected {
 @media screen and (max-width: 768px) {
     body {
         grid-template-columns: 1fr;
-        /* Una sola columna en móvil */
         grid-template-rows: 60px 1fr;
         grid-template-areas:
             "header"
             "main";
     }
 
+    /* Backdrop del aside */
+    .aside-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    body:not(.aside-collapsed) .aside-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
     /* El aside se convierte en un menú lateral deslizable */
     .aside {
         position: fixed;
-        top: 60px;
+        top: 0;
         left: 0;
         bottom: 0;
-        width: 250px;
+        width: 280px;
         z-index: 2000;
         transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         background: var(--aside-bg);
-        border-right: 2px solid var(--aside-border);
+        border-right: none;
+        padding-top: 20px;
+        box-shadow: none;
     }
 
-    /* Cuando NO está colapsado en móvil, lo mostramos */
     body:not(.aside-collapsed) .aside {
         transform: translateX(0);
-        box-shadow: 10px 0 20px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Ajuste del botón de menú en el aside cuando está en móvil */
-    #aside__menuham {
-        margin-bottom: 15px;
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3);
     }
 
     .main {
         grid-area: main;
     }
 
+    /* Ocultar el botón de añadir nota original en el header móvil */
+    #add-note-btn {
+        display: none;
+    }
+
+    /* Botón de acción flotante (FAB) */
+    .mobile-fab {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--color-2);
+        /* Usamos el azul de la paleta */
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    }
+
+    .mobile-fab:active {
+        transform: scale(0.9);
+    }
+
+    .mobile-fab svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Zona de eliminación para móvil */
+    .mobile-delete-zone {
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        background: rgba(244, 67, 54, 0.1);
+        border: 2px dashed #f44336;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f44336;
+        z-index: 998;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+    }
+
+    .mobile-delete-zone.active {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .mobile-delete-zone.hover {
+        background: #f44336;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(244, 67, 54, 0.4);
+    }
+
+    /* Header adjustments */
     .logo-text {
         display: none;
-        /* Ocultamos el texto del logo para ahorrar espacio */
     }
 
     .header-toolbar {
@@ -3128,12 +3210,6 @@ body.selection-mode-active .note-card-container.is-selected {
     .view-options-label,
     .sort-options-label {
         display: none;
-        /* Ocultamos etiquetas de texto */
-    }
-
-    .view-options-container,
-    .sort-options-container {
-        gap: 0;
     }
 
     .search-container {
@@ -3141,72 +3217,63 @@ body.selection-mode-active .note-card-container.is-selected {
         height: 36px;
     }
 
-    .search-inpt {
-        width: 100%;
-        font-size: 12px;
-    }
-
     .perfil-nombre {
         display: none;
     }
 
-    .header-right-side {
-        margin-right: 10px;
-        gap: 10px;
-    }
-
-    /* Ajustes para las notas en móvil */
+    /* Notas */
     .note-card-container {
         width: calc(100% - 20px) !important;
-        /* Una columna por defecto */
-        margin: 10px 5px !important;
+        margin: 8px 10px !important;
+    }
+
+    .note-card {
+        padding: 12px;
     }
 
     @media (min-width: 480px) {
         .note-card-container {
             width: calc(50% - 14px) !important;
-            /* Dos columnas en pantallas intermedias */
             margin: 7px !important;
         }
     }
 
-    /* Ajuste del editor modal */
+    /* Editor Modal */
     #editor {
         width: 96%;
         height: 96%;
-        padding: 15px;
-    }
-
-    .editor-toolbar {
-        margin-bottom: 10px;
-    }
-
-    .editor-tools-right {
-        column-gap: 10px;
+        padding: 18px;
+        border-radius: 20px;
     }
 
     .editor-title {
-        font-size: 1.2em;
-        margin-bottom: 5px;
+        font-size: 1.4em;
+        margin-bottom: 8px;
     }
 
     .editor-body {
-        font-size: 16px;
-        /* Texto un poco más grande para facilitar la lectura en móvil */
+        font-size: 17px;
+        line-height: 1.6;
     }
 
     .editor-footer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    /* Ajuste de la barra de selección */
+    .search-inpt {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    /* Barra de selección */
     #selection-toolbar {
         flex-direction: column;
         height: auto;
-        padding: 10px;
-        top: -200px;
+        padding: 15px;
+        top: -300px;
+        border-radius: 0 0 20px 20px;
     }
 
     #selection-toolbar.active {
@@ -3216,11 +3283,10 @@ body.selection-mode-active .note-card-container.is-selected {
     #selection-toolbar-buttons {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .selection-toolbar-span {
         display: none;
-        /* Ocultar texto en botones de selección */
     }
 }
