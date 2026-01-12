@@ -13,9 +13,24 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
+// Configuración de CORS más flexible
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:3000'
+].filter(Boolean).map(url => url.replace(/\/$/, "")); // Eliminar barra diagonal final si existe
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true, // Permite que el frontend envíe cookies
+  origin: function (origin, callback) {
+    // console.log('Petición desde origen:', origin);
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      callback(null, true);
+    } else {
+      console.error(`Bloqueo CORS: El origen ${origin} no está en la lista blanca:`, allowedOrigins);
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true,
   optionsSuccessStatus: 200
 };
 
