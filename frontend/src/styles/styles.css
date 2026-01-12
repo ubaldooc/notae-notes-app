@@ -2885,211 +2885,6 @@ body.selection-mode-active .note-card-container.is-selected {
 
 
 
-:root {
-    /* Colores principales y sus variaciones */
-    --color-1: #4CAF50;
-    /* Verde */
-    --color-2: #2196F3;
-    /* Azul */
-    --color-3: #FFC107;
-    /* Amarillo */
-    --color-4: #FF5722;
-    /* Naranja */
-    --color-5: #E91E63;
-    /* Rosa */
-    --color-6: #9C27B0;
-    /* Púrpura */
-    --color-7: #00BCD4;
-    /* Cian */
-    --color-8: #673AB7;
-    /* Índigo */
-    --color-9: #FFEB3B;
-    /* Amarillo brillante */
-    --color-10: #795548;
-    /* Marrón */
-    --color-11: #F44336;
-    /* Rojo */
-    --color-12: #3F51B5;
-    /* Azul oscuro */
-
-    /* Paleta de colores adicional */
-    --color-pink-hot: #FF69B4;
-    --color-red: #FF0000;
-    --color-orange: #FFA500;
-    --color-yellow: #FFFF00;
-    --color-green-yellow: #ADFF2F;
-    --color-green: #008000;
-    --color-cyan: #00FFFF;
-    --color-blue: #0000FF;
-    --color-blue-violet: #8A2BE2;
-    --color-violet: #EE82EE;
-    --color-black: #000000;
-
-    /* Más colores y sus variantes */
-    --color-magenta-bright: #FF00FF;
-    --color-deep-pink: #FF1493;
-    --color-gold: #FFD700;
-    --color-lime-green: #32CD32;
-    --color-emerald-green: #2ECC71;
-    --color-teal: #008080;
-    --color-sky-blue: #3498DB;
-    --color-royal-blue: #00008B;
-    --color-purple-vivid: #8A2BE2;
-    /* Nota: Duplicado con --color-blue-violet en valor hexadecimal */
-    --color-chocolate: #D2691E;
-    --color-burgundy: #800020;
-    --color-coral: #FF7F50;
-    --color-crimson: #DC143C;
-    --color-rose-pastel: #F8BBD0;
-    --color-tangerine: #FFA07A;
-    --color-lime: #00FF00;
-    --color-lemon-pastel: #FFFACD;
-    --color-emerald: #50C878;
-    --color-sky-blue-alt: #87CEEB;
-    /* Alternativa para cielo azul */
-    --color-navy: #000080;
-    --color-lavender-pastel: #E6E6FA;
-    --color-indigo: #4B0082;
-    --color-sienna: #A0522D;
-    --color-pure-red: #FF0000;
-    /* Nota: Duplicado con --color-red en valor hexadecimal */
-    --color-pure-green: #008000;
-    /* Nota: Duplicado con --color-green en valor hexadecimal */
-
-    /* Colores con nombres en español */
-    --verde: #4CAF50;
-    /* Duplicado con --color-1 */
-    --azul: #2196F3;
-    /* Duplicado con --color-2 */
-    --amarillo: #FFC107;
-    /* Duplicado con --color-3 */
-    --naranja: #FF5722;
-    /* Duplicado con --color-4 */
-    --rosa: #E91E63;
-    /* Duplicado con --color-5 */
-    --purpura: #9C27B0;
-    /* Duplicado con --color-6 */
-    --cian: #00BCD4;
-    /* Duplicado con --color-7 */
-    --indigo-esp: #673AB7;
-    /* Indigo con nombre en español, valor diferente a --color-8 */
-    --amarillo-brillante: #FFEB3B;
-    /* Duplicado con --color-9 */
-    --marron: #795548;
-    /* Duplicado con --color-10 */
-    --rojo: #F44336;
-    /* Duplicado con --color-11 */
-    --azul-oscuro: #3F51B5;
-    /* Duplicado con --color-12 */
-
-    /* Paleta de colores con nombres en español y otros nombres */
-    --rosa-brillante: #FF69B4;
-    /* Duplicado con --color-pink-hot */
-    --rojo-esp: #FF0000;
-    /* Duplicado con --color-red */
-    --naranja-esp: #FFA500;
-    /* Duplicado con --color-orange */
-    --amarillo-esp: #FFFF00;
-    /* Duplicado con --color-yellow */
-    --verde-lima: #ADFF2F;
-    /* Duplicado con --color-green-yellow */
-    --verde-esp: #008000;
-    /* Duplicado con --color-green */
-    --cian-esp: #00FFFF;
-    /* Duplicado con --color-cyan */
-    --azul-esp: #0000FF;
-    /* Duplicado con --color-blue */
-    --violeta-azulado: #8A2BE2;
-    /* Duplicado con --color-blue-violet */
-    --violeta-esp: #EE82EE;
-    /* Duplicado con --color-violet */
-    --negro: #000000;
-    /* Duplicado con --color-black */
-    --rojo-claro: #E74C3C;
-    --rojo-oscuro: #C0392B;
-    --magenta: #FF00FF;
-    /* Duplicado con --color-magenta-bright */
-    --rosa-profundo: #FF1493;
-    /* Duplicado con --color-deep-pink */
-    --naranja-oscuro: #F39C12;
-    --verde-claro: #32CD32;
-    /* Duplicado con --color-lime-green */
-    --verde-esmeralda: #2ECC71;
-    /* Duplicado con --color-emerald-green */
-    --verde-azulado: #008080;
-    /* Duplicado con --color-teal */
-    --azul-claro: #3498DB;
-    /* Duplicado con --color-sky-blue */
-    --azul-marino: #00008B;
-    /* Duplicado con --color-royal-blue */
-    --indigo-esp-alt: #4B0082;
-    /* Indigo con nombre en español, valor diferente a --color-8 y --indigo-esp */
-    --chocolate: #D2691E;
-    /* Duplicado con --color-chocolate */
-    --borgoña: #800020;
-    /* Duplicado con --color-burgundy */
-    --coral-claro: #FF7F50;
-    /* Duplicado con --color-coral */
-    --carmesí: #DC143C;
-    /* Duplicado con --color-crimson */
-    --rosa-pálido: #F8BBD0;
-    /* Duplicado con --color-rose-pastel */
-    --salmón-claro: #FFA07A;
-    /* Duplicado con --color-tangerine */
-    --dorado: #FFD700;
-    /* Duplicado con --color-gold */
-    --verde-brillante: #00FF00;
-    /* Duplicado con --color-lime */
-    --blanco-crema: #FFFACD;
-    /* Duplicado con --color-lemon-pastel */
-    --azul-cielo: #87CEEB;
-    /* Duplicado con --color-sky-blue-alt */
-    --azul-marino-profundo: #000080;
-    /* Duplicado con --color-navy */
-    --lavanda: #E6E6FA;
-    /* Duplicado con --color-lavender-pastel */
-    --marrón-claro: #A0522D;
-    /* Duplicado con --color-sienna */
-
-    /* Colores para usar con data-color */
-    --color-option-FFC0CB: #FFC0CB;
-    --color-option-FF69B4: #FF69B4;
-    /* Duplicado con --color-pink-hot y --rosa-brillante */
-    --color-option-FF0000: #FF0000;
-    /* Duplicado con --color-red y --rojo-esp */
-    --color-option-FFA500: #FFA500;
-    /* Duplicado con --color-orange y --naranja-esp */
-    --color-option-FFFF00: #FFFF00;
-    /* Duplicado con --color-yellow y --amarillo-esp */
-    --color-option-ADFF2F: #ADFF2F;
-    /* Duplicado con --color-green-yellow y --verde-lima */
-    --color-option-008000: #008000;
-    /* Duplicado con --color-green y --verde-esp */
-    --color-option-00FFFF: #00FFFF;
-    /* Duplicado con --color-cyan y --cian-esp */
-    --color-option-0000FF: #0000FF;
-    /* Duplicado con --color-blue y --azul-esp */
-    --color-option-8A2BE2: #8A2BE2;
-    /* Duplicado con --color-blue-violet y --violeta-azulado */
-    --color-option-EE82EE: #EE82EE;
-    /* Duplicado con --color-violet y --violeta-esp */
-    --color-option-800080: #800080;
-    /* Duplicado con --color-purple-vivid */
-    --color-option-A52A2A: #A52A2A;
-    --color-option-808080: #808080;
-    --color-option-000000: #000000;
-    /* Duplicado con --color-black y --negro */
-    --color-option-FFFFFF: #FFFFFF;
-}
-
-
-
-
-
-
-
-
-
 
 
 @media screen and (max-width: 768px) {
@@ -3233,14 +3028,23 @@ body.selection-mode-active .note-card-container.is-selected {
 
     /* Header adjustments */
     .header {
-        padding: 0 12px;
-        height: 60px;
+        padding: 0 8px;
+        height: 56px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         width: 100%;
     }
 
+    .logo {
+        height: 34px !important;
+    }
+
     #aside__menuham {
-        margin-right: 5px;
+        margin-right: 2px;
+    }
+
+    #aside__menuham svg {
+        height: 24px;
+        width: 24px;
     }
 
     .logo-text,
@@ -3252,29 +3056,29 @@ body.selection-mode-active .note-card-container.is-selected {
     }
 
     .header-toolbar {
-        gap: 12px;
+        gap: 4px;
         flex: 1;
         min-width: 0;
         justify-content: space-evenly;
-        padding: 0 10px;
+        padding: 0 4px;
         overflow: visible;
     }
 
     .header-toolbar svg {
-        height: 30px;
+        height: 22px;
         flex-shrink: 0;
     }
 
     .search-container {
         flex: 1;
-        max-width: 220px;
-        min-width: 60px;
-        height: 40px;
-        border-radius: 12px;
-        padding: 0 10px;
+        max-width: 100px;
+        min-width: 40px;
+        height: 36px;
+        border-radius: 10px;
+        padding: 0 6px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
     }
 
     .search-inpt {
@@ -3291,13 +3095,13 @@ body.selection-mode-active .note-card-container.is-selected {
 
     .header-right-side {
         margin-right: 0;
-        gap: 10px;
+        gap: 6px;
         flex-shrink: 0;
     }
 
     .perfil-img {
-        height: 38px;
-        width: 38px;
+        height: 32px;
+        width: 32px;
         flex-shrink: 0;
     }
 
