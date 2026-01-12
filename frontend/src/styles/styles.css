@@ -12,7 +12,9 @@ body {
     height: 100%;
     height: 100dvh;
     width: 100%;
-    overflow: hidden;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .header,
@@ -392,8 +394,7 @@ header * {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    column-gap: 14px;
-    /* margin-left: 10px; */
+    column-gap: 8px;
 }
 
 .logo {
@@ -3234,29 +3235,45 @@ body.selection-mode-active .note-card-container.is-selected {
     }
 
     .logo-text,
-    .perfil-arrow {
-        display: none;
+    .perfil-arrow,
+    .add-note-text,
+    .view-options-label,
+    .sort-options-label {
+        display: none !important;
     }
 
     .header-toolbar {
-        gap: 12px;
-        flex-grow: 1;
-        justify-content: space-around;
-        padding: 0 10px;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        padding: 0 2px;
+        overflow: hidden;
+    }
+
+    .header-toolbar svg {
+        height: 28px !important;
+        flex-shrink: 0;
     }
 
     .search-container {
-        max-width: 160px;
-        min-width: 80px;
-        height: 40px;
-        border-radius: 12px;
-        padding: 0 12px;
+        flex: 1;
+        max-width: 140px;
+        min-width: 40px;
+        height: 36px;
+        border-radius: 10px;
+        padding: 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     .search-inpt {
-        font-size: 15px;
-        margin-left: 6px;
-        width: 100%;
+        font-size: 14px;
+        margin-left: 0;
+        flex: 1;
+        min-width: 0;
+        width: auto;
     }
 
     .perfil-nombre {
@@ -3265,7 +3282,23 @@ body.selection-mode-active .note-card-container.is-selected {
 
     .header-right-side {
         margin-right: 0;
-        gap: 10px;
+        gap: 4px;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .perfil-img {
+        height: 36px !important;
+        width: 36px !important;
+        flex-shrink: 0;
+    }
+
+    .view-option-btn {
+        padding: 2px;
+    }
+
+    .sort-trigger-btn {
+        padding: 4px;
     }
 
     /* Notas */
@@ -3284,14 +3317,18 @@ body.selection-mode-active .note-card-container.is-selected {
         font-size: 19px;
         margin-bottom: 12px;
         max-height: none;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .note-body {
         font-size: 15px;
         line-height: 1.5;
         height: auto;
-        --max-lines: 6;
+        --max-lines: 8;
         max-height: calc(var(--max-lines) * 1.5em);
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     @media (min-width: 480px) {
@@ -3335,9 +3372,12 @@ body.selection-mode-active .note-card-container.is-selected {
     #selection-toolbar {
         flex-direction: column;
         height: auto;
-        padding: 20px;
-        top: -400px;
-        border-radius: 0 0 25px 25px;
+        padding: 15px;
+        top: -500px;
+        left: 0;
+        transform: none;
+        width: 100%;
+        border-radius: 0 0 20px 20px;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
     }
 
