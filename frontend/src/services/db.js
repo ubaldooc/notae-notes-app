@@ -2,9 +2,9 @@
 // ESTE ES EL ARCHIVO QUE CONTIENE LAS FUNCIONES PARA MANEJAR LAS NOTAS CON INDEXEDDB
 
 import Dexie from 'dexie';
-import { 
+import {
   syncNoteWithBackend, deleteNoteFromBackend, moveNoteToTrashInBackend, restoreNoteFromBackend, emptyTrashInBackend, updateNotesOrderInBackend,
-  createGroupInBackend, deleteGroupFromBackend, updateGroupInBackend, updateGroupsOrderInBackend 
+  createGroupInBackend, deleteGroupFromBackend, updateGroupInBackend, updateGroupsOrderInBackend
 } from './api.js';
 import { validarORestauraNotaJSON } from '../utils.js';
 
@@ -22,15 +22,14 @@ export const initDb = async (userId) => {
   if (db) {
     // Si hay una conexión existente, la cerramos antes de cambiar.
     db.close();
-    console.log(`Base de datos de la sesión anterior cerrada.`);
   }
 
   // Usamos un nombre de base de datos dinámico para cada usuario para asegurar el aislamiento.
   const dynamicDbName = userId ? `${dbName}_${userId}` : `${dbName}_guest`;
   console.log(`Inicializando base de datos: ${dynamicDbName}`);
-  
+
   db = new Dexie(dynamicDbName);
-  
+
   // Definimos el esquema. Añadimos índices para los campos por los que consultamos u ordenamos.
   db.version(1).stores({
     [notesStoreName]: 'id, groupId, status, updatedAt, customOrder', // 'id' es la clave primaria, los demás son índices
@@ -292,13 +291,13 @@ const vaciarPapeleraEnDB = async () => {
 // OPCIONAL
 // Opcional: Función para buscar notas por grupo (si necesitas)
 const obtenerNotasPorGrupoDesdeDB = async (groupId) => {
-    try {
-        const db = getDb();
-        return await db[notesStoreName].where('groupId').equals(groupId).toArray();
-    } catch (error) {
-        console.error(`Error al obtener notas del grupo ${groupId}:`, error);
-        return [];
-    }
+  try {
+    const db = getDb();
+    return await db[notesStoreName].where('groupId').equals(groupId).toArray();
+  } catch (error) {
+    console.error(`Error al obtener notas del grupo ${groupId}:`, error);
+    return [];
+  }
 };
 
 // 3. Funciones para interactuar con los GRUPOS
@@ -446,57 +445,56 @@ export const actualizarOrdenNotasEnDB = async (notasActualizadas) => {
  */
 const buscarYCorregirDuplicados = async (storeName) => {
   try {
-      const db = getDb();
-      const table = db[storeName];
+    const db = getDb();
+    const table = db[storeName];
 
-      console.log(`Iniciando la búsqueda de duplicados en la tabla "${storeName}"...`);
+    console.log(`Iniciando la búsqueda de duplicados en la tabla "${storeName}"...`);
 
-      const todosLosItems = await table.toArray();
-      const itemsAgrupadosPorId = new Map();
+    const todosLosItems = await table.toArray();
+    const itemsAgrupadosPorId = new Map();
 
-      // 1. Agrupar todos los items por su 'id'
-      for (const item of todosLosItems) {
-          if (!itemsAgrupadosPorId.has(item.id)) {
-              itemsAgrupadosPorId.set(item.id, []);
-          }
-          itemsAgrupadosPorId.get(item.id).push(item);
+    // 1. Agrupar todos los items por su 'id'
+    for (const item of todosLosItems) {
+      if (!itemsAgrupadosPorId.has(item.id)) {
+        itemsAgrupadosPorId.set(item.id, []);
       }
+      itemsAgrupadosPorId.get(item.id).push(item);
+    }
 
-      const idsParaEliminar = [];
+    const idsParaEliminar = [];
 
-      // 2. Encontrar los duplicados y decidir cuáles eliminar
-      for (const [id, items] of itemsAgrupadosPorId.entries()) {
-          if (items.length > 1) {
-              console.warn(`Se encontró un ID duplicado: "${id}" con ${items.length} entradas.`);
+    // 2. Encontrar los duplicados y decidir cuáles eliminar
+    for (const [id, items] of itemsAgrupadosPorId.entries()) {
+      if (items.length > 1) {
+        console.warn(`Se encontró un ID duplicado: "${id}" con ${items.length} entradas.`);
 
-              // Ordenar por fecha de creación para encontrar el más antiguo.
-              items.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        // Ordenar por fecha de creación para encontrar el más antiguo.
+        items.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-              // Conservamos el último elemento (el más reciente) y marcamos los otros para eliminar.
-              const itemsAEliminar = items.slice(0, -1);
-              idsParaEliminar.push(...itemsAEliminar.map(item => item.id));
+        // Conservamos el último elemento (el más reciente) y marcamos los otros para eliminar.
+        const itemsAEliminar = items.slice(0, -1);
+        idsParaEliminar.push(...itemsAEliminar.map(item => item.id));
 
-              console.log(` - Se conservará la versión de: ${new Date(items[items.length - 1].createdAt).toLocaleString()}`);
-              console.log(` - Se eliminarán ${itemsAEliminar.length} versiones antiguas.`);
-          }
+        console.log(` - Se conservará la versión de: ${new Date(items[items.length - 1].createdAt).toLocaleString()}`);
+        console.log(` - Se eliminarán ${itemsAEliminar.length} versiones antiguas.`);
       }
+    }
 
-      // 3. Eliminar los duplicados antiguos si se encontraron
-      if (idsParaEliminar.length > 0) {
-          console.log(`Eliminando ${idsParaEliminar.length} registros duplicados antiguos...`);
-          await table.bulkDelete(idsParaEliminar);
-          console.log('¡Corrección de duplicados completada!');
-      } else {
-          console.log(`No se encontraron duplicados en "${storeName}". ¡Todo en orden!`);
-      }
+    // 3. Eliminar los duplicados antiguos si se encontraron
+    if (idsParaEliminar.length > 0) {
+      console.log(`Eliminando ${idsParaEliminar.length} registros duplicados antiguos...`);
+      await table.bulkDelete(idsParaEliminar);
+      console.log('¡Corrección de duplicados completada!');
+    } else {
+    }
   } catch (error) {
-      console.error(`Error al buscar y corregir duplicados en "${storeName}":`, error);
+    console.error(`Error al buscar y corregir duplicados en "${storeName}":`, error);
   }
 };
 
 
 
-export { 
+export {
   guardarNotaEnDB, cargarNotasDesdeDB, obtenerNotasPorGrupoDesdeDB,
   guardarGrupoEnDB, cargarGruposDesdeDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB, actualizarOrdenGruposEnDB, buscarYCorregirDuplicados,
   obtenerNotaPorIdDesdeDB,
@@ -529,30 +527,29 @@ export {
 // Función para añadir 20 notas de ejemplo a la base de datos
 const agregar20NotasEjemplo = async () => {
   try {
-      const db = await getDb();
-      const notasParaAgregar = [];
+    const db = await getDb();
+    const notasParaAgregar = [];
 
-      for (let i = 1; i <= 20; i++) {
-          const notaEjemplo = {
-              // id: `id-${Date.now()}-${i}`, // Genera un ID único para cada nota
-              id: `note-test-${Date.now()}-${i}`, // Genera un ID único para cada nota
-              title: `Mi nota prrona ${i}`,
-              body: `Texto aquí texto allá, muévelo alv para la nota número ${i}.`,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              charCount: 20 + i,
-              pinned: i % 2 === 0,
-              groupId: "group-test-99999"
-          };
-          notasParaAgregar.push(notaEjemplo);
-      }
+    for (let i = 1; i <= 20; i++) {
+      const notaEjemplo = {
+        // id: `id-${Date.now()}-${i}`, // Genera un ID único para cada nota
+        id: `note-test-${Date.now()}-${i}`, // Genera un ID único para cada nota
+        title: `Mi nota prrona ${i}`,
+        body: `Texto aquí texto allá, muévelo alv para la nota número ${i}.`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        charCount: 20 + i,
+        pinned: i % 2 === 0,
+        groupId: "group-test-99999"
+      };
+      notasParaAgregar.push(notaEjemplo);
+    }
 
-      // Usa bulkPut() para añadir todas las notas de golpe
-      await db[notesStoreName].bulkPut(notasParaAgregar);
-      console.log('20 notas añadidas exitosamente a la base de datos.');
+    // Usa bulkPut() para añadir todas las notas de golpe
+    await db[notesStoreName].bulkPut(notasParaAgregar);
 
   } catch (error) {
-      console.error('Error al añadir las notas de ejemplo:', error);
+    console.error('Error al añadir las notas de ejemplo:', error);
   }
 };
 
@@ -566,11 +563,10 @@ const agregar20NotasEjemplo = async () => {
 // Función para eliminar todas las notas de la base de datos
 const eliminarTodasLasNotasDeDB = async () => {
   try {
-      const db = await getDb();
-      await db[notesStoreName].clear();
-      console.log('Todas las notas han sido eliminadas exitosamente de la base de datos.');
+    const db = await getDb();
+    await db[notesStoreName].clear();
   } catch (error) {
-      console.error('Error al eliminar todas las notas:', error);
+    console.error('Error al eliminar todas las notas:', error);
   }
 };
 

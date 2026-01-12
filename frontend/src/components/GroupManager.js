@@ -3,8 +3,10 @@ import DOMPurify from 'dompurify';
 import Sortable from 'sortablejs';
 
 
-import { guardarGrupoEnDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB, actualizarOrdenGruposEnDB, 
-        obtenerNotaPorIdDesdeDB, guardarNotaEnDB } from '../services/db.js';
+import {
+    guardarGrupoEnDB, eliminarGrupoDeDB, actualizarPropiedadesGrupoEnDB, actualizarOrdenGruposEnDB,
+    obtenerNotaPorIdDesdeDB, guardarNotaEnDB
+} from '../services/db.js';
 
 import { colorearActualizarGrupoEditor } from './NoteEditor.js';
 
@@ -42,7 +44,7 @@ const editorUnpinnedIcon = document.getElementById("editor-unpinned");
 const editorSaveNote = document.getElementById("editor-save-btn");
 const guardarEditorNoteBtn = document.querySelector(".editor-save-btn");
 
-const editorTitle = document.getElementById("editor-title");   
+const editorTitle = document.getElementById("editor-title");
 const editorBody = document.getElementById("editor-body");
 const editorCreation = document.getElementById("editor-creation");
 const editorLastMod = document.getElementById("editor-last-mod");
@@ -143,10 +145,10 @@ export const inicializarDragAndDropGrupos = () => {
                     // creando un nuevo array ordenado.
                     const { groups } = store.getState();
                     const groupMap = new Map(groups.map(g => [g.id, g]));
-                    
+
                     // Creamos un nuevo array de grupos en el orden correcto.
                     const reorderedGroups = items.map(item => groupMap.get(item.id))
-                                                 .filter(Boolean); // Filtramos por si algún grupo no se encontrara
+                        .filter(Boolean); // Filtramos por si algún grupo no se encontrara
 
                     store.dispatch({ type: 'SET_DATA', payload: { notes: store.getState().notes, groups: reorderedGroups } });
                 } catch (error) {
@@ -291,7 +293,7 @@ export const renombrarGrupo = (groupID) => {
     });
 
     nameTarget.contentEditable = true;
-    
+
     const grupoActivo = document.querySelector(".notes-group.active");
 
     // si te da problemas o tirones al renombrar un grupo, puedes intentar quitando el setTimeout.
@@ -335,7 +337,7 @@ export const cambiarColorGrupo = (groupID) => {
     colorDropdown.style.position = "absolute";
     colorDropdown.style.top = `calc(${rect.top + window.scrollY}px - 126px)`;
     colorDropdown.style.left = `calc(${rect.left + window.scrollX}px + 16px)`;
-    
+
 
     colorDropdown.addEventListener("click", async (event) => {
         if (event.target.classList.contains("color-option")) {
@@ -370,7 +372,7 @@ export const cambiarColorGrupo = (groupID) => {
 // ELIMINAR GRUPO
 export const eliminarGrupo = (identificadorGrupo) => {
     const groupID = validarIDOConvertirElemento(identificadorGrupo);
-    
+
     if (!groupID) {
         console.error("No se pudo obtener un ID de grupo válido. La operación de eliminación ha sido cancelada.");
         return;
@@ -510,7 +512,6 @@ export const opcionesGrupo = (groupID) => {
         // 1. Llama a la función de desuscripción si existe.
         if (unsubscribeFromStore) {
             unsubscribeFromStore();
-            console.log(`Dropdown para el grupo ${targetGroupId} se ha desuscrito del store.`);
         }
         groupOptionsDropdown.classList.remove("active");
         groupOptionsDropdown.remove();
@@ -524,14 +525,12 @@ export const opcionesGrupo = (groupID) => {
         const groupFromState = currentState.groups.find(g => g.id === targetGroupId);
         // Si el grupo ya no existe en el estado (porque fue eliminado), cerramos el dropdown.
         if (!groupFromState) {
-            console.log(`El grupo ${targetGroupId} fue eliminado. Cerrando su dropdown de opciones.`);
             closeAndRemoveDropdown();
         }
         // Aquí podrías añadir lógica para actualizar el contenido del dropdown si cambiara,
         // por ejemplo, si una opción dependiera del nombre del grupo.
     });
 
-    console.log(`Dropdown para el grupo ${targetGroupId} se ha suscrito al store.`);
 
     const handleOptionClick = (event) => {
         const selectedOptionElement = event.target.closest(".group-option");
@@ -558,7 +557,7 @@ export const opcionesGrupo = (groupID) => {
                 //     // console.log("Acción para bajar grupo");
                 //     break;
                 default:
-                    // console.log("Opción no reconocida");
+                // console.log("Opción no reconocida");
             }
             closeAndRemoveDropdown();
         }
@@ -623,7 +622,7 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
         isForNote = false;
         targetID = 'editor';
     }
-    
+
     const currentContextId = isForNote ? targetID : 'editor';
 
     if (currentVisibleDropdown && currentDropdownTargetId === currentContextId) {
@@ -685,7 +684,6 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
                     await guardarNotaEnDB(notaActualizada);
                     // Actualizamos el store. Esto disparará la actualización de la UI.
                     store.dispatch({ type: 'UPSERT_NOTE', payload: notaActualizada });
-                    console.log(`Nota ${noteId} actualizada con nuevo groupId: ${selectedGroupId}`);
                 } else {
                     console.error(`No se encontró la nota con ID ${noteId} para actualizar.`);
                 }
@@ -723,7 +721,7 @@ export const dropdownCambiarGroup = (noteID_or_editorFlag) => {
     });
 
     // console.log(isForNote, targetID);
-    
+
     if (isForNote && targetID && !editor.classList.contains("active")) {
         const targetNote = document.getElementById(targetID);
         if (targetNote) {
@@ -791,7 +789,6 @@ document.addEventListener("click", (event) => {
         if (noteCardContainer && !noteCardContainer.classList.contains('is-trashed')) {
             dropdownCambiarGroup(noteCardContainer.id);
         } else if (!noteCardContainer) {
-            console.log("No se pudo encontrar el contenedor de la nota.");
         }
     }
 
@@ -799,9 +796,9 @@ document.addEventListener("click", (event) => {
         const noteCardEditorId = editor.dataset.noteId;
         const elementoEnDOM = document.getElementById(noteCardEditorId);
         if (elementoEnDOM) {
-          dropdownCambiarGroup(noteCardEditorId);
+            dropdownCambiarGroup(noteCardEditorId);
         } else {
-          dropdownCambiarGroup(null);
+            dropdownCambiarGroup(null);
         }
     }
 });
@@ -820,15 +817,15 @@ document.addEventListener("click", (event) => {
 
 // INICIALIZAR LISTENERS DE ESTE ARCHIVO
 export const initGroupManager = () => {
-    
-        // Botón de añadir grupo
+
+    // Botón de añadir grupo
     const addGroupButton = document.querySelector(".aside__add-group__box");
     if (addGroupButton) {
         addGroupButton.addEventListener("click", crearGrupo);
     };
 
 
-        // Dropdown de color de grupo
+    // Dropdown de color de grupo
     document.addEventListener("click", (event) => {
         if (event.target.classList.contains("group-color-selector")) {
             const contenedorPadre = event.target.parentElement.id;
@@ -837,7 +834,7 @@ export const initGroupManager = () => {
     });
 
 
-        // Dropdown de opciones de grupo
+    // Dropdown de opciones de grupo
     document.addEventListener("click", (event) => {
         const svgTarget = event.target.closest(".groupOptionsSVG");
 
@@ -860,5 +857,5 @@ export const initGroupManager = () => {
 
 
     console.log("GroupManager incializado");
-    
+
 };

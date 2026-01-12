@@ -40,7 +40,7 @@ export const handleFilter = (groupId) => {
     const filterSelector = (!groupId || groupId === 'all' || groupId === '.muuri-item' || groupId === 'null' || groupId === null || groupId === undefined)
         ? item => item.getElement().matches('.note-card-container:not(.is-trashed)') // Filtra todo lo que no esté en la papelera
         : `[data-group-id="${groupId}"]`;
-    
+
     // 1. Primero, mostramos todas las notas (excepto las de la papelera) para "resetear" el layout.
     // Esto ayuda a evitar que las notas aparezcan en lugares extraños al cambiar entre grupos.
     const allNotesSelector = item => item.getElement().matches('.note-card-container:not(.is-trashed)');
@@ -50,7 +50,7 @@ export const handleFilter = (groupId) => {
     // Tengo que aplicar este filtro primero porque sin el las notas salen desordenadas y en lugares extraños solitarias
     gridPinned.filter("muuri", { instant: true });
     gridUnpinned.filter("muuri", { instant: true });
-    
+
     requestAnimationFrame(() => {
         // Aplicamos el filtro del grupo seleccionado.
         gridPinned.filter(filterSelector);
@@ -77,7 +77,7 @@ const showTrashView = async () => {
     trashViewContainer.style.display = 'block';
 
     const emptyTrashBtn = document.getElementById('empty-trash-btn');
-    
+
     // Limpiar el grid de la papelera antes de añadir nuevos elementos
     if (gridTrash.getItems().length > 0) {
         gridTrash.remove(gridTrash.getItems(), { removeElements: true });
@@ -167,7 +167,7 @@ const showMainView = () => {
     // Mostrar los grids principales
     document.getElementById('pinned-notes-container').style.display = ''; // Usar '' para volver al estilo por defecto de CSS
     document.getElementById('unpinned-notes-container').style.display = '';
-    
+
     // Forzar un relayout para evitar problemas visuales
     if (gridPinned) gridPinned.refreshItems().layout();
     if (gridUnpinned) gridUnpinned.refreshItems().layout();
@@ -195,7 +195,6 @@ export const initFilters = (grids) => {
         const pinnedNotesContainer = document.getElementById('pinned-notes-container');
         pinnedNotesContainer.style.marginBottom = visibleItemPinnedCount > 0 ? '60px' : '0px';
 
-        console.log(`Visible items count: ${visibleItemPinnedCount} pinned, ${visibleItemUnpinnedCount} unpinned`); // Log for debugging
 
         const noNotesMessage = document.getElementById('no-notes-message');
         if (noNotesMessage) {
@@ -226,7 +225,7 @@ export const initFilters = (grids) => {
         });
         // Después de filtrar, es crucial re-ordenar y recalcular el layout.
         // Obtenemos la función de ordenamiento actual para no resetear la preferencia del usuario
-        const currentSortFunction = getSortFunction(); 
+        const currentSortFunction = getSortFunction();
         if (currentSortFunction) { // Solo ordenamos si la función es válida
             grid.sort(currentSortFunction, { layout: 'instant' });
         }
@@ -263,7 +262,7 @@ export const initFilters = (grids) => {
     // Filtrar notas por grupo
     const parentContainer = document.querySelector('.aside-container');
     if (parentContainer) {
-        parentContainer.addEventListener('click', (event) => {            
+        parentContainer.addEventListener('click', (event) => {
             const clickedElement = event.target;
 
             if (
@@ -273,7 +272,7 @@ export const initFilters = (grids) => {
             ) {
                 return;
             }
-            
+
             const groupButton = clickedElement.closest('.notes-group');
             const allNotesButton = clickedElement.closest('.aside__all-notes');
             const trashButton = clickedElement.closest('.aside__trash-bin__box');
@@ -293,5 +292,4 @@ export const initFilters = (grids) => {
             }
         });
     }
-    console.log("FilterManager inicializado.");
 };

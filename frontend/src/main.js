@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // La lógica de inicialización ahora espera a que el SessionManager
     // termine de configurar la sesión y la UI del Header.
     document.addEventListener('initial-ui-load-complete', async () => {
-        console.log('Carga inicial completa. Sincronizando y renderizando datos...');
         await sincronizarYcargarDatos();
     });
 
@@ -203,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Acción para "Cancelar" (deshace el arrastre)
         const cancelDrag = () => {
-            console.log("Cancelando cambio de orden y revirtiendo el arrastre.");
             const currentSortOrder = localStorage.getItem('noteSortOrder') || 'newest';
             applySort(currentSortOrder, false); // Re-aplica el orden actual para revertir el arrastre.
         };
@@ -223,7 +221,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Necesitamos saber qué botón se presionó.
             onConfirm: async () => {
                 if (document.activeElement === setNewOrderBtn) {
-                    console.log("Estableciendo la vista actual como el nuevo orden personalizado...");
                     const allItems = gridPinned.getItems().concat(gridUnpinned.getItems());
                     const notasParaActualizar = allItems.map((item, index) => ({ id: item.getElement().id, order: index }));
                     if (notasParaActualizar.length > 0) await actualizarOrdenNotasEnDB(notasParaActualizar);
@@ -231,7 +228,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     updateSortButtonUI();
                     if (localStorage.getItem('user')) updateUserPreferencesInBackend({ noteSortOrder: 'custom' }).catch(console.warn);
                 } else if (document.activeElement === switchToOrderBtn) {
-                    console.log("Cambiando a modo 'Personalizado' y cargando el orden guardado...");
                     applySort('custom');
                 }
             },
@@ -261,11 +257,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Comprobamos si el orden realmente cambió para evitar escrituras innecesarias en la DB.
             if (JSON.stringify(initialDragOrder) === JSON.stringify(finalOrderIds)) {
-                console.log("El orden personalizado no cambió. No se guarda.");
                 return;
             }
 
-            console.log('Guardando orden personalizado...');
             const allItems = gridPinned.getItems().concat(gridUnpinned.getItems());
             const notasParaActualizar = allItems.map((item, index) => {
                 const element = item.getElement();
@@ -285,7 +279,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (JSON.stringify(initialDragOrder) !== JSON.stringify(finalOrderIds)) {
                 showCustomOrderModal(item.getElement());
             } else {
-                console.log("La nota volvió a su posición original. No se muestra el modal.");
             }
         }
         // Limpiamos el array para la próxima operación de arrastre.
@@ -360,7 +353,6 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Se utiliza al cambiar de usuario o al cerrar sesión.
      */
     const limpiarUI = () => {
-        console.log("Limpiando la interfaz de usuario...");
         gridPinned.remove(gridPinned.getItems(), { removeElements: true });
         gridUnpinned.remove(gridUnpinned.getItems(), { removeElements: true });
 
@@ -379,7 +371,6 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Esta función se suscribirá a los cambios del store.
      */
     const renderAppFromState = (currentState) => {
-        console.log("Renderizando la aplicación desde el estado del store...", currentState);
         const { notes, groups, user, isTrashVisible } = currentState;
 
         // --- 1. CÁLCULO DE DIFERENCIAS (QUÉ CAMBIÓ) ---
@@ -517,7 +508,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const noNotesMessage = document.getElementById('no-notes-message');
 
         try {
-            console.log('Iniciando sincronización y carga de datos...');
 
             // Helper para ejecutar promesas de forma segura, devolviendo un valor por defecto en caso de error.
             // Esto hace que la carga inicial sea más robusta frente a fallos de red o del backend.
@@ -550,7 +540,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sincronizarEntidades = (localMap, backendMap, localSaveFn, backendCreateFn, backendUpdateFn) => {
                 // Si no hay sesión, no hay nada que sincronizar con el backend.
                 if (!user) {
-                    console.log("Modo invitado: Omitiendo sincronización con el backend.");
                     return;
                 }
 
@@ -599,11 +588,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 5. Ejecutar todas las promesas de sincronización en segundo plano.
             Promise.all(syncPromises).then(() => {
-                console.log('Sincronización en segundo plano completada.');
             }).catch(err => {
                 console.error("Ocurrió un error durante la sincronización en segundo plano:", err);
             });
-            console.log('Sincronización completada.');
 
             // 5.5 (Paso de Recuperación): Asegurarse de que todas las notas tengan un estado válido.
             // Esto "recupera" notas antiguas que podrían no tener el campo 'status'.
@@ -651,7 +638,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 8. Inicializar funcionalidades.
             inicializarDragAndDropGrupos();
-            console.log('Drag and drop de grupos inicializado.');
         } catch (error) {
             console.error('Error CRÍTICO durante la carga y sincronización inicial de datos:', error);
             // Aquí se podría mostrar un mensaje al usuario de que la app podría no funcionar correctamente.

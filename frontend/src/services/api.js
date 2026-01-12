@@ -8,7 +8,7 @@ const API_URL = process.env.API_URL || 'http://localhost:3000/api';
  * @param {string} [successMessage] - Mensaje opcional para mostrar en consola si la llamada es exitosa.
  * @returns {Promise<any>} La respuesta JSON del servidor.
  */
-const apiCall = async (endpoint, options = {}, successMessage) => {
+const apiCall = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
@@ -37,9 +37,6 @@ const apiCall = async (endpoint, options = {}, successMessage) => {
       throw new Error(errorMessage);
     }
 
-    if (successMessage) {
-      console.log(successMessage);
-    }
 
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
@@ -60,11 +57,11 @@ export const loginWithGoogle = (token) =>
   apiCall('/auth/google', {
     method: 'POST',
     body: JSON.stringify({ token }),
-  }, 'Verificando token de Google con el backend.');
+  });
 
 // Cierra la sesión en el backend (elimina la cookie)
 export const logoutFromBackend = () =>
-  apiCall('/auth/logout', { method: 'POST' }, 'Cerrando sesión en el backend.');
+  apiCall('/auth/logout', { method: 'POST' });
 
 // --- Rutas de la API para Notas ---
 
@@ -74,30 +71,30 @@ export const syncNoteWithBackend = (note) =>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(note),
-  }, `Nota ${note.id} sincronizada con el backend.`);
+  });
 
 // Elimina una nota PERMANENTEMENTE del backend
 export const deleteNoteFromBackend = (noteId) =>
-  apiCall(`/notes/${noteId}`, { method: 'DELETE' }, `Nota ${noteId} eliminada permanentemente del backend.`);
+  apiCall(`/notes/${noteId}`, { method: 'DELETE' });
 
 // Mueve una nota a la papelera en el backend
 export const moveNoteToTrashInBackend = (noteId) =>
-  apiCall(`/notes/${noteId}/trash`, { method: 'PUT' }, `Nota ${noteId} movida a la papelera en el backend.`);
+  apiCall(`/notes/${noteId}/trash`, { method: 'PUT' });
 
 // Restaura una nota desde la papelera en el backend
 export const restoreNoteFromBackend = (noteId) =>
-  apiCall(`/notes/${noteId}/restore`, { method: 'PUT' }, `Nota ${noteId} restaurada en el backend.`);
+  apiCall(`/notes/${noteId}/restore`, { method: 'PUT' });
 
 // Vacía toda la papelera en el backend
 export const emptyTrashInBackend = () =>
-  apiCall('/notes/trashed', { method: 'DELETE' }, 'Papelera vaciada en el backend.');
+  apiCall('/notes/trashed', { method: 'DELETE' });
 
 // Actualiza el orden personalizado de múltiples notas en el backend
 export const updateNotesOrderInBackend = (notes) =>
   apiCall('/notes/order', {
     method: 'PUT',
     body: JSON.stringify(notes),
-  }, 'Orden personalizado de las notas actualizado en el backend.');
+  });
 
 // Obtiene TODAS las notas (activas y en papelera) del backend
 export const fetchNotesFromBackend = () => apiCall('/notes');
@@ -113,7 +110,7 @@ export const createGroupInBackend = (group) =>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(group),
-  }, `Grupo ${group.id} creado en el backend.`);
+  });
 
 // Actualiza un grupo en el backend
 export const updateGroupInBackend = (groupId, updates) =>
@@ -121,18 +118,18 @@ export const updateGroupInBackend = (groupId, updates) =>
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
-  }, `Grupo ${groupId} actualizado en el backend.`);
+  });
 
 // Elimina un grupo del backend
 export const deleteGroupFromBackend = (groupId) =>
-  apiCall(`/groups/${groupId}`, { method: 'DELETE' }, `Grupo ${groupId} eliminado del backend.`);
+  apiCall(`/groups/${groupId}`, { method: 'DELETE' });
 
 // Actualiza el orden de múltiples grupos en el backend
 export const updateGroupsOrderInBackend = (groups) =>
   apiCall('/groups/order', {
     method: 'PUT',
     body: JSON.stringify(groups),
-  }, 'Orden de los grupos actualizado en el backend.');
+  });
 
 // --- Rutas de la API para Usuario ---
 
@@ -141,14 +138,14 @@ export const updateUserThemeInBackend = (theme) =>
   apiCall('/user/theme', {
     method: 'PUT',
     body: JSON.stringify({ theme }),
-  }, `Preferencia de tema actualizada a "${theme}" en el backend.`);
+  });
 
 // Actualiza las preferencias de vista y orden del usuario
 export const updateUserPreferencesInBackend = (preferences) =>
   apiCall('/user/preferences', {
     method: 'PUT',
     body: JSON.stringify(preferences),
-  }, 'Preferencias de usuario actualizadas en el backend.');
+  });
 
 // --- Rutas de la API para Feedback ---
 
@@ -157,23 +154,23 @@ export const sendFeedbackToBackend = (feedbackText) =>
   apiCall('/feedback', {
     method: 'POST',
     body: JSON.stringify({ feedbackText }),
-  }, 'Feedback enviado al backend.');
+  });
 
 
 // --- Rutas de la API para Administrador ---
 
 // Obtiene todos los comentarios (solo para administradores)
 export const fetchAdminFeedback = (page = 1, limit = 10, status = 'all', search = '') =>
-  apiCall(`/admin/feedback?page=${page}&limit=${limit}&status=${status}&search=${encodeURIComponent(search)}`, {}, `Obteniendo feedback para el administrador (página ${page}, estado ${status}, búsqueda: "${search}").`);
+  apiCall(`/admin/feedback?page=${page}&limit=${limit}&status=${status}&search=${encodeURIComponent(search)}`);
 
 // Marca un comentario como resuelto
 export const resolveFeedbackInBackend = (feedbackId) =>
-  apiCall(`/admin/feedback/${feedbackId}/resolve`, { method: 'PUT' }, `Feedback ${feedbackId} marcado como resuelto.`);
+  apiCall(`/admin/feedback/${feedbackId}/resolve`, { method: 'PUT' });
 
 // Elimina un comentario permanentemente
 export const deleteFeedbackFromBackend = (feedbackId) =>
-  apiCall(`/admin/feedback/${feedbackId}`, { method: 'DELETE' }, `Feedback ${feedbackId} eliminado.`);
+  apiCall(`/admin/feedback/${feedbackId}`, { method: 'DELETE' });
 
 // Envía una respuesta a un comentario
 export const sendReplyToFeedback = (feedbackId, replyText) =>
-  apiCall(`/admin/feedback/${feedbackId}/reply`, { method: 'POST', body: JSON.stringify({ replyText }) }, `Respuesta enviada para feedback ${feedbackId}.`);
+  apiCall(`/admin/feedback/${feedbackId}/reply`, { method: 'POST', body: JSON.stringify({ replyText }) });

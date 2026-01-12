@@ -31,7 +31,6 @@ const handleLoginFlow = async (user) => {
  */
 async function handleCredentialResponse(response) {
     const googleToken = response.credential;
-    console.log("JWT de Google recibido, enviando al backend para verificación...");
 
     try {
         const backendResponse = await loginWithGoogle(googleToken);
@@ -77,7 +76,6 @@ function initializeGoogleSignIn() {
 export const logout = async () => {
     try {
         await logoutFromBackend();
-        console.log("Sesión cerrada en el backend.");
     } catch (error) {
         console.error("Error al cerrar la sesión en el backend:", error);
     }
@@ -110,12 +108,10 @@ const checkExistingSession = async () => {
     const user = userJSON ? JSON.parse(userJSON) : null;
 
     if (user) {
-        console.log("Sesión existente encontrada. Inicializando DB de usuario.");
         store.dispatch({ type: 'SET_USER', payload: user });
         await initDb(user.id);
         document.dispatchEvent(new CustomEvent('session-initialized', { detail: { user } }));
     } else {
-        console.log("No hay sesión. Inicializando DB de invitado.");
         store.dispatch({ type: 'SET_USER', payload: null });
         await initDb(GUEST_USER_ID);
         document.dispatchEvent(new CustomEvent('session-initialized', { detail: { user: null } }));

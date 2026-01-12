@@ -333,24 +333,17 @@ export const validarIDOConvertirElemento = (identificador) => {
     if (typeof identificador === 'string' || identificador instanceof String) {
         const elemento = document.getElementById(identificador);
         if (elemento) {
-            // console.log(`El identificador \"${identificador}\" corresponde a un elemento HTML.`);
             return elemento.id;
-        } else {
-            // console.warn(`\"${identificador}\" parece un ID, pero no se encontró un elemento con ese ID.`);
-            return null;
         }
+        return null;
     }
     else if (identificador instanceof HTMLElement) {
         if (identificador.id) {
-            // console.log(`Se pasó un elemento HTML con ID: ${identificador.id}`);
             return identificador.id;
-        } else {
-            // console.warn("Se pasó un elemento HTML, pero no tiene un atributo ID.");
-            return null;
         }
+        return null;
     }
     else {
-        // console.error("El valor proporcionado no es un ID válido ni un elemento HTML.");
         return null;
     }
 };

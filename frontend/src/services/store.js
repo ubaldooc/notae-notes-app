@@ -114,7 +114,6 @@ const createStore = (reducer) => {
         // Calcula el nuevo estado usando el reducer.
         state = reducer(state, action);
         // Notifica a todos los suscriptores.
-        console.log("Notificando a los suscriptores sobre el cambio de estado...", state);
         subscribers.forEach(callback => callback(state));
     };
 
