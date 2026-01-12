@@ -416,6 +416,7 @@ header * {
     /* Evita que la imagen sea seleccionable */
     -webkit-user-drag: none;
     /* Específico para navegadores WebKit */
+    z-index: 1000;
 }
 
 .logo-text {
@@ -2856,7 +2857,7 @@ body.selection-mode-active .note-card-container.is-selected {
 
 /* ESTILOS PARA EL EDITOR EN MODO SOLO LECTURA */
 #editor.read-only {
-    background-color: var(--editor-readonly-bg) !important;
+    background-color: var(--editor-readonly-bg);
     /* Un gris neutro para indicar inactividad */
     outline-color: var(--editor-readonly-outline);
 }
@@ -3249,7 +3250,7 @@ body.selection-mode-active .note-card-container.is-selected {
     .add-note-text,
     .view-options-label,
     .sort-options-label {
-        display: none !important;
+        display: none;
     }
 
     .header-toolbar {
@@ -3262,7 +3263,7 @@ body.selection-mode-active .note-card-container.is-selected {
     }
 
     .header-toolbar svg {
-        height: 30px !important;
+        height: 30px;
         flex-shrink: 0;
     }
 
@@ -3297,8 +3298,8 @@ body.selection-mode-active .note-card-container.is-selected {
     }
 
     .perfil-img {
-        height: 38px !important;
-        width: 38px !important;
+        height: 38px;
+        width: 38px;
         flex-shrink: 0;
     }
 
@@ -3312,10 +3313,10 @@ body.selection-mode-active .note-card-container.is-selected {
 
     /* Notas */
     .note-card-container {
-        width: calc(100% - 20px) !important;
-        height: auto !important;
+        width: calc(100% - 20px);
+        height: auto;
         min-height: 160px;
-        margin: 10px !important;
+        margin: 10px;
     }
 
     .note-card {
@@ -3345,8 +3346,8 @@ body.selection-mode-active .note-card-container.is-selected {
 
     @media (min-width: 480px) {
         .note-card-container {
-            width: calc(50% - 16px) !important;
-            margin: 8px !important;
+            width: calc(50% - 16px);
+            margin: 8px;
         }
     }
 
