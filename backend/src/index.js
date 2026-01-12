@@ -121,21 +121,25 @@ app.post('/api/auth/google', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     // En lugar de enviar el token en el cuerpo, lo establecemos como una cookie HttpOnly
     res.cookie('sessionToken', sessionToken, {
       httpOnly: true, // La cookie no es accesible desde JavaScript en el cliente
-      secure: process.env.NODE_ENV === 'production', // Usar solo en HTTPS en producción
-      sameSite: 'lax', // 'strict' o 'lax' para protección CSRF
+      secure: isProd, // Usar solo en HTTPS en producción
+      sameSite: isProd ? 'none' : 'lax', // 'strict' o 'lax' para protección CSRF
+      partitioned: isProd, // Es para habilitar las cookies de terceros en navegadores basados en chromium
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días, igual que el token
     });
 
+
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
-      user: { 
-        id: user._id, 
-        name: user.name, 
-        email: user.email, 
-        picture: user.picture, 
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
         theme: user.theme,
         noteView: user.noteView,
         noteSortOrder: user.noteSortOrder,
@@ -165,7 +169,7 @@ const noteSchema = new mongoose.Schema({
   groupId: String,
   status: { type: String, default: 'active', enum: ['active', 'trashed'] },
   customOrder: { type: Number, default: -1 }
-}, { 
+}, {
   versionKey: false,
   timestamps: true // Mongoose gestionará createdAt y updatedAt automáticamente
 });
@@ -470,7 +474,7 @@ app.put('/api/groups/:id', async (req, res) => {
     const group = await Group.findOneAndUpdate(
       { id: req.params.id, userId: req.user.userId },
       req.body,
-      { 
+      {
         new: true,
         // Respetar el timestamp que viene del frontend
         timestamps: false
@@ -529,13 +533,14 @@ app.post('/api/notes', async (req, res) => {
     const note = await Note.findOneAndUpdate(
       { id: noteData.id, userId: req.user.userId }, // Filtro por ID de nota y de usuario
       { ...noteData, userId: req.user.userId }, // Aseguramos que el userId esté en los datos a insertar/actualizar
-      { 
-        new: true, 
-        upsert: true, 
-        setDefaultsOnInsert: true, 
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
         // Añadimos esta opción para que Mongoose no actualice `updatedAt` automáticamente.
         // De esta forma, respetará el valor que viene del frontend.
-        timestamps: false }
+        timestamps: false
+      }
     );
     res.status(201).json(note);
   } catch (error) {
@@ -693,7 +698,7 @@ app.use(express.static(path.resolve(__dirname, '..', '..', 'frontend')));
 // 3. Ruta "catch-all" para la aplicación principal (Single Page Application).
 // Cualquier otra petición GET que no sea una API o un archivo estático, servirá index.html.
 app.get('/{*path}', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '..', '..', 'frontend', 'index.html'));
 });
 
 const deleteOldTrashedNotes = async () => {
@@ -702,18 +707,18 @@ const deleteOldTrashedNotes = async () => {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   try {
-      const result = await Note.deleteMany({
-          status: 'trashed', // Se podría añadir userId aquí, pero es menos crítico si las rutas ya están protegidas.
-          updatedAt: { $lt: thirtyDaysAgo } // $lt significa "less than" (menor que)
-      });
+    const result = await Note.deleteMany({
+      status: 'trashed', // Se podría añadir userId aquí, pero es menos crítico si las rutas ya están protegidas.
+      updatedAt: { $lt: thirtyDaysAgo } // $lt significa "less than" (menor que)
+    });
 
-      if (result.deletedCount > 0) {
-          console.log(`Limpieza de papelera: Se eliminaron ${result.deletedCount} notas con más de 30 días.`);
-      } else {
-          console.log('Limpieza de papelera: No se encontraron notas antiguas para eliminar.');
-      }
+    if (result.deletedCount > 0) {
+      console.log(`Limpieza de papelera: Se eliminaron ${result.deletedCount} notas con más de 30 días.`);
+    } else {
+      console.log('Limpieza de papelera: No se encontraron notas antiguas para eliminar.');
+    }
   } catch (error) {
-      console.error('Error durante la limpieza automática de la papelera:', error);
+    console.error('Error durante la limpieza automática de la papelera:', error);
   }
 };
 

@@ -121,12 +121,39 @@ export const initUtils = () => {
     // Restaurar el estado del aside al cargar la página
     if (localStorage.getItem("aside-collapsed") === "true") {
         document.body.classList.add("aside-collapsed");
+    } else if (window.innerWidth <= 768) {
+        // En móvil, por defecto empezamos colapsados (cerrados)
+        document.body.classList.add("aside-collapsed");
     }
 
     const AsideMenuHam = document.getElementById("aside__menuham");
     if (AsideMenuHam) {
         AsideMenuHam.addEventListener("click", activarAside);
     }
+
+    // Cerrar aside al hacer clic fuera en móvil
+    document.addEventListener("click", (event) => {
+        const isMobile = window.innerWidth <= 768;
+        const body = document.body;
+        const aside = document.querySelector(".aside");
+
+        // Si estamos en móvil, el aside NO está colapsado (está abierto)
+        // Y el clic NO fue dentro del aside ni en el botón de hamburguesa
+        if (isMobile && !body.classList.contains("aside-collapsed")) {
+            if (!aside.contains(event.target) && !AsideMenuHam.contains(event.target)) {
+                activarAside();
+            }
+        }
+    });
+
+    // Cerrar aside al cambiar de grupo o filtro en móvil
+    document.addEventListener("click", (event) => {
+        if (window.innerWidth <= 768 && !document.body.classList.contains("aside-collapsed")) {
+            if (event.target.closest(".notes-group") || event.target.closest(".aside__all-notes") || event.target.closest(".aside__trash-bin__box")) {
+                activarAside();
+            }
+        }
+    });
 }
 
 
@@ -179,7 +206,7 @@ export const generateDynamicBackgroundColor = (colorString) => {
         // En modo oscuro, mezclamos el color con un fondo oscuro para desaturarlo y suavizarlo.
         // Esto evita colores puros y demasiado brillantes que desentonarían.
         const mixFactor = 0.3; // Cuánto del color original se conserva (0.3 = 30%)
-        
+
         // Color base oscuro para la mezcla (un gris oscuro neutro)
         const baseDarkR = 45;
         const baseDarkG = 52;
@@ -200,7 +227,7 @@ export const generateDynamicBackgroundColor = (colorString) => {
 
 
 // FORMATO DE FECHA COMODO PARA EDITOR Y OTRAS COSAS
-export const formatFecha = (fechaISO)=> {
+export const formatFecha = (fechaISO) => {
     let fecha = new Date(fechaISO);
 
     let dia = fecha.getDate().toString().padStart(2, '0');
@@ -217,7 +244,7 @@ export const formatFecha = (fechaISO)=> {
 }
 
 // FORMATO DE FECHA REDUCIDO PARA LAS NOTECARDS
-export const formatFechaNoteCard = (fechaISO)=> {
+export const formatFechaNoteCard = (fechaISO) => {
     let fecha = new Date(fechaISO);
 
     let dia = fecha.getDate().toString().padStart(2, '0');
@@ -271,7 +298,7 @@ export const validarORestauraNotaJSON = (notaJSON) => {
     // 5. Itera sobre el esquema para reparar o copiar los valores.
     for (const prop in esquemaNota) {
         const { type, defaultValue } = esquemaNota[prop];
-        
+
         // Verifica si la propiedad del JSON existe y tiene el tipo correcto.
         // if (notaJSON.hasOwnProperty(prop) && (typeof notaJSON[prop] === type || (Array.isArray(type) && type.includes(typeof notaJSON[prop])))) {
         if (Object.prototype.hasOwnProperty.call(notaJSON, prop) && (typeof notaJSON[prop] === type || (Array.isArray(type) && type.includes(typeof notaJSON[prop])))) {
@@ -307,12 +334,12 @@ export const validarIDOConvertirElemento = (identificador) => {
         const elemento = document.getElementById(identificador);
         if (elemento) {
             // console.log(`El identificador \"${identificador}\" corresponde a un elemento HTML.`);
-            return elemento.id; 
+            return elemento.id;
         } else {
             // console.warn(`\"${identificador}\" parece un ID, pero no se encontró un elemento con ese ID.`);
             return null;
         }
-    } 
+    }
     else if (identificador instanceof HTMLElement) {
         if (identificador.id) {
             // console.log(`Se pasó un elemento HTML con ID: ${identificador.id}`);
@@ -321,7 +348,7 @@ export const validarIDOConvertirElemento = (identificador) => {
             // console.warn("Se pasó un elemento HTML, pero no tiene un atributo ID.");
             return null;
         }
-    } 
+    }
     else {
         // console.error("El valor proporcionado no es un ID válido ni un elemento HTML.");
         return null;
