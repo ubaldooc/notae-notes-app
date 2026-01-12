@@ -380,6 +380,7 @@ body.aside-collapsed {
     align-items: center;
     /* border-bottom: 2px solid black; */
     width: 100%;
+    overflow: hidden;
 }
 
 header * {
