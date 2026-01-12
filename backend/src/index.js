@@ -327,7 +327,7 @@ app.get('/api/admin/feedback', async (req, res) => {
 
   try {
     // Ejecutamos dos consultas en paralelo para mayor eficiencia
-    const [feedbasount] = await Promise.all([
+    const [feedbacks, totalCount] = await Promise.all([
       Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
       Feedback.countDocuments(filter)
     ]);
