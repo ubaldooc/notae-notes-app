@@ -13,7 +13,7 @@ import {
 // Importaciones de componentes de la interfaz de usuario (UI)
 import { initGroupManager, renderizarGrupoEnDOM, inicializarDragAndDropGrupos } from './components/GroupManager.js';
 
-import { initNoteEditor } from './components/NoteEditor.js';
+import { initNoteEditor, abrirEditorNota } from './components/NoteEditor.js';
 
 import { initNoteCard, renderizarNotaEnDOM } from './components/NoteCard.js';
 
@@ -23,7 +23,7 @@ import { initFilters } from './components/FilterManager.js';
 
 import { initViewManager, applyView, updateSortButtonUI, applySort } from './components/ViewManager.js';
 
-import { initUtils, getSortFunction } from './utils.js';
+import { initUtils, getSortFunction, activarAside } from './utils.js';
 
 import { initKeyboardShortcuts } from './components/KeyboardShortcuts.js';
 
@@ -74,6 +74,9 @@ const editorBody = document.getElementById("editor-body");
 const editorCreation = document.getElementById("editor-creation");
 const editorLastMod = document.getElementById("editor-last-mod");
 const editorcharCounter = document.getElementById("editor-character-counter");
+
+const createNewNote = document.getElementById("mobile-fab-add-note");
+
 
 // Contenedor de todas las notas
 // const allNotesContainer = document.getElementById("all-notes-container");

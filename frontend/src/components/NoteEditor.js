@@ -22,6 +22,7 @@ const editorUnpinnedIcon = document.getElementById("editor-unpinned");
 const editorPinNote = document.getElementById("editor-pin");
 const editorGroupColor = document.getElementById("editor-group-color");
 const editorGroupName = document.getElementById("editor-group-name");
+const mobileFab = document.getElementById("mobile-fab-add-note");
 
 
 // Valores de grupo por defefcto
@@ -239,7 +240,7 @@ const focusAndSetCursorAtEnd = (element) => {
 
 
 // ABRIR EL EDITOR 
-export const abrirEditorNota = (notaJSON = null, { readOnly = false } = {}) => {    
+export const abrirEditorNota = (notaJSON = null, { readOnly = false } = {}) => {
     limpiarEditor();
     const isNewNote = !notaJSON;
     if (isNewNote) {
@@ -296,6 +297,10 @@ export const abrirEditorNota = (notaJSON = null, { readOnly = false } = {}) => {
         }
     }
 
+    if (mobileFab) {
+        mobileFab.style.display = "none";
+    }
+
     modalNote.classList.add("active");
     editor.classList.add("active");
     editorTitle.innerHTML = DOMPurify.sanitize(notaActualGlobal.title);
@@ -318,16 +323,19 @@ export const abrirEditorNota = (notaJSON = null, { readOnly = false } = {}) => {
     } else {
         editor.dataset.noteId = null;
     }
-    
+
     actualizarPlaceholders();
 };
 
 
-    // FUNCION PARA CERRAR EL EDITOR
+// FUNCION PARA CERRAR EL EDITOR
 export const cerrarEditorUI = () => {
     document.querySelector(".modal-editor").classList.remove("active");
     editor.classList.remove("active");
     notaActualGlobal = null;
+    if (mobileFab) {
+        mobileFab.style.display = "";
+    }
 };
 
 
@@ -445,7 +453,7 @@ export const guardarNota = async (notaJSON) => {
             await guardarNotaEnDB(notaValida);
             actualizarNotaEnStore(notaValida);
             // reordenarNotasEnDOM();
-            
+
         } catch (error) {
             console.error("Error en el proceso de guardado:", error);
         }
@@ -459,9 +467,9 @@ export const guardarNota = async (notaJSON) => {
 // INICIALIZAR LOSLISTENERS DEL EDITOR
 export const initNoteEditor = () => {
 
-        // Abrir el editor de notas o guardar si se presiona y ya hay una nota abierta
+    // Abrir el editor de notas o guardar si se presiona y ya hay una nota abierta
     const addNoteButton = document.getElementById('add-note-btn');
-    addNoteButton.addEventListener("click", ()=> {
+    addNoteButton.addEventListener("click", () => {
         // console.log("editor abierto");
 
         if (!document.querySelector(".modal-editor").classList.contains("active")) {
@@ -472,7 +480,7 @@ export const initNoteEditor = () => {
                     console.log("Ya tienes una nota vacia");
                 } else {
                     guardarNota(notaActualGlobal);
-    
+
                     infoJSONNota(notaActualGlobal);
                     abrirEditorNota();
                 }
@@ -481,8 +489,8 @@ export const initNoteEditor = () => {
     });
 
 
-        // GUARDAR NOTA DEL EDITOR MEDIANTE CTRL + ENTER
-    document.addEventListener('keydown', function(event) {
+    // GUARDAR NOTA DEL EDITOR MEDIANTE CTRL + ENTER
+    document.addEventListener('keydown', function (event) {
         if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
             if (document.querySelector(".modal-editor").classList.contains("active") && notaActualGlobal) {
                 if (notaActualGlobal.title.length === 0 && notaActualGlobal.body.length === 0) {
@@ -490,33 +498,33 @@ export const initNoteEditor = () => {
                     cerrarEditorUI();
                 } else {
                     guardarNota(notaActualGlobal);
-    
-                    infoJSONNota(notaActualGlobal); 
+
+                    infoJSONNota(notaActualGlobal);
                     abrirEditorNota();
-    
+
                 }
             }
         }
     });
 
-    
-        // GUARDAR NOTA DEL EDITOR MEDIANTE BOTON GUARDAR
+
+    // GUARDAR NOTA DEL EDITOR MEDIANTE BOTON GUARDAR
     const editorSaveNote = document.querySelector(".editor-save-btn");
     editorSaveNote.addEventListener("click", () => {
-        if (notaActualGlobal) { 
+        if (notaActualGlobal) {
             if (notaActualGlobal.title.length === 0 && notaActualGlobal.body.length === 0) {
                 console.log("Nota vacia descartada");
             } else {
                 guardarNota(notaActualGlobal);
-    
+
                 infoJSONNota(notaActualGlobal);
             }
-            cerrarEditorUI(); 
+            cerrarEditorUI();
         }
     });
 
-        
-        // GUARDAR NOTA DEL EDITOR MEDIANTE CLICK EN EL MODAL
+
+    // GUARDAR NOTA DEL EDITOR MEDIANTE CLICK EN EL MODAL
     // const modalNote = document.getElementById("modal-editor");
     modalNote.addEventListener("click", (event) => {
         if (event.target.classList.contains("modal-editor")) {
@@ -549,7 +557,7 @@ export const initNoteEditor = () => {
         if (modalNote.classList.contains('active')) {
             console.log('Atajo Escape detectado. Cerrando editor...');
             // La lógica de guardar o descartar ya está en el listener del modal
-            modalNote.click(); 
+            modalNote.click();
         }
     });
 
@@ -566,5 +574,5 @@ export const initNoteEditor = () => {
 
 
     console.log("initNoteEditor cargado correctamente");
-    
+
 }
