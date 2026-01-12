@@ -8,7 +8,7 @@ import { gridUnpinned } from "../main";
 
 
 // Vaolres por defecto cuando no hay sesion iniciada
-const GUEST_IMAGE_PATH = 'src/assets/guest-perfil.webp';
+const GUEST_IMAGE_PATH = 'src/assets/guest-perfil.jpg';
 const GUEST_NAME = 'Invitado';
 
 export const initHeader = () => {
