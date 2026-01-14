@@ -1,5 +1,7 @@
 # 📝 Notae - Notas Web Premium
 
+![Preview de Notae](./assets/preview.webp)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
 [![Vite](https://img.shields.io/badge/Frontend-Vite-646CFF.svg)](https://vitejs.dev/)
@@ -8,6 +10,18 @@
 
 > [!TIP]
 > **[➡️ Ver Demo en Vivo](https://notae-notes.vercel.app/)** *(Próximamente)*
+
+---
+
+## 🎬 Demo en Acción
+
+Mira cómo Notae facilita la organización de tus ideas con una interfaz fluida y animaciones premium.
+
+<div align="center">
+  <video src="./assets/demo.mp4" width="100%" muted autoplay loop poster="./assets/preview.png">
+    Tu navegador no soporta videos. Puedes ver la demo en <code>./assets/demo.mp4</code>
+  </video>
+</div>
 
 ---
 
@@ -22,15 +36,13 @@
 - **Offline-First con Dexie.js:** Tus notas se guardan instantáneamente en tu navegador usando IndexedDB. Sigue trabajando incluso sin conexión.
 - **Sincronización en la Nube:** Al iniciar sesión con Google (OAuth 2.0), tus notas se sincronizan automáticamente con nuestra base de datos MongoDB.
 
-### 🎨 Interfaz de Usuario Premium
-- **Layout Masonry Dinámico:** Gracias a **Muuri**, disfruta de una cuadrícula de notas fluida y auto-ajustable con animaciones suaves.
-- **Drag & Drop Reordenación:** Personaliza el orden de tus notas y grupos simplemente arrastrándolos.
-- **Modo Oscuro/Claro Inteligente:** Una interfaz que se adapta a tus preferencias y cuida tu vista.
+---
 
-### ⚡ Productividad Aumentada
-- **Atajos de Teclado:** Domina la aplicación sin tocar el ratón.
-- **Gestión Multi-selección:** Selecciona varias notas para eliminarlas o moverlas en lote.
-- **Papelera de Reciclaje:** Elimina notas con seguridad; siempre puedes recuperarlas o borrarlas definitivamente.
+## 📸 Galería de Interfaz
+
+| Sesion con sincronizacion de datos | Modo Oscuro Premium |
+|:---:|:---:|
+| ![Sesion iniciada](./sesion.webp.png) | ![Modo Oscuro](./assets/dark-mode.webp) |
 
 ---
 
@@ -93,13 +105,13 @@ Este script instalará las dependencias (si es necesario) y arrancará tanto el 
 
 ---
 
-## � Contacto y Contribución
+## 📧 Contacto y Contribución
 
 ¿Tienes ideas para mejorar Notae? ¡Me encantaría escucharlas!
 
 - **Desarrollador:** Ubaldo O.
-- **Email:** [ubaldooc.54@gmail.com](mailto:ubaldooc.54@gmail.com)
-- **LinkedIn:** [Ubaldo O.](https://linkedin.com/in/)
+- **Email:** [fco.castro.dev@gmail.com](mailto:fco.castro.dev@gmail.com)
+- **LinkedIn:** [Francisco Castro.](https://www.linkedin.com/in/francisco-c-887613384)
 
 ---
 

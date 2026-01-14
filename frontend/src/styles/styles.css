@@ -853,6 +853,8 @@ header * {
     height: 70%;
     border-radius: 50%;
     cursor: pointer;
+    background: white;
+    border: 2px solid white;
 }
 
 .perfil-options-dropdown {
@@ -1479,7 +1481,7 @@ body.aside-collapsed .aside .all-notes-text {
     flex-direction: column;
     flex-wrap: nowrap;
     overflow-x: auto;
-    z-index: 1101;
+    z-index: 9999;
     pointer-events: none;
     user-select: none;
     opacity: 0;
@@ -1488,6 +1490,12 @@ body.aside-collapsed .aside .all-notes-text {
 
     scrollbar-width: thin;
     scrollbar-color: #2196f3 rgb(192, 192, 192);
+}
+
+/* ASEGURAR QUE EL PADRE SE POSICIONE POR ENCIMA DE TODO CUANDO EL DROPDOWN ESTÉ ACTIVO */
+.note-card-container:has(.available-groups-dropdown.active),
+#editor-group:has(.available-groups-dropdown.active) {
+    z-index: 10001 !important;
 }
 
 .available-groups-dropdown.active {
