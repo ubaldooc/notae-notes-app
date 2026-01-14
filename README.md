@@ -9,16 +9,16 @@
 **Notae** es una aplicación de gestión de notas diseñada para ofrecer una experiencia fluida, rápida y organizada. Combina la potencia de un backend en la nube con la resiliencia del almacenamiento local, permitiéndote capturar ideas sin interrupciones.
 
 > [!TIP]
-> **[➡️ Ver Demo en Vivo](https://notae-notes.vercel.app/)** *(Próximamente)*
+> **[➡️ Ver Demo en Vivo](https://notae-notes-app.vercel.app/){:target="_blank" rel="noopener"}** *(Próximamente)*
 
 ---
 
 ## 🎬 Demo en Acción
-
+ 
 Mira cómo Notae facilita la organización de tus ideas con una interfaz fluida y animaciones premium.
 
 <div align="center">
-  <video src="./assets/demo.mp4" width="100%" muted autoplay loop poster="./assets/preview.png">
+  <video src="./assets/demo.mp4" width="100%" muted autoplay loop poster="./assets/preview.webp">
     Tu navegador no soporta videos. Puedes ver la demo en <code>./assets/demo.mp4</code>
   </video>
 </div>
@@ -42,7 +42,7 @@ Mira cómo Notae facilita la organización de tus ideas con una interfaz fluida 
 
 | Sesion con sincronizacion de datos | Modo Oscuro Premium |
 |:---:|:---:|
-| ![Sesion iniciada](./sesion.webp.png) | ![Modo Oscuro](./assets/dark-mode.webp) |
+| ![Sesion iniciada](./sesion.webp) | ![Modo Oscuro](./assets/dark-mode.webp) |
 
 ---
 
@@ -109,12 +109,12 @@ Este script instalará las dependencias (si es necesario) y arrancará tanto el 
 
 ¿Tienes ideas para mejorar Notae? ¡Me encantaría escucharlas!
 
-- **Desarrollador:** Ubaldo O.
-- **Email:** [fco.castro.dev@gmail.com](mailto:fco.castro.dev@gmail.com)
-- **LinkedIn:** [Francisco Castro.](https://www.linkedin.com/in/francisco-c-887613384)
+- **Desarrollador:** Francisco Castro.
+- **Email:** [fco.castro.dev@gmail.com](mailto:fco.castro.dev@gmail.com){:target="_blank" rel="noopener"}
+- **LinkedIn:** [Francisco Castro.](https://www.linkedin.com/in/francisco-c-887613384){:target="_blank" rel="noopener"}
 
 ---
-
+ 
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
