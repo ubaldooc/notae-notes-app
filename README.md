@@ -17,11 +17,7 @@
 
 Mira cómo Notae facilita la organización de tus ideas con una interfaz fluida y animaciones premium.
 
-<div align="center">
-  <video src="./assets/demo.mp4" width="100%" muted autoplay loop poster="./assets/preview.webp">
-    Tu navegador no soporta videos. Puedes ver la demo en <code>./assets/demo.mp4</code>
-  </video>
-</div>
+![Demo en Acción](./assets/demo.gif)
 
 ---
 
