@@ -10,6 +10,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verificar la conexión con el servidor de correo al iniciar
+// Esto te avisará en la consola si las credenciales del .env son incorrectas
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error('Error de conexión con el servidor de correo:', error);
+  } else {
+    console.log('Servidor de correo listo para enviar mensajes');
+  }
+});
+
 /**
  * Envía un correo electrónico.
  * @param {string} to - El destinatario del correo.
