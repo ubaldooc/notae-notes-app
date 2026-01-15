@@ -1,8 +1,11 @@
 import { fetchAdminFeedback, resolveFeedbackInBackend, deleteFeedbackFromBackend, sendReplyToFeedback } from './services/api.js';
 import { formatFecha } from './utils.js';
-import { showNotification } from './components/Notifier.js'; // Asegúrate de que Notifier.js esté disponible
+import { showNotification, initNotifier } from './components/Notifier.js'; // Asegúrate de que Notifier.js esté disponible
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Inicializar notificaciones si es necesario
+    if (typeof initNotifier === 'function') initNotifier();
+
     const feedbackContainer = document.getElementById('feedback-list-container');
     const loader = document.getElementById('admin-loader');
     const errorMessage = document.getElementById('admin-error-message');
@@ -263,4 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             modal.onclick = (event) => { if (event.target === modal) closeModal(); };
         }
     });
+
+    // IMPORTANTE: Hacer visible el cuerpo de la página una vez que el JS ha cargado
+    document.body.classList.add('loaded');
 });

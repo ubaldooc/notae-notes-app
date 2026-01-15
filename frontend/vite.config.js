@@ -15,6 +15,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      // Redirige las peticiones de estilos al backend (necesario para el panel de admin)
+      '/styles': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

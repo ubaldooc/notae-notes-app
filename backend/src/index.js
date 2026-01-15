@@ -549,6 +549,8 @@ app.get('/api/status', (req, res) => {
 
 // Servir la carpeta de estilos para que el panel de admin pueda cargar el CSS
 app.use('/styles', express.static(path.join(__dirname, '../../frontend/src/styles')));
+// Servir la carpeta src para que el panel de admin pueda cargar el JS
+app.use('/src', express.static(path.join(__dirname, '../../frontend/src')));
 
 // Ruta para servir el panel de administración estático
 app.get('/admin', (req, res) => {
