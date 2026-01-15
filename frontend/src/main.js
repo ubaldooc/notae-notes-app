@@ -240,28 +240,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     let initialDragOrder = []; // Variable para guardar el orden al iniciar el arrastre
 
     const handleDragStart = () => {
-        const currentSortOrder = localStorage.getItem('noteSortOrder') || 'newest';
-        // Solo capturamos el orden si NO estamos en modo 'custom'
-        if (currentSortOrder !== 'custom') {
-            initialDragOrder = gridPinned.getItems().concat(gridUnpinned.getItems()).map(i => i.getElement().id);
-        }
+        // Capturamos el orden inicial siempre para poder comparar cambios al finalizar
+        initialDragOrder = gridPinned.getItems().concat(gridUnpinned.getItems()).map(i => i.getElement().id);
     };
 
     const handleDragEnd = async (item) => {
         const currentSortOrder = localStorage.getItem('noteSortOrder') || 'newest';
+        const finalItems = gridPinned.getItems().concat(gridUnpinned.getItems());
+        const finalOrderIds = finalItems.map(i => i.getElement().id);
+
+        // Verificamos si el orden realmente cambió
+        const hasChanged = JSON.stringify(initialDragOrder) !== JSON.stringify(finalOrderIds);
+
+        // Limpiamos el array para la próxima operación
+        initialDragOrder = [];
+
+        if (!hasChanged) return;
 
         if (currentSortOrder === 'custom') {
             // Si el modo actual es 'custom', guardamos el nuevo orden directamente.
-            const finalItems = gridPinned.getItems().concat(gridUnpinned.getItems());
-            const finalOrderIds = finalItems.map(i => i.getElement().id);
-
-            // Comprobamos si el orden realmente cambió para evitar escrituras innecesarias en la DB.
-            if (JSON.stringify(initialDragOrder) === JSON.stringify(finalOrderIds)) {
-                return;
-            }
-
-            const allItems = gridPinned.getItems().concat(gridUnpinned.getItems());
-            const notasParaActualizar = allItems.map((item, index) => {
+            const notasParaActualizar = finalItems.map((item, index) => {
                 const element = item.getElement();
                 element.dataset.customOrder = index;
                 return { id: element.id, order: index };
@@ -271,18 +269,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await actualizarOrdenNotasEnDB(notasParaActualizar);
             }
         } else {
-            // Si el modo NO es 'custom', comparamos el orden final con el inicial.
-            const finalItems = gridPinned.getItems().concat(gridUnpinned.getItems());
-            const finalOrderIds = finalItems.map(i => i.getElement().id);
-
-            // Si el orden es diferente, mostramos el modal.
-            if (JSON.stringify(initialDragOrder) !== JSON.stringify(finalOrderIds)) {
-                showCustomOrderModal(item.getElement());
-            } else {
-            }
+            // Si el modo NO es 'custom' y hubo cambios, mostramos el modal.
+            showCustomOrderModal(item.getElement());
         }
-        // Limpiamos el array para la próxima operación de arrastre.
-        initialDragOrder = [];
     };
 
 
