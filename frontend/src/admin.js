@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderPagination(currentPage, totalPages);
             }
         } catch (error) {
+            console.error("Error detallado al cargar feedback:", error);
             if (error.message.includes('403')) {
                 errorMessage.textContent = 'Acceso Denegado. No tienes permisos de administrador.';
             } else if (error.message.includes('401')) {
