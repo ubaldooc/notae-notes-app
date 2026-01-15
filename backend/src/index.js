@@ -547,23 +547,6 @@ app.get('/api/status', (req, res) => {
 // El backend ahora funciona solo como API.
 // El frontend se sirve desde Vercel.
 
-// Servir la carpeta de estilos para que el panel de admin pueda cargar el CSS
-app.use('/styles', express.static(path.join(__dirname, '../../frontend/src/styles')));
-// Servir la carpeta src para que el panel de admin pueda cargar el JS
-app.use('/src', express.static(path.join(__dirname, '../../frontend/src')));
-
-// Ruta para servir el panel de administración estático
-app.get('/admin', (req, res) => {
-  // __dirname es 'backend/src', subimos 2 niveles para llegar a la raíz y entramos a frontend
-  const adminPath = path.join(__dirname, '../../frontend/admin-panel.html');
-
-  res.sendFile(adminPath, (err) => {
-    if (err) {
-      console.error('Error al servir admin-panel.html:', err);
-      res.status(404).send('No se encontró el archivo del panel de administración (admin-panel.html).');
-    }
-  });
-});
 
 
 // --- Ruta de la API para Feedback ---
