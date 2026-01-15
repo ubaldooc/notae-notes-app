@@ -504,6 +504,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     return await promise;
                 } catch (error) {
+                    // Si el backend devuelve 401 (Acceso denegado), significa que la cookie expiró
+                    // pero localStorage aún tiene el usuario. Limpiamos para corregir el estado.
+                    if (error.message && (error.message.includes('Acceso denegado') || error.message.includes('401'))) {
+                        console.warn("Sesión inválida detectada. Limpiando datos locales...");
+                        localStorage.removeItem('user');
+                        document.dispatchEvent(new Event('session-cleared'));
+                        return defaultValue;
+                    }
+
                     console.warn(`Una operación de carga de datos falló y se usará un valor por defecto. Error: ${error.message}`);
                     return defaultValue;
                 }
