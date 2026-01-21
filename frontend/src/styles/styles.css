@@ -773,7 +773,7 @@ header * {
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    resize: vertical;
+    resize: none;
     font-family: "Varela Round", sans-serif;
     font-size: 14px;
 }
@@ -1561,10 +1561,13 @@ body.aside-collapsed .aside .all-notes-text {
 
 .delete-group-close-button {
     color: #aaa;
-    float: right;
-    font-size: 28px;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
+    line-height: 1;
 }
 
 .delete-group-close-button:hover,
@@ -1576,11 +1579,13 @@ body.aside-collapsed .aside .all-notes-text {
 
 .modal-delete-group-content>h2 {
     margin-bottom: 10px;
+    margin-top: 15px;
+    /* Espacio extra para que no choque con el botón de cerrar */
 }
 
 .modal-delete-group-content button {
-    padding: 10px 20px;
-    margin: 10px;
+    padding: 8px 16px;
+    margin: 0px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -1607,6 +1612,29 @@ body.aside-collapsed .aside .all-notes-text {
 .modal-delete-group-content .cancel-btn:hover {
     transform: scale(1.1);
     background-color: rgb(196, 196, 196);
+}
+
+/* MODAL DE CONFIRMACION DARK MODE */
+body.dark-mode .modal-delete-group-content {
+    background-color: #2c3e50;
+    border-color: #4a627a;
+    color: #ecf0f1;
+}
+
+body.dark-mode .delete-group-close-button {
+    color: #bdc3c7;
+}
+
+body.dark-mode .delete-group-close-button:hover {
+    color: #ffffff;
+}
+
+body.dark-mode .modal-delete-group-content .cancel-btn {
+    background-color: #4a627a;
+}
+
+body.dark-mode .modal-delete-group-content .cancel-btn:hover {
+    background-color: #5c7a99;
 }
 
 
