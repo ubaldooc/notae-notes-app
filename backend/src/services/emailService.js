@@ -1,77 +1,95 @@
-const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 
-// 1. Configurar el "transporter" de Nodemailer
-let transporter;
+// Configuración de OAuth2
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.MAIL_GOOGLE_CLIENT_ID,
+  process.env.MAIL_GOOGLE_CLIENT_SECRET,
+  'https://developers.google.com/oauthplayground' // O tu URL de redirección
+);
 
-// Si existen credenciales de OAuth2, usamos ese método (más seguro y recomendado por Google)
-// Si existen credenciales de OAuth2, usamos ese método (más seguro y recomendado por Google)
-if (process.env.MAIL_GOOGLE_CLIENT_ID && process.env.MAIL_GOOGLE_CLIENT_SECRET && process.env.MAIL_GOOGLE_REFRESH_TOKEN) {
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      type: 'OAuth2',
-      user: process.env.MAIL_USER,
-      clientId: process.env.MAIL_GOOGLE_CLIENT_ID,
-      clientSecret: process.env.MAIL_GOOGLE_CLIENT_SECRET,
-      refreshToken: process.env.MAIL_GOOGLE_REFRESH_TOKEN,
-    },
-  });
-  console.log('EmailService: Usando autenticación OAuth2 con Gmail segun variables MAIL_*.');
-} else {
-  // Fallback a autenticación por contraseña de aplicación
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    },
-  });
-  console.log('EmailService: Usando autenticación simple (User/Pass) con variables MAIL_*.');
-}
+oAuth2Client.setCredentials({
+  refresh_token: process.env.MAIL_GOOGLE_REFRESH_TOKEN
+});
 
+const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
 /**
- * Envía un correo electrónico.
- * @param {string} to - El destinatario del correo.
- * @param {string} subject - El asunto del correo.
- * @param {string} text - El cuerpo del correo en texto plano.
- * @param {string} html - El cuerpo del correo en formato HTML.
+ * Codifica el mensaje en base64 para la API de Gmail.
+ */
+const encodeMessage = (message) => {
+  return Buffer.from(message)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+};
+
+/**
+ * Crea el contenido del correo en formato RAW.
+ */
+const createRawMessage = ({ to, subject, html, replyTo }) => {
+  const senderName = "Notae";
+  const from = process.env.MAIL_USER || 'me';
+
+  const messageParts = [
+    `From: "${senderName}" <${from}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+  ];
+
+  if (replyTo) {
+    messageParts.push(`Reply-To: ${replyTo}`);
+  }
+
+  messageParts.push('', html);
+
+  return messageParts.join('\n');
+};
+
+/**
+ * Envía un correo electrónico usando la API de Gmail (HTTP).
  */
 const sendEmail = async (to, subject, text, html) => {
   try {
-    const mailOptions = {
-      from: `"Mi App de Notas" <${process.env.MAIL_USER}>`, // Nombre del remitente
-      to: to,
-      subject: subject,
-      text: text,
-      html: html,
-    };
+    const rawContent = createRawMessage({ to, subject, html });
+    const encodedMessage = encodeMessage(rawContent);
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Correo enviado exitosamente:', info.messageId);
-    return info;
+    const res = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+
+    console.log('Correo enviado exitosamente vía Gmail API:', res.data.id);
+    return res.data;
   } catch (error) {
-    console.error('Error al enviar el correo:', error);
-    // Relanzamos el error original para que el llamador pueda ver los detalles.
+    console.error('Error al enviar el correo vía Gmail API:', error);
     throw error;
   }
 };
 
 /**
- * Envía un correo electrónico con opciones personalizadas.
- * @param {object} options - Opciones de correo (to, subject, html, replyTo, etc.).
+ * Envía un correo electrónico con opciones personalizadas usando la API de Gmail (HTTP).
  */
 const sendCustomEmail = async (options) => {
   try {
-    const mailOptions = {
-      from: `"Mi App de Notas" <${process.env.MAIL_USER}>`,
-      ...options
-    };
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Correo personalizado enviado exitosamente:', info.messageId);
-    return info;
+    const rawContent = createRawMessage(options);
+    const encodedMessage = encodeMessage(rawContent);
+
+    const res = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+
+    console.log('Correo personalizado enviado exitosamente vía Gmail API:', res.data.id);
+    return res.data;
   } catch (error) {
-    console.error('Error al enviar el correo personalizado:', error);
+    console.error('Error al enviar el correo personalizado vía Gmail API:', error);
     throw error;
   }
 };
