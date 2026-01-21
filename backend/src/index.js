@@ -65,7 +65,7 @@ const feedbackLimiter = (req, res, next) => {
   // Si está dentro de la ventana, verificamos el límite
   if (requestData.count >= FEEDBACK_LIMIT) {
     return res.status(429).json({
-      message: 'Has excedido el límite de comentarios. Por favor, intenta de nuevo en unos minutos.'
+      message: 'Hay demasiadas personas enviando comentarios. Por favor, intenta de nuevo en unos minutos.'
     });
   }
 

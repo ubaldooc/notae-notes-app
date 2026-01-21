@@ -210,7 +210,7 @@ export const initHeader = () => {
                 showNotification('¡Gracias por tus comentarios!', 'success');
                 closeModal();
             } catch (error) {
-                showNotification('No se pudo enviar el comentario. Inténtalo de nuevo.', 'error');
+                showNotification(error.message || 'No se pudo enviar el comentario. Inténtalo de nuevo.', 'error');
             } finally {
                 sendBtn.disabled = false;
                 sendBtn.textContent = 'Enviar';
