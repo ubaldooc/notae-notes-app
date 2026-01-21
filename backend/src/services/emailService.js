@@ -10,7 +10,7 @@ if (process.env.MAIL_GOOGLE_CLIENT_ID && process.env.MAIL_GOOGLE_CLIENT_SECRET &
     service: 'gmail',
     auth: {
       type: 'OAuth2',
-      user: process.env.EMAIL_USER,
+      user: process.env.MAIL_USER,
       clientId: process.env.MAIL_GOOGLE_CLIENT_ID,
       clientSecret: process.env.MAIL_GOOGLE_CLIENT_SECRET,
       refreshToken: process.env.MAIL_GOOGLE_REFRESH_TOKEN,
