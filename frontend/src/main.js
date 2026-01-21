@@ -638,6 +638,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 8. Inicializar funcionalidades.
             inicializarDragAndDropGrupos();
+
+            // --- CORRECCIÓN EXPLÍCITA PARA EL MENSAJE 'SIN NOTAS' ---
+            // Al cambiar de sesión, queremos que el mensaje se actualice inmediatamente con el texto correcto
+            // (basado en si hay usuario o no), sin esperar a ciclos de renderizado del store.
+            if (noNotesMessage) {
+                const activeNotes = finalNotes.filter(n => n.status === 'active');
+                // IMPORTANTE: store.state.isTrashVisible podría no estar disponible aquí directamente si no lo importamos.
+                // Asumimos que al cargar/sincronizar NO estamos en la papelera.
+                if (activeNotes.length === 0 && finalGroups.length === 0) {
+                    noNotesMessage.style.display = 'block';
+                    noNotesMessage.innerHTML = user ? 'Crea tu primera nota para empezar.' : 'Tus notas se guardarán aquí, en tu navegador.';
+                } else {
+                    noNotesMessage.style.display = 'none';
+                }
+            }
         } catch (error) {
             console.error('Error CRÍTICO durante la carga y sincronización inicial de datos:', error);
             // Aquí se podría mostrar un mensaje al usuario de que la app podría no funcionar correctamente.
