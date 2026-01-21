@@ -7,7 +7,7 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const path = require('path'); // Añadir path para resolver rutas de archivos
-const { sendEmail } = require('./services/emailService.js');
+const { sendEmail, sendCustomEmail } = require('./services/emailService.js');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,6 +37,52 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser()); // Usa el middleware de cookie-parser
+
+// Rate Limiter Manual para Feedback
+const FEEDBACK_LIMIT = 30; // Máximo de peticiones
+const FEEDBACK_WINDOW_MS = 30 * 60 * 1000; // 30 minutos
+
+const feedbackRequestCounts = new Map();
+
+const feedbackLimiter = (req, res, next) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const now = Date.now();
+
+  if (!feedbackRequestCounts.has(ip)) {
+    feedbackRequestCounts.set(ip, { count: 1, startTime: now });
+    return next();
+  }
+
+  const requestData = feedbackRequestCounts.get(ip);
+
+  // Si ha pasado el tiempo de la ventana, reiniciamos el contador
+  if (now - requestData.startTime > FEEDBACK_WINDOW_MS) {
+    requestData.count = 1;
+    requestData.startTime = now;
+    return next();
+  }
+
+  // Si está dentro de la ventana, verificamos el límite
+  if (requestData.count >= FEEDBACK_LIMIT) {
+    return res.status(429).json({
+      message: 'Has excedido el límite de comentarios. Por favor, intenta de nuevo en unos minutos.'
+    });
+  }
+
+  // Incrementamos el contador
+  requestData.count++;
+  next();
+};
+
+// Limpieza periódica del mapa para evitar fugas de memoria (cada hora)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of feedbackRequestCounts.entries()) {
+    if (now - data.startTime > FEEDBACK_WINDOW_MS) {
+      feedbackRequestCounts.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000);
 
 // Cliente de Google Auth
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -204,7 +250,8 @@ app.use('/api/notes', authMiddleware);
 app.use('/api/groups', authMiddleware);
 app.use('/api/user', authMiddleware);
 // La ruta de feedback también requiere autenticación.
-app.use('/api/feedback', authMiddleware);
+// app.use('/api/feedback', authMiddleware); // Desactivado para permitir feedback anónimo si se desea, o manejado dentro de la ruta
+
 // Las rutas de admin requieren el middleware de admin.
 
 
@@ -261,31 +308,82 @@ app.put('/api/user/preferences', async (req, res) => {
 // --- Ruta de la API para Feedback ---
 
 // Ruta para recibir feedback de los usuarios
-app.post('/api/feedback', async (req, res) => {
-  const { feedbackText } = req.body;
-  const userId = req.user.userId;
+// Ruta para recibir feedback de los usuarios
+app.post('/api/feedback', feedbackLimiter, async (req, res) => {
+  const { feedbackText, email } = req.body;
 
-  if (!feedbackText || feedbackText.trim().length === 0) {
-    return res.status(400).json({ message: 'El texto del comentario no puede estar vacío.' });
+  // Soporte para ambos nombres de campo por compatibilidad con código frontend anterior/nuevo
+  const message = feedbackText || req.body.message;
+
+  // Log para verificar qué IP está detectando el servidor
+  console.log(`📩 Intento de feedback desde IP: ${req.ip || req.headers['x-forwarded-for']}`);
+
+  if (!message || message.trim().length === 0) {
+    return res.status(400).json({ message: 'El mensaje no puede estar vacío.' });
   }
 
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    // Si el usuario está autenticado, intentamos obtener su info, si no, usamos la info del body
+    let userInfo = 'Usuario Anónimo/Invitado';
+    let userEmail = email || 'No proporcionado';
+    let userName = 'Invitado';
+    let userId = null;
+
+    // 1. Intenta obtener usuario de req.user si pasó por middleware (no es el caso aquí porque lo quitamos)
+    // 2. O intenta decodificar el token manualmente como en el snippet solicitado
+    const token = req.cookies.sessionToken || (req.headers.authorization && req.headers.authorization.startsWith('Bearer') ? req.headers.authorization.split(' ')[1] : null);
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (user) {
+          userInfo = `${user.name} (${user.email})`;
+          userEmail = user.email;
+          userName = user.name;
+          userId = user._id;
+        }
+      } catch (e) {
+        // Token inválido o expirado, lo ignoramos y seguimos como anónimo
+      }
     }
 
-    const newFeedback = new Feedback({
-      userId: userId,
-      userEmail: user.email,
-      feedbackText: feedbackText,
-    });
+    // Guardar en base de datos si se desea historial (Opcional, pero mantenemos la lógica anterior si es útil)
+    if (userId) {
+      const newFeedback = new Feedback({
+        userId: userId,
+        userEmail: userEmail,
+        feedbackText: message,
+      });
+      await newFeedback.save();
+    } else {
+      // Si no hay usuario, podríamos querer guardarlo igual pero el esquema actual requiere userId.
+      // Si el esquema es estricto en userId, tendríamos que cambiarlo o no guardar en DB para anónimos.
+      // Asumimos que el objetivo principal es el CORREO según la solicitud.
+    }
 
-    await newFeedback.save();
-    res.status(201).json({ message: '¡Gracias por tus comentarios!' });
+    const mailOptions = {
+      to: process.env.FEEDBACK_EMAIL || process.env.MAIL_USER, // Destino configurable
+      subject: `📢 [Notae] Feedback de ${userName}`,
+      html: `
+        <h3>Este mensaje proviene de tu app de notas Notae</h3>
+        <h3>Has recibido un nuevo comentario/feedback:</h3>
+        <p><strong>Usuario:</strong> ${userInfo}</p>
+        <p><strong>Email de contacto:</strong> ${userEmail}</p>
+        <hr />
+        <p><strong>Mensaje:</strong></p>
+        <p style="white-space: pre-wrap;">${message}</p>
+      `,
+      replyTo: userEmail !== 'No proporcionado' ? userEmail : undefined
+    };
+
+    await sendCustomEmail(mailOptions);
+
+    res.status(200).json({ message: '¡Gracias por tus comentarios! Los hemos recibido correctamente.' });
+
   } catch (error) {
-    console.error('Error al guardar el feedback:', error);
-    res.status(500).json({ message: 'Error interno al procesar tu comentario.' });
+    console.error('Error al enviar feedback:', error);
+    res.status(500).json({ message: 'Error interno al enviar el feedback.' });
   }
 });
 
