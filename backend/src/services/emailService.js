@@ -31,10 +31,13 @@ const createRawMessage = ({ to, subject, html, replyTo }) => {
   const senderName = "Notae";
   const from = process.env.MAIL_USER || 'me';
 
+  // Codificar el asunto para que soporte UTF-8 (emojis, acentos) en las cabeceras
+  const encodedSubject = Buffer.from(subject).toString('base64');
+
   const messageParts = [
     `From: "${senderName}" <${from}>`,
     `To: ${to}`,
-    `Subject: ${subject}`,
+    `Subject: =?utf-8?B?${encodedSubject}?=`,
     'Content-Type: text/html; charset=utf-8',
     'MIME-Version: 1.0',
   ];
@@ -45,7 +48,8 @@ const createRawMessage = ({ to, subject, html, replyTo }) => {
 
   messageParts.push('', html);
 
-  return messageParts.join('\n');
+  // Usar CRLF (\r\n) que es el estándar para protocolos de correo
+  return messageParts.join('\r\n');
 };
 
 /**
