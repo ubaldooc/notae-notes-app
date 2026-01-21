@@ -121,4 +121,8 @@ const checkExistingSession = async () => {
 export const initSessionManager = () => {
     initializeGoogleSignIn();
     checkExistingSession();
+
+    document.addEventListener('auth-error', () => {
+        logout();
+    });
 };

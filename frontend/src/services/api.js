@@ -21,6 +21,10 @@ const apiCall = async (endpoint, options = {}) => {
     });
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        document.dispatchEvent(new CustomEvent('auth-error'));
+      }
+
       // Intenta parsear un mensaje de error JSON del backend.
       let errorMessage = `Error del servidor: ${response.status} ${response.statusText}`;
       try {
