@@ -58,32 +58,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Middleware de autenticación de administrador
-const adminAuthMiddleware = async (req, res, next) => {
-  const token = req.cookies.sessionToken;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Acceso denegado. No se proporcionó token.' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
-
-    if (!user) {
-      return res.status(401).json({ message: 'Usuario no encontrado.' });
-    }
-
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Acceso prohibido. Se requieren permisos de administrador.' });
-    }
-
-    req.user = { userId: decoded.userId, role: user.role };
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token inválido o expirado.' });
-  }
-};
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -99,7 +74,7 @@ const userSchema = new mongoose.Schema({
   theme: { type: String, default: 'light', enum: ['light', 'dark'] },
   noteView: { type: String, default: 'masonry', enum: ['grid', 'list', 'masonry'] },
   noteSortOrder: { type: String, default: 'newest', enum: ['newest', 'oldest', 'custom', 'title-asc', 'title-desc'] },
-  role: { type: String, default: 'user', enum: ['user', 'admin'] }
+  noteSortOrder: { type: String, default: 'newest', enum: ['newest', 'oldest', 'custom', 'title-asc', 'title-desc'] }
 }, { timestamps: true, versionKey: false });
 
 const User = mongoose.model('User', userSchema);
@@ -158,7 +133,7 @@ app.post('/api/auth/google', async (req, res) => {
         theme: user.theme,
         noteView: user.noteView,
         noteSortOrder: user.noteSortOrder,
-        role: user.role
+        noteSortOrder: user.noteSortOrder
       },
     });
   } catch (error) {
@@ -231,7 +206,7 @@ app.use('/api/user', authMiddleware);
 // La ruta de feedback también requiere autenticación.
 app.use('/api/feedback', authMiddleware);
 // Las rutas de admin requieren el middleware de admin.
-app.use('/api/admin', adminAuthMiddleware);
+
 
 // --- Rutas de la API para Usuario ---
 
@@ -314,120 +289,7 @@ app.post('/api/feedback', async (req, res) => {
   }
 });
 
-// --- Rutas de la API para Administrador ---
 
-// Obtener todos los comentarios (solo para administradores)
-app.get('/api/admin/feedback', async (req, res) => {
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const status = req.query.status || 'all'; // 'all', 'pending', 'resolved'
-  const search = req.query.search || ''; // Nuevo parámetro de búsqueda
-  const skip = (page - 1) * limit;
-
-  const filter = {};
-  if (status === 'pending') {
-    filter.isResolved = false;
-  } else if (status === 'resolved') {
-    filter.isResolved = true;
-  }
-
-  // Si hay un término de búsqueda, lo añadimos al filtro
-  if (search) {
-    const searchRegex = new RegExp(search, 'i'); // 'i' para case-insensitive
-    filter.$or = [
-      { userEmail: { $regex: searchRegex } },
-      { feedbackText: { $regex: searchRegex } }
-    ];
-  }
-
-  try {
-    // Ejecutamos dos consultas en paralelo para mayor eficiencia
-    const [feedbacks, totalCount] = await Promise.all([
-      Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Feedback.countDocuments(filter)
-    ]);
-
-    res.json({
-      feedbacks,
-      currentPage: page,
-      totalPages: Math.ceil(totalCount / limit),
-      totalCount
-    });
-  } catch (error) {
-    console.error('Error al obtener los comentarios para el administrador:', error);
-    res.status(500).json({ message: 'Error al obtener los comentarios.' });
-  }
-});
-
-// Marcar un comentario como resuelto (solo para administradores)
-app.put('/api/admin/feedback/:id/resolve', async (req, res) => {
-  try {
-    const feedback = await Feedback.findByIdAndUpdate(
-      req.params.id,
-      { $set: { isResolved: true } },
-      { new: true } // Devuelve el documento actualizado
-    );
-    if (!feedback) {
-      return res.status(404).json({ message: 'Comentario no encontrado.' });
-    }
-    res.status(200).json({ message: 'Comentario marcado como resuelto.', feedback });
-  } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el comentario.' });
-  }
-});
-
-// Responder a un comentario (solo para administradores)
-app.post('/api/admin/feedback/:id/reply', async (req, res) => {
-  const { replyText } = req.body;
-  if (!replyText) {
-    return res.status(400).json({ message: 'El texto de la respuesta no puede estar vacío.' });
-  }
-
-  try {
-    const feedback = await Feedback.findById(req.params.id);
-    if (!feedback) {
-      return res.status(404).json({ message: 'Comentario original no encontrado.' });
-    }
-
-    const subject = 'Respuesta a tu comentario en Mi App de Notas';
-    const textBody = `Hola,\n\nGracias por tus comentarios. Aquí tienes una respuesta de nuestro equipo:\n\n"${replyText}"\n\nTu comentario original fue:\n"${feedback.feedbackText}"\n\nSaludos,\nEl equipo de Mi App de Notas`;
-    const htmlBody = `
-      <p>Hola,</p>
-      <p>Gracias por tus comentarios. Aquí tienes una respuesta de nuestro equipo:</p>
-      <blockquote style="border-left: 2px solid #ccc; padding-left: 1em; margin-left: 1em; font-style: italic;">${replyText}</blockquote>
-      <p>Tu comentario original fue:</p>
-      <blockquote style="border-left: 2px solid #ccc; padding-left: 1em; margin-left: 1em;">${feedback.feedbackText}</blockquote>
-      <p>Saludos,<br>El equipo de Mi App de Notas</p>
-    `;
-
-    await sendEmail(feedback.userEmail, subject, textBody, htmlBody);
-
-    // Marcar el comentario como respondido y resuelto
-    feedback.isReplied = true;
-    feedback.isResolved = true; // Asumimos que responder también resuelve el comentario
-    const updatedFeedback = await feedback.save();
-
-    res.status(200).json({ message: 'Respuesta enviada correctamente.', feedback: updatedFeedback });
-  } catch (error) {
-    console.error('Error detallado al enviar la respuesta por correo:', error);
-    // Ahora enviamos un mensaje más específico al frontend
-    res.status(500).json({ message: `Error al enviar el correo: ${error.message}` });
-  }
-});
-
-// Eliminar un comentario (solo para administradores)
-app.delete('/api/admin/feedback/:id', async (req, res) => {
-  try {
-    const result = await Feedback.findByIdAndDelete(req.params.id);
-    if (!result) {
-      return res.status(404).json({ message: 'Comentario no encontrado.' });
-    }
-    res.status(200).json({ message: 'Comentario eliminado correctamente.' });
-  } catch (error) {
-    console.error('Error al eliminar el comentario:', error);
-    res.status(500).json({ message: 'Error al eliminar el comentario.' });
-  }
-});
 
 // --- Rutas de la API para Grupos ---
 

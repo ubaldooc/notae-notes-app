@@ -161,20 +161,3 @@ export const sendFeedbackToBackend = (feedbackText) =>
   });
 
 
-// --- Rutas de la API para Administrador ---
-
-// Obtiene todos los comentarios (solo para administradores)
-export const fetchAdminFeedback = (page = 1, limit = 10, status = 'all', search = '') =>
-  apiCall(`/admin/feedback?page=${page}&limit=${limit}&status=${status}&search=${encodeURIComponent(search)}`);
-
-// Marca un comentario como resuelto
-export const resolveFeedbackInBackend = (feedbackId) =>
-  apiCall(`/admin/feedback/${feedbackId}/resolve`, { method: 'PUT' });
-
-// Elimina un comentario permanentemente
-export const deleteFeedbackFromBackend = (feedbackId) =>
-  apiCall(`/admin/feedback/${feedbackId}`, { method: 'DELETE' });
-
-// Envía una respuesta a un comentario
-export const sendReplyToFeedback = (feedbackId, replyText) =>
-  apiCall(`/admin/feedback/${feedbackId}/reply`, { method: 'POST', body: JSON.stringify({ replyText }) });
